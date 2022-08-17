@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  app:
+    container_name: fileshot-webui
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_BACKEND_URL: /api
+    networks:
+      - strelkanet
+    environment:
+      - DATABASE_HOST=postgresdb
+      - DATABASE_NAME=strelka_ui
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - STRELKA_HOST=strelka_frontend_1
+    ports:
+      - "8080:8080"
+
+  postgresdb:
+    image: docker.io/bitnami/postgresql:11
+    networks:
+      - strelkanet
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=strelka_ui
+    ports:
+      - "5432:5432"
+
+networks:
+  strelkanet:
+    name: build_net
+    external: true

@@ -1,0 +1,67 @@
+{
+  "name": "ui",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ant-design/pro-form": "^1.69.4",
+    "@ant-design/pro-layout": "^6.38.9",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^13.5.0",
+    "ansi-regex": "^6.0.1",
+    "antd": "^4.21.3",
+    "browserslist": "^4.20.4",
+    "css-what": "^5.1.0",
+    "dns-packet": "^5.4.0",
+    "ejs": "^3.1.8",
+    "glob-parent": "^6.0.2",
+    "normalize-url": "^7.0.3",
+    "path-parse": "^1.0.7",
+    "postcss": "^8.4.14",
+    "react": "^17.0.2",
+    "react-copy-to-clipboard": "^5.1.0",
+    "react-dom": "^17.0.2",
+    "react-json-view": "^1.21.3",
+    "react-router-dom": "^5.2.0",
+    "web-vitals": "^1.0.1",
+    "ws": "^8.8.0"
+  },
+  "devDependencies": {
+    "react-scripts": "^4.0.3"
+  },
+  "resolutions": {
+    "browserslist": "^4.16.5",
+    "glob-parent": "^5.1.2",
+    "ws": "^6.2.2",
+    "immer": "^9.0.6",
+    "ejs": "^3.1.7",
+    "css-what": "^5.0.1",
+    "path-parse": "^1.0.7",
+    "dns-packet": "^5.2.2",
+    "normalize-url": "^4.5.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
