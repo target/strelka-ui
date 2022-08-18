@@ -8,4 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Builds Strelka
-        run: docker-compose docker-compose.yaml build
+        run: docker-compose build
