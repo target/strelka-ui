@@ -53,6 +53,6 @@ toml==0.10.2
 tomli==1.2.3
 typing_extensions==4.0.1
 urllib3==1.26.7
-waitress==2.0.0
+waitress==2.1.2
 Werkzeug==1.0.1
 wrapt==1.13.3
