@@ -38,14 +38,7 @@ Start or ensure Strelka cluster is ready and accessible.
 See https://github.com/target/strelka for more information.
 ```
 
-#### Step 1: Build and Start Strelka UI (Docker)
-```
-# Terminal 1
-# From the ./strelka-ui directory
-$ docker-compose -f docker-compose.yaml up
-```
-
-#### Step 2: (Required Only for First Launch): Initialize Database
+#### Step 1: (Required Only for First Launch): Initialize Database
 ```
 # Terminal 2
 # Setup a Virtual Python Environment
@@ -59,6 +52,13 @@ $ pip3 install -r app/requirements.txt
 $ python3 app/manage.py db init
 $ python3 app/manage.py db migrate
 $ python3 app/manage.py db upgrade
+```
+
+#### Step 2: Build and Start Strelka UI (Docker)
+```
+# Terminal 1
+# From the ./strelka-ui directory
+$ docker-compose -f docker-compose.yaml up
 ```
 
 #### Step 3: Access Strelka UI
