@@ -1,0 +1,11 @@
+name: "Push Build"
+on:
+  push
+jobs:
+  strelka:
+    name: "Strelka UI Push Build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Builds Strelka
+        run: docker-compose docker-compose.yaml build
