@@ -8,4 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Builds Strelka
-        run: pwd && ls
+        run: docker-compose build
