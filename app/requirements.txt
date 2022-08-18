@@ -35,7 +35,7 @@ protobuf==3.17.0
 psycopg2==2.8.6
 pyasn1==0.4.8
 pycparser==2.20
-PyJWT==2.1.0
+PyJWT==2.4.0
 pylint==2.12.2
 pylint-flask==0.6
 pylint-flask-sqlalchemy==0.2.0
