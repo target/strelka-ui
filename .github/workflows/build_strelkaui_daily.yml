@@ -1,7 +1,7 @@
 name: "Daily Build"
 on:
   schedule:
-    - cron: '* * * * *'
+    - cron: '* 2 * * *'
 jobs:
   strelka:
     name: "Strelka UI Daily Build"
