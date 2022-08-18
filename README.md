@@ -2,10 +2,13 @@
   <img src="./misc/assets/strelkaui_banner.png" alt="Strelka Banner" />
 </h1>
 
+<div align="center">
+
 [Releases][release]&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Pull Requests][pr]&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Issues][issues]
 
 [![GitHub release][img-version-badge]][repo] [![Build Status][img-actions-badge]][actions-ci] [![Pull Requests][img-pr-badge]][pr] [![Slack][img-slack-badge]][slack]  [![License][img-license-badge]][license]
 
+</div>
 
 The Strelka Web UI is a browser / API based file submission frontend for the [Strelka Enterprise File Scanner](https://github.com/target/strelka). This application allows users to easily submit files to a Strelka cluster and review historical response results.
 
