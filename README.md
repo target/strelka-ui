@@ -165,7 +165,7 @@ Links
 [release]:https://github.com/target/strelka-ui/releases/latest "Strelka Latest Release ➶"
 [issues]:https://github.com/target/strelka-ui/issues "Strelka Issues ➶"
 [pull-requests]:https://github.com/target/strelka-ui/pulls "Strelka Pull Requests ➶"
-[repo]:https://github.com/target/strelk-ui "Strelka Repository ➶"
+[repo]:https://github.com/target/strelka-ui "Strelka Repository ➶"
 [slack]:https://join.slack.com/t/cfc-open-source/shared_invite/zt-e54crchh-a6x4iDy18D5lVwFKQoEeEQ "Slack (external link) ➶"
 [actions-ci]:https://github.com/target/strelka-ui/actions/workflows/build_strelkaui_daily.yml "Github Actions ➶"
 [pr]:https://github.com/target/strelka-ui/pulls "Strelka Pull Requests ➶"
