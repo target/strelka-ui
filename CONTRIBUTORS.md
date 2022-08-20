@@ -11,5 +11,5 @@ git log -p <file>
 - Allen Swackhamer (@swackhamer)
 - Derek Thomas (@Derekt2)
 - Erin Mozdy (@ecmozdy)
-- Caleb Walch @cawalch)
+- Caleb Walch (@cawalch)
 - Kurt Rotzler 
