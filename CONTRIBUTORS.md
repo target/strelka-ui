@@ -6,5 +6,10 @@ git log -p <file>
 ```
 
 # Contributors
-- Paul Hutelmyer - Lead / Support
-- George Jenkins - Original Concept / Developer
+- Paul Hutelmyer
+- George Jenkins
+- Allen Swackhamer (@swackhamer)
+- Derek Thomas (@Derekt2)
+- Erin Mozdy (@ecmozdy)
+- Caleb Walch @cawalch)
+- Kurt Rotzler 
