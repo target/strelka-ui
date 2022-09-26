@@ -44,6 +44,10 @@ See https://github.com/target/strelka for more information.
 # Setup a Virtual Python Environment
 # From the ./strelka-ui directory
 
+# Install Python Requirements
+# Note: This is just used for initial launch. Not needed afterwards.
+# Depending on your environment, you may need additional packages:
+# sudo apt-get install build-essential python3-dev libpq-dev python3-dev gcc python3-dev musl-dev libffi-dev cargo
 $ python3 -m venv env
 $ source env/bin/activate
 $ pip3 install -r app/requirements.txt
