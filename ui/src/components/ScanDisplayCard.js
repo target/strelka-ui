@@ -9,9 +9,11 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
   const [expanded, setExpanded] = useState(false);
 
   const item_key = scanner_name
-    .match(/[A-Z][a-z]+/g)
+    .match(/[A-Z][a-z]+([0-9][a-z]+)?/g)
     .map((v) => v.toLowerCase())
     .slice(0, 3)[1]
+
+   const scanner_key = "scan_" + item_key
 
   return (
     <div style={{ width: "100%" }}>
@@ -26,7 +28,7 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
         <div>
           <Typography>
             <Title level={5}>{scanner_name}</Title>
-            <Text>Took {data["scan"][item_key].elapsed} seconds</Text>
+            <Text>Took {data[scanner_key].elapsed} seconds</Text>
           </Typography>
         </div>
         <div>
@@ -41,7 +43,7 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
             <br />
         <DataDisplayObj
           value={
-            data["scan"][item_key]
+            data[scanner_key]
           }
         />
         </div>
