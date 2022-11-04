@@ -9,11 +9,10 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
   const [expanded, setExpanded] = useState(false);
 
   const item_key = scanner_name
-    .match(/[A-Z][a-z]+([0-9][a-z]+)?/g)
-    .map((v) => v.toLowerCase())
-    .slice(0, 3)[1]
+    .match(/Scan(.+)/)
+    .map((v) => v.toLowerCase())[1]
 
-   const scanner_key = "scan_" + item_key
+  const scanner_key = "scan_" + item_key
 
   return (
     <div style={{ width: "100%" }}>
