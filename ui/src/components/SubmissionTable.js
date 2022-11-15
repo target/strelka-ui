@@ -127,6 +127,13 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       ),
     },
     {
+      title: "Description",
+      dataIndex: "submitted_description",
+      key: "submitted_description",
+      width: 200,
+      render: (_, full) => <p style={{"overflow-wrap": "anywhere"}}>{full.submitted_description}</p>,
+    },
+    {
       title: "Submitted by",
       dataIndex: "user.user_cn",
       key: "user.user_cn",
