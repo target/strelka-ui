@@ -6,26 +6,29 @@ from database import db
 class FileSubmission(db.Model):
     __tablename__ = "file_submission"
 
+    # Database Metadata
     id = db.Column(db.Integer, primary_key=True)
 
+    # File Metadata
     file_id = db.Column(db.String(), unique=True)
     file_name = db.Column(db.String())
     file_size = db.Column(db.Integer())
 
+    # Strelka Metadata
     strelka_response = db.Column(db.JSON())
     mime_types = db.Column(db.ARRAY(db.String(), dimensions=1))
     yara_hits = db.Column(db.ARRAY(db.String(), dimensions=1))
     scanners_run = db.Column(db.ARRAY(db.String(), dimensions=1))
     hashes = db.Column(db.ARRAY(db.String(), dimensions=2))
 
+    # Submission Metadata
     submitted_from_ip = db.Column(db.String())
     submitted_from_client = db.Column(db.String())
-
+    submitted_description = db.Column(db.String())
     submitted_by_user_id = db.Column(
         db.ForeignKey("user.id"), nullable=False, index=True
     )
     user = relationship("User", back_populates="submissions")
-
     submitted_at = db.Column(db.DateTime(), default=db.func.now(), index=True)
     processed_at = db.Column(db.DateTime())
 
@@ -42,6 +45,7 @@ class FileSubmission(db.Model):
             submitted_from_ip,
             submitted_from_client,
             submitted_by_user_id,
+            submitted_description,
             submitted_at,
             processed_at,
     ):
@@ -56,6 +60,7 @@ class FileSubmission(db.Model):
         self.submitted_from_ip = submitted_from_ip
         self.submitted_from_client = submitted_from_client
         self.submitted_by_user_id = submitted_by_user_id
+        self.submitted_description = submitted_description
         self.submitted_at = submitted_at
         self.processed_at = processed_at
 
