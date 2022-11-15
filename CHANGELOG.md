@@ -1,6 +1,14 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2022-11-15
+### Added
+- Ability to add description to uploaded files
+
+### Changed
+- Changing default docker-compose postgresdb name
+- Removing unnecessary directory
+
 ## 2022-11-04
 ### Changed
 - Bug fix for issues when loading scanners with uppercase names
