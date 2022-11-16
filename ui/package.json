@@ -15,7 +15,9 @@
     "dns-packet": "^5.4.0",
     "ejs": "^3.1.8",
     "glob-parent": "^6.0.2",
+    "loader-utils": "^2.0.4",
     "normalize-url": "^7.0.3",
+    "nth-check": "^2.0.1",
     "path-parse": "^1.0.7",
     "postcss": "^8.4.14",
     "react": "^17.0.2",
@@ -27,7 +29,7 @@
     "ws": "^8.8.0"
   },
   "devDependencies": {
-    "react-scripts": "^4.0.3"
+    "react-scripts": "^5.0.1"
   },
   "resolutions": {
     "browserslist": "^4.16.5",
@@ -35,7 +37,7 @@
     "ws": "^6.2.2",
     "immer": "^9.0.6",
     "ejs": "^3.1.7",
-    "css-what": "^5.0.1",
+    "css-what": "^6.0.1",
     "path-parse": "^1.0.7",
     "dns-packet": "^5.2.2",
     "normalize-url": "^4.5.1"
