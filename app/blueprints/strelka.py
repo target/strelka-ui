@@ -77,7 +77,8 @@ def submitFile():
 def getRequestID(response):
     return (
         response["request"]["id"]
-        if "request" in response and "id" in response["request"]
+        if "request" in response
+        and "id" in response["request"]
         else ""
     )
 
@@ -85,7 +86,8 @@ def getRequestID(response):
 def getRequestTime(response):
     return (
         str(datetime.datetime.fromtimestamp(response["request"]["time"]))
-        if "request" in response and "time" in response["request"]
+        if "request" in response
+        and "time" in response["request"]
         else ""
     )
 
@@ -102,22 +104,28 @@ def getMimeTypes(response):
 
 def getScannersRun(response):
     return (
-        response["file"]["scanner_list"]
-        if "file" in response and "scanner_list" in response["file"]
+        response["file"]["scanners"]
+        if "file" in response
+        and "scanners" in response["file"]
         else []
     )
 
 
 def getYaraHits(response):
     return (
-        response["scan_yara"]["matches"]
-        if "scan_yara" in response and "matches" in response["scan_yara"]
+        response["scan"]["yara"]["matches"]
+        if "scan" in response
+        and "yara" in response["scan"]
+        and "matches" in response["scan"]["yara"]
         else []
     )
 
 
 def getHashes(response):
-    hashes = response["scan_hash"] if "scan_hash" in response else {}
+    hashes = response["scan"]["hash"].copy() \
+             if "scan" in response \
+             and "hash" in response["scan"] \
+             else {}
     del hashes["elapsed"]
     return hashes.items()
 
@@ -126,8 +134,6 @@ def getHashes(response):
 def getScanStats():
     if not session.get('logged_in'):
         return "unauthenticated", 401
-
-    current_app.logger.info("fetching scan stats")
 
     all_time = db.session.query(FileSubmission).count()
     thirty_days = (
@@ -167,7 +173,6 @@ def getScan(id):
     if not session.get("logged_in"):
         return "unauthenticated", 401
 
-    current_app.logger.info("fetching scan by id: %s", id)
     submission = db.session.query(FileSubmission).options(joinedload(FileSubmission.user)).filter_by(file_id=id).first()
 
     if submission is not None:
@@ -187,7 +192,6 @@ def view():
 
     if (just_mine):
         user_id = session["user_id"]
-        current_app.logger.info("fetching scans for %s from page %s in batches of %s", user_id, page, per_page)
         submissions = (
             FileSubmission.query.options(joinedload(FileSubmission.user))
             .filter(FileSubmission.submitted_by_user_id == user_id)
@@ -195,7 +199,6 @@ def view():
             .paginate(page, per_page, error_out=False)
         )
     else:
-        current_app.logger.info("fetching all scans from page %s in batches of %s", page, per_page)
         submissions = (
             FileSubmission.query.options(joinedload(FileSubmission.user))
             .order_by(FileSubmission.submitted_at.desc())
