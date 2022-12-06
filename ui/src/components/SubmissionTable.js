@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Table, Space, Dropdown, Menu, message } from "antd";
+import { Table, Space, Dropdown, Menu, message, Input } from "antd";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
@@ -39,6 +39,21 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const filterJustMine = query.get("just_mine");
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Handle search input
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Filter table data based on search query
+  const filteredData = data.filter((item) => {
+    return (
+      item.file_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.submitted_description.toLowerCase().includes(searchQuery.toLowerCase()) 
+    );
+  });
 
   const fetchTableData = (params = {}) => {
     setIsLoading(true);
@@ -166,7 +181,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "yara_hits",
       width: 200,
       render: (_, record) => (
-        <TagSet items={record?.strelka_response?.scan.yara?.matches} />
+        <TagSet items={record?.strelka_response?.scan?.yara?.matches} />
       ),
     },
     {
@@ -179,8 +194,6 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
     {
       title: "Action",
       key: "action",
-      dataIndex: "file_id",
-      key: "file_id",
       width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, record) => (
         <Space size="middle">
@@ -197,12 +210,17 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
 
   return (
     <div ref={refElem}>
+      <Input.Search
+        placeholder="Search by File Name or Submission Description..."
+        onChange={handleSearch}
+        style={{ marginBottom: 16 }}
+      />
       <Table
         size={minimalView ? "small" : "middle"}
         loading={isLoading}
         columns={tableProps}
         pagination={pagination}
-        dataSource={data}
+        dataSource={filteredData}
         onChange={handleTableChange}
         scroll={{ x: 600 }}
       />
