@@ -12,8 +12,6 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
     .match(/Scan(.+)/)
     .map((v) => v.toLowerCase())[1]
 
-  const scanner_key = "scan_" + item_key
-
   return (
     <div style={{ width: "100%" }}>
       <div
@@ -27,7 +25,7 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
         <div>
           <Typography>
             <Title level={5}>{scanner_name}</Title>
-            <Text>Took {data[scanner_key].elapsed} seconds</Text>
+            <Text>Took {data["scan"][item_key].elapsed} seconds</Text>
           </Typography>
         </div>
         <div>
@@ -42,7 +40,7 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
             <br />
         <DataDisplayObj
           value={
-            data[scanner_key]
+            data["scan"][item_key]
           }
         />
         </div>
