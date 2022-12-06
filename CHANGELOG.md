@@ -1,6 +1,14 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2022-12-06
+### Changed
+- Bug fix for when attempting to submit a file.
+- Bug fix for when attempting to load a file.
+
+### Added
+- Ability to filter by file name and description on Submission page.
+ 
 ## 2022-11-15
 ### Added
 - Ability to add description to uploaded files
