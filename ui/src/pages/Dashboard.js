@@ -56,6 +56,7 @@ const DashboardPage = (props) => {
 
   const uploadProps = {
     name: "file",
+    multiple: true,
     data: { description: fileDescription },
     withCredentials: true,
     action: `${APP_CONFIG.BACKEND_URL}/strelka/upload`,

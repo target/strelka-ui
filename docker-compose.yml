@@ -1,7 +1,10 @@
 version: '3'
+
 networks:
   strelkanet:
+    name: build_net
     external: true
+
 services:
   app:
     build:
