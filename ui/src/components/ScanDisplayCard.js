@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { Button, Typography } from "antd";
 import { DataDisplayObj } from "../components/DataDisplay";
 
@@ -14,36 +13,24 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
 
   return (
     <div style={{ width: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%"
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
         <div>
           <Typography>
             <Title level={5}>{scanner_name}</Title>
-            <Text>Took {data["scan"][item_key].elapsed} seconds</Text>
+            {
+              data && data["scan_" + item_key] && "elapsed" in data["scan_" + item_key] &&
+              <Text>Took {data["scan_" + item_key]["elapsed"]} seconds</Text>
+            }
           </Typography>
         </div>
         <div>
           <Button onClick={() => setExpanded(!expanded)}>{expanded ? "Hide" : "Show"}</Button>
         </div>
       </div>
-        <div style={{
-            height: expanded ? "auto" : "0px",
-            overflowX: "auto",
-            width: "100%"
-        }}>
-            <br />
-        <DataDisplayObj
-          value={
-            data["scan"][item_key]
-          }
-        />
-        </div>
+      <div style={{ height: expanded ? "auto" : "0px", overflowX: "auto", width: "100%" }}>
+        <br />
+        <DataDisplayObj value={data["scan_" + item_key]} />
+      </div>
       <br />
     </div>
   );
