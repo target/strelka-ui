@@ -38,27 +38,7 @@ Start or ensure Strelka cluster is ready and accessible.
 See https://github.com/target/strelka for more information.
 ```
 
-#### Step 1: (Required Only for First Launch): Initialize Database
-```
-# Terminal 2
-# Setup a Virtual Python Environment
-# From the ./strelka-ui directory
-
-# Install Python Requirements
-# Note: This is just used for initial launch. Not needed afterwards.
-# Depending on your environment, you may need additional packages:
-# sudo apt-get install build-essential python3-dev libpq-dev python3-dev gcc python3-dev musl-dev libffi-dev cargo
-$ virtualenv env
-$ source env/bin/activate
-$ pip3 install -r app/requirements.txt
-
-# Initialize database 
-$ python3 app/manage.py db init
-$ python3 app/manage.py db migrate
-$ python3 app/manage.py db upgrade
-```
-
-#### Step 2: Build and Start Strelka UI (Docker)
+#### Step 1: Build and Start Strelka UI (Docker)
 ```
 # Terminal 1
 # From the ./strelka-ui directory
@@ -127,7 +107,7 @@ The Strelka UI also provides API routes for user script based access. Please ref
 ## Database
 The database uses [https://www.sqlalchemy.org/](SQLAlchemy) as an ORM. [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/) is used to provide db migrations though Alembic. A helper script file, `manage.py`, is provided to assist with common database tasks. 
 
-If you are creating a new database, or modifying the current one, you must perform the following steps:
+If you are creating a new database, or modifying the current one, you must perform the following steps - although upon starting the cluster, these commands will be executed for you:
 
 Generate a new migration from model changes:
 - python manage.py db migrate 
