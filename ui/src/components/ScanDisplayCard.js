@@ -4,9 +4,11 @@ import { DataDisplayObj } from "../components/DataDisplay";
 
 const { Title, Text } = Typography;
 
+// Use state to control whether the data display is expanded or collapsed
 const ScanDisplayCard = ({ scanner_name, data }) => {
   const [expanded, setExpanded] = useState(false);
 
+  // Extract the item key from the scanner name
   const item_key = scanner_name
     .match(/Scan(.+)/)
     .map((v) => v.toLowerCase())[1]
@@ -18,6 +20,7 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
           <Typography>
             <Title level={5}>{scanner_name}</Title>
             {
+              // Only render the elapsed time if the data and elapsed properties exist
               data && data["scan_" + item_key] && "elapsed" in data["scan_" + item_key] &&
               <Text>Took {data["scan_" + item_key]["elapsed"]} seconds</Text>
             }
