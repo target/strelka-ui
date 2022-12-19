@@ -21,8 +21,8 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
             <Title level={5}>{scanner_name}</Title>
             {
               // Only render the elapsed time if the data and elapsed properties exist
-              data && data["scan_" + item_key] && "elapsed" in data["scan_" + item_key] &&
-              <Text>Took {data["scan_" + item_key]["elapsed"]} seconds</Text>
+              data && data[`${'scan_' in data ? 'scan_' : ''}${item_key}`] && "elapsed" in data[`${'scan_' in data ? 'scan_' : ''}${item_key}`] &&
+              <Text>Took {data[`${'scan_' in data ? 'scan_' : ''}${item_key}`]["elapsed"]} seconds</Text>
             }
           </Typography>
         </div>

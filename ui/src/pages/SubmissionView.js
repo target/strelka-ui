@@ -140,7 +140,7 @@ const SubmissionsPage = (props) => {
           </Descriptions.Item>
           <Descriptions.Item label="YARA Hits">
             <div>
-              {data?.strelka_response?.scan_yara.matches.map((type) => (
+            {data?.strelka_response?.scan?.['scan_yara' in data.strelka_response ? 'scan_yara' : 'yara'].matches.map((type) => (
                 <Tag style={{ marginBottom: "4px" }} key={type}>
                   {type}
                 </Tag>
