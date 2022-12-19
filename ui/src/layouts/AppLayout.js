@@ -1,4 +1,4 @@
-import { Layout, Menu } from "antd";
+import { Layout, Menu} from "antd";
 import { BarChartOutlined, UploadOutlined } from "@ant-design/icons";
 
 import { Link } from "react-router-dom";
@@ -6,6 +6,7 @@ import { InternalRouter } from "../routes/InternalRouter";
 import { useContext } from "react";
 import AuthCtx from "../contexts/auth";
 import { APP_CONFIG } from "../config";
+import SystemStatus from "../components/SystemStatus";
 
 const { Header } = Layout;
 const { SubMenu } = Menu;
@@ -43,9 +44,11 @@ const AppLayout = () => {
               <Link to="/submissions" key={window.location.pathname}>All Submissions</Link>
             </Menu.Item>
           </SubMenu>
-
-          <Menu.Item key="logout" style={{ float: "right" }} onClick={doLogout}>
+          <Menu.Item key="logout" onClick={doLogout}>
             Logout
+          </Menu.Item>
+          <Menu.Item disabled key="status" style={{marginLeft: "auto"}}>
+            <SystemStatus></SystemStatus>
           </Menu.Item>
         </Menu>
       </Header>

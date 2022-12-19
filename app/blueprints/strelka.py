@@ -1,27 +1,37 @@
 import datetime
-import json
 
 from flask import Blueprint, current_app, request, session, jsonify
 from sqlalchemy.orm import joinedload
 
 from database import db
-from services.strelka import submit_file
+from services.strelka import submit_file, get_frontend_status
 from models import User, FileSubmission
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
+@strelka.route("/status", methods=["GET"])
+def getServerStatus():
+
+    try:
+        if get_frontend_status():
+            return jsonify({"message": "Server is reachable"}, 200)
+        else:
+            return jsonify({"message": "Server is not reachable"}, 500)
+    except Exception as e:
+        current_app.logger.info("failed to submit %s to strelka: %s", file.filename, e)
+        return "strelka submission was not successful", 500
 
 @strelka.route("/upload", methods=["POST"])
 def submitFile():
     if not session.get("logged_in"):
-        return "unauthenticated", 401
+        return jsonify({"message": "unauthenticated"}, 401)
 
     if "file" not in request.files:
-        return "no file in request", 400
+        return jsonify({"message": "no file in request"}, 400)
 
     file = request.files["file"]
     if file.filename == "":
-        return "submitted filename is empty", 400
+        return jsonify({"message": "submitted filename is empty"}, 400)
 
     if file:
         try:
@@ -33,7 +43,7 @@ def submitFile():
             )
 
             if not succeeded:
-                return "strelka submission was not successful", 500
+                return jsonify({"message": "strelka submission was not successful"}, 500)
             else:
                 user_id = session.get("user_id")
                 current_app.logger.info("saving new submission for user %s", user_id)
@@ -71,7 +81,7 @@ def submitFile():
 
         except Exception as e:
             current_app.logger.info("failed to submit %s to strelka: %s", file.filename, e)
-            return "strelka submission was not successful", 500
+            return jsonify({"message": "strelka submission was not successful"}, 500)
 
 
 def getRequestID(response):
