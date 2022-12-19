@@ -1,9 +1,21 @@
 import json
 import logging
+from icmplib import ping
 from flask import current_app
 
 from strelka.submit_to_strelka import submit_file_to_strelka
 
+def get_frontend_status():
+    logger = logging.getLogger("waitress")
+
+    strelka_host = current_app.config["STRELKA_HOST"]
+
+    try:
+        response = ping(f"{strelka_host}", count=1, interval=1)
+        return response.is_alive
+    except Exception as e:
+        logger.error(f"failed to contact {strelka_host} for a health check: {e}")
+        return False, {}, 0
 
 def submit_file(file, meta):
     logger = logging.getLogger("waitress")
