@@ -1,6 +1,16 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2022-12-19
+### Changed
+- Removed need to initialize local database. Done automatically now.
+- Bug fix for README build badge.
+- Bug fix for file view page.
+
+### Added
+- Added support for multiple file submissions in Dashboard dropzone.
+- Added Strelka server connection status on Dashboard.
+
 ## 2022-12-06
 ### Changed
 - Bug fix for when attempting to submit a file.
