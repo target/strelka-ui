@@ -26,7 +26,7 @@ jsonschema==4.3.3
 lazy-object-proxy==1.7.1
 ldap3==2.9
 Mako==1.2.2
-MarkupSafe==2.0.0
+MarkupSafe>=2.0.0
 mccabe==0.6.1
 mypy-extensions==0.4.3
 Paste==3.5.0
