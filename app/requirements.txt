@@ -6,8 +6,8 @@ certifi==2022.12.7
 cffi==1.14.5
 chardet==4.0.0
 click==8.0.0
+Flask==2.2.3
 cryptography==39.0.1
-Flask==1.1.2
 Flask-Caching==1.10.1
 Flask-Cors==3.0.10
 flask-expects-json==1.7.0
@@ -26,7 +26,7 @@ jsonschema==4.3.3
 lazy-object-proxy==1.7.1
 ldap3==2.9
 Mako==1.2.2
-MarkupSafe==2.0.0
+MarkupSafe>=2.0.0
 mccabe==0.6.1
 mypy-extensions==0.4.3
 Paste==3.5.0
@@ -55,5 +55,5 @@ tomli==1.2.3
 typing_extensions==4.0.1
 urllib3==1.26.7
 waitress==2.1.2
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 wrapt==1.13.3

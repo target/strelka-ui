@@ -1,5 +1,6 @@
 #!/bin/sh
-python manage.py db init
-python manage.py db migrate
-python manage.py db upgrade
+export FLASK_APP=/app/app.py
+flask db init
+flask db migrate
+flask db upgrade
 python app.py
