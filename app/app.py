@@ -45,6 +45,9 @@ def create_app():
     CORS(app, supports_credentials=True)
     db.init_app(app)
 
+    # Initialize Flask-Migrate and associate it with the app
+    migrate = Migrate(app, db)
+
     # register routes
     app.register_blueprint(ui)
     app.register_blueprint(auth, url_prefix="/api/auth")
