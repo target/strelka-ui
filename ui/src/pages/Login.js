@@ -90,6 +90,7 @@ const LoginPage = () => {
                   },
                 },
               }}
+              isKeyPressSubmit={true}
             >
               <GenericLogo />
               <h1
@@ -113,6 +114,7 @@ const LoginPage = () => {
                     message: "Please enter your username",
                   },
                 ]}
+                autoFocus
               />
 
               <ProFormText.Password
