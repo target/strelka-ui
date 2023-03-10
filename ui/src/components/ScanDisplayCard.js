@@ -11,31 +11,41 @@ const ScanDisplayCard = ({ scanner_name, data }) => {
   // Extract the item key from the scanner name
   const item_key = scanner_name
     .match(/Scan(.+)/)
-    .map((v) => v.toLowerCase())[1]
-    console.log(scanner_name)
-    console.log(item_key)
-    console.log(data["scan"])
+    .map((v) => v.toLowerCase())[1];
 
   return (
     <div style={{ width: "100%" }}>
-      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
         <div>
-        <Typography>
+          <Typography>
             <Title level={5}>{scanner_name}</Title>
-            {
-              data["scan"][`${item_key}`] ? (
-                <Text>Took {data["scan"][`${item_key}`]["elapsed"]} seconds</Text>
-              ) : (
-                <Text>Scanner not supported in Scan Results view.</Text>
-              )
-            }
+            {data["scan"][`${item_key}`] ? (
+              <Text>Took {data["scan"][`${item_key}`]["elapsed"]} seconds</Text>
+            ) : (
+              <Text>Scanner not supported in Scan Results view.</Text>
+            )}
           </Typography>
         </div>
         <div>
-          <Button onClick={() => setExpanded(!expanded)}>{expanded ? "Hide" : "Show"}</Button>
+          <Button onClick={() => setExpanded(!expanded)}>
+            {expanded ? "Hide" : "Show"}
+          </Button>
         </div>
       </div>
-      <div style={{ height: expanded ? "auto" : "0px", overflowX: "auto", width: "100%" }}>
+      <div
+        style={{
+          height: expanded ? "auto" : "0px",
+          overflowX: "auto",
+          width: "100%",
+        }}
+      >
         <br />
         <DataDisplayObj value={data["scan"][item_key]} />
       </div>

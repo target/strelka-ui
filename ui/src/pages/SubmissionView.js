@@ -52,7 +52,7 @@ const SubmissionsPage = (props) => {
   const { id } = useParams();
 
   useEffect(() => {
-    let mounted = true;   
+    let mounted = true;
 
     fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/scans/${id}`, {
       method: "GET",
@@ -75,8 +75,7 @@ const SubmissionsPage = (props) => {
           setFileNameView(res.strelka_response[0].file.name);
           setFileDepthView(res.strelka_response[0].file.depth);
         }
-      })
-      ;
+      });
 
     return function cleanup() {
       mounted = false;
@@ -94,7 +93,6 @@ const SubmissionsPage = (props) => {
       .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
       .join(" ");
   };
-  
 
   return isLoading ? (
     <div
@@ -134,26 +132,22 @@ const SubmissionsPage = (props) => {
             {data.user.user_cn}
           </Descriptions.Item>
           <Descriptions.Item label="Upload Description">
-            <div>
-                {data.submitted_description}
-            </div>
+            <div>{data.submitted_description}</div>
           </Descriptions.Item>
           <Descriptions.Item label="Files Analyzed">
-            <div>
-                {data.strelka_response.length}
-            </div>
+            <div>{data.strelka_response.length}</div>
           </Descriptions.Item>
           <Descriptions.Item label="Creation Time">
             <p>
               {data.submitted_at
-                ? new Date(data?.submitted_at).toISOString().split('.')[0]+"Z"
+                ? new Date(data?.submitted_at).toISOString().split(".")[0] + "Z"
                 : ""}{" "}
             </p>
           </Descriptions.Item>
           <Descriptions.Item label="Scan Time">
             <p>
               {data?.processed_at
-                ? new Date(data?.processed_at).toISOString().split('.')[0]+"Z"
+                ? new Date(data?.processed_at).toISOString().split(".")[0] + "Z"
                 : ""}{" "}
             </p>
           </Descriptions.Item>
@@ -249,8 +243,8 @@ const SubmissionsPage = (props) => {
             <List bordered>
               <List.Item>
                 <div>
-                  <div style={{ paddingBottom: '8px' }}>
-                  <b>{FormatListItemName("Expand Parent Scan Only")}</b>
+                  <div style={{ paddingBottom: "8px" }}>
+                    <b>{FormatListItemName("Expand Parent Scan Only")}</b>
                   </div>
 
                   <Button onClick={() => handleEventView("parent")}>
@@ -259,23 +253,23 @@ const SubmissionsPage = (props) => {
                 </div>
               </List.Item>
               <List.Item>
-              <div>
-              <div style={{ paddingBottom: '8px' }}>
-                  <b>{FormatListItemName("Expand All Scans")}</b>
+                <div>
+                  <div style={{ paddingBottom: "8px" }}>
+                    <b>{FormatListItemName("Expand All Scans")}</b>
                   </div>
-             
-                    <div/>
+
+                  <div />
                   <Button onClick={() => handleEventView("all")}>
                     Expand All
                   </Button>
                 </div>
               </List.Item>
               <List.Item>
-              <div>
-              <div style={{ paddingBottom: '8px' }}>
-                  <b>{FormatListItemName("Only Expand Specific Scan")}</b>
+                <div>
+                  <div style={{ paddingBottom: "8px" }}>
+                    <b>{FormatListItemName("Only Expand Specific Scan")}</b>
                   </div>
-            
+
                   <Select
                     id="expandSelect"
                     defaultValue="Select Filename"
@@ -305,7 +299,9 @@ const SubmissionsPage = (props) => {
           <Card style={{ width: "100%" }}>
             <Typography>
               <Title level={3}>Scan Results</Title>
-              <Text type="secondary">Results of named scans for the submitted file</Text>
+              <Text type="secondary">
+                Results of named scans for the submitted file
+              </Text>
             </Typography>
             <br />
 

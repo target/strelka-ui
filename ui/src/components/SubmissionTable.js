@@ -51,10 +51,12 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const filteredData = data.filter((item) => {
     return (
       item.file_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.submitted_description && item.submitted_description.toLowerCase().includes(searchQuery.toLowerCase()))
+      (item.submitted_description &&
+        item.submitted_description
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()))
     );
   });
-  
 
   const fetchTableData = (params = {}) => {
     setIsLoading(true);
@@ -158,7 +160,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       width: minimalView ? componentWidth / 4 : 200,
       render: (submitted_at, full) => {
         return submitted_at ? (
-          <p>{new Date(submitted_at).toISOString().split('.')[0]+"Z"}</p>
+          <p>{new Date(submitted_at).toISOString().split(".")[0] + "Z"}</p>
         ) : (
           <p></p>
         );
@@ -183,7 +185,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "yara_hits",
       key: "yara_hits",
       width: 200,
-        render: (yara_hits) => <TagSet items={yara_hits} />,
+      render: (yara_hits) => <TagSet items={yara_hits} />,
     },
     {
       title: "Scanners Run",
@@ -197,9 +199,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "action",
       width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, record) => (
-        <Space size="middle">
-          {copyHashes(record)}
-        </Space>
+        <Space size="middle">{copyHashes(record)}</Space>
       ),
     },
   ];
@@ -221,7 +221,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
         loading={isLoading}
         columns={tableProps}
         pagination={pagination}
-        dataSource={filteredData.map(item => ({ ...item, key: item.id }))}
+        dataSource={filteredData.map((item) => ({ ...item, key: item.id }))}
         onChange={handleTableChange}
         scroll={{ x: 600 }}
       />
