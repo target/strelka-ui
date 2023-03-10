@@ -1,6 +1,10 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2023-03-10
+### Changed
+- Added extracted file support
+
 ## 2022-12-19
 ### Changed
 - Removed need to initialize local database. Done automatically now.
