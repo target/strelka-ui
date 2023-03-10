@@ -104,6 +104,36 @@ The Strelka UI also provides API routes for user script based access. Please ref
 - [base url]/api/strelka/scans?page=?&per_page=? (GET)
 - [base url]/api/strelka/scans/[scan id] (GET)
 
+#### Example
+The following is an example of how to authenticate to the Strelka UI API, gather Scan statistics, and Submit a file using Python `requests`.
+
+```commandline
+import requests
+
+# Set Script Variables
+baseurl = "<ADDRESS>"
+username = "<USERNAME>"
+password = "<PASSWORD"
+
+# Create a Session
+session = requests.Session()
+
+# Authenticate with Session
+data = {"username": username, "password": password}
+response = session.post(baseurl + "/api/auth/login", data=data)
+
+# Retrieve Stats
+response = session.get(baseurl + "/api/strelka/scans/stats")
+
+# Submit File
+filepath = "<PATH_TO_FILE_TO_UPLOAD>"
+
+with open(filepath, "rb") as file:
+    files = {"file": file}
+    data = {"description": "<SUBMISSION_DESCRIPTION>"}
+    response = session.post(baseurl + "/api/strelka/upload", files=files, data=data)
+```
+
 ## Database
 The database uses [https://www.sqlalchemy.org/](SQLAlchemy) as an ORM. [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/) is used to provide db migrations though Alembic. A helper script file, `manage.py`, is provided to assist with common database tasks. 
 

@@ -7,8 +7,10 @@ class Config(object):
     TESTING = False
 
     if os.environ.get("COOKIE_SIGNING_SECRET_KEY") is not None:
-        logging.info("loaded cookie signing secret key from COOKIE_SIGNING_SECRET_KEY env var")
-        SECRET_KEY = os.environ.get("COOKIE_SIGNING_SECRET_KEY") 
+        logging.info(
+            "loaded cookie signing secret key from COOKIE_SIGNING_SECRET_KEY env var"
+        )
+        SECRET_KEY = os.environ.get("COOKIE_SIGNING_SECRET_KEY")
     else:
         logging.info("generated transient cookie signing secret key")
         SECRET_KEY = os.urandom(32)
@@ -17,7 +19,7 @@ class Config(object):
     UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "/opt")
     STRELKA_HOST = os.environ.get("STRELKA_HOST", "strelka_frontend_1")
     STRELKA_PORT = os.environ.get("STRELKA_PORT", "57314")
-    STRELKA_CERT = os.environ.get("STRELKA_CERT", '')
+    STRELKA_CERT = os.environ.get("STRELKA_CERT", "")
     LDAP_URL = os.environ.get("LDAP_URL", "")
     CA_CERT_PATH = os.environ.get("CA_CERT_PATH", "")
     STATIC_ASSET_FOLDER = os.environ.get("STATIC_ASSET_FOLDER", "../ui/build/")

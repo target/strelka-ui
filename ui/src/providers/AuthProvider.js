@@ -1,5 +1,5 @@
-import Authentication from './Authentication'
-import AuthContext from '../contexts/auth'
+import Authentication from "./Authentication";
+import AuthContext from "../contexts/auth";
 
 const AuthenticationProvider = ({ children, ...props }) => {
   return (
@@ -8,7 +8,7 @@ const AuthenticationProvider = ({ children, ...props }) => {
         <AuthContext.Provider value={api}>{children}</AuthContext.Provider>
       )}
     </Authentication>
-  )
-}
+  );
+};
 
-export default AuthenticationProvider
+export default AuthenticationProvider;
