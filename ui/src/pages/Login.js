@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Card, message } from "antd";
 import ProForm, { ProFormText } from "@ant-design/pro-form";
 import { KeyOutlined, UserOutlined } from "@ant-design/icons";
@@ -45,7 +45,6 @@ const LoginPage = () => {
                   formBody.push(encodedKey + "=" + encodedValue);
                 }
                 formBody = formBody.join("&");
-
                 try {
                   const res = await fetchWithTimeout(
                     `${APP_CONFIG.BACKEND_URL}/auth/login`,
@@ -60,7 +59,6 @@ const LoginPage = () => {
                       timeout: APP_CONFIG.LOGIN_TIMEOUT,
                     }
                   );
-
                   if (res.status === 200) {
                     login();
                     message.success(`Login succeeded`);

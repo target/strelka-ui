@@ -1,12 +1,13 @@
 import React from "react";
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Redirect } from "react-router-dom";
 
-import AuthCtx from '../contexts/auth'
+import AuthCtx from "../contexts/auth";
 
 const PrivateRoute = ({ children, ...rest }) => {
   const { isAuthenticated } = React.useContext(AuthCtx);
 
-  return <Route
+  return (
+    <Route
       {...rest}
       render={({ location }) =>
         isAuthenticated ? (
@@ -21,6 +22,7 @@ const PrivateRoute = ({ children, ...rest }) => {
         )
       }
     />
-}
+  );
+};
 
 export default PrivateRoute;

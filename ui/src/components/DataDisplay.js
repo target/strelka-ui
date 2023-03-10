@@ -1,31 +1,20 @@
 import React from "react";
 import { Typography } from "antd";
 
-import ConditionalWrapper from "./ConditionalWrapper";
-
 const { Text } = Typography;
 
-const DataDisplayObj = ({ name, value }) => {
-  if (value === undefined || value === null) {
-    return null;
-  }
+export const ConditionalWrapper = ({ condition, wrapper, children }) =>
+  condition ? wrapper(children) : children;
 
-  if (typeof value === "function") {
-    return null;
-  }
-
-  if (
-    typeof value === "boolean" ||
-    typeof value === "number" ||
-    typeof value === "string" ||
-    typeof value === "bigint"
-  ) {
+export const DataDisplayObj = ({ name, value }) => {
+  if (typeof value === "string" || typeof value === "number") {
     return (
       <div>
         <ConditionalWrapper
           condition={name}
           wrapper={(children) => (
             <span>
+              {" "}
               <Text code>{name}</Text> {children}
             </span>
           )}
@@ -36,22 +25,19 @@ const DataDisplayObj = ({ name, value }) => {
     );
   }
 
-  if (Array.isArray(value)) {
+  if (typeof value === "boolean") {
     return (
       <div>
         <ConditionalWrapper
           condition={name}
           wrapper={(children) => (
             <span>
+              {" "}
               <Text code>{name}</Text> {children}
             </span>
           )}
         >
-          <div style={{ marginLeft: "10px", paddingLeft: "12px" }}>
-            {value.map((value) => (
-              <DataDisplayObj value={value} />
-            ))}
-          </div>
+          <Text>{value.toString()}</Text>
         </ConditionalWrapper>
       </div>
     );
@@ -70,9 +56,9 @@ const DataDisplayObj = ({ name, value }) => {
           )}
         >
           <div style={{ marginLeft: "10px" }}>
-            {Object.entries(value).map((entries) => {
-              return <DataDisplayObj name={entries[0]} value={entries[1]} />;
-            })}
+            {Object.entries(value).map(([key, val]) => (
+              <DataDisplayObj key={key} name={key} value={val} />
+            ))}
           </div>
         </ConditionalWrapper>
       </div>
@@ -81,5 +67,3 @@ const DataDisplayObj = ({ name, value }) => {
 
   return null;
 };
-
-export { DataDisplayObj };

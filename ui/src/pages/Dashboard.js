@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Row, Col, Card, Input, Statistic, Typography, message } from "antd";
-import { MessageOutlined } from '@ant-design/icons';
+import { MessageOutlined } from "@ant-design/icons";
 import PageWrapper from "../components/PageWrapper";
 import SubmissionTable from "../components/SubmissionTable";
 import Dropzone from "../components/Dropzone";
@@ -11,7 +11,9 @@ import { fetchWithTimeout } from "../util";
 const { Title, Text } = Typography;
 
 const DashboardPage = (props) => {
-  const [fileDescription, setFileDescription] = useState("No Description Provided");
+  const [fileDescription, setFileDescription] = useState(
+    "No Description Provided"
+  );
   const [filesUploaded, setFilesUploaded] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
   const [stats, setStats] = useState({
@@ -21,7 +23,7 @@ const DashboardPage = (props) => {
     twentyfour_hours: 0,
   });
 
-  const setDescription = event => {
+  const setDescription = (event) => {
     setFileDescription(event.target.value);
   };
 
@@ -119,20 +121,24 @@ const DashboardPage = (props) => {
       <br />
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
         <Col className="gutter-row" xs={24} sm={24} md={24} lg={8}>
-            <Card>
-              <Typography>
-                <Title level={3}>Upload File</Title>
-                <Text type="secondary">
-                  Drop a file below and add a description to start a Strelka Scan.
-                </Text>
-              </Typography>
-              <br />
-              <Input onChange={setDescription} placeholder="Description to be saved with submission..."  prefix={<MessageOutlined />}/>
-              <br />
-              <br />
-              <Dropzone height="200px" {...uploadProps} />
-            </Card>
-          </Col>
+          <Card>
+            <Typography>
+              <Title level={3}>Upload File</Title>
+              <Text type="secondary">
+                Drop a file below and add a description to start a Strelka Scan.
+              </Text>
+            </Typography>
+            <br />
+            <Input
+              onChange={setDescription}
+              placeholder="Description to be saved with submission..."
+              prefix={<MessageOutlined />}
+            />
+            <br />
+            <br />
+            <Dropzone height="200px" {...uploadProps} />
+          </Card>
+        </Col>
         <Col className="gutter-row" xs={24} sm={24} md={24} lg={16}>
           <Card>
             <Typography>

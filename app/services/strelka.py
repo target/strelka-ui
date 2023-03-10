@@ -5,6 +5,7 @@ from flask import current_app
 
 from strelka.submit_to_strelka import submit_file_to_strelka
 
+
 def get_frontend_status():
     logger = logging.getLogger("waitress")
 
@@ -16,6 +17,7 @@ def get_frontend_status():
     except Exception as e:
         logger.error(f"failed to contact {strelka_host} for a health check: {e}")
         return False, {}, 0
+
 
 def submit_file(file, meta):
     logger = logging.getLogger("waitress")
@@ -34,7 +36,7 @@ def submit_file(file, meta):
                 meta,
             )
 
-            return True, json.loads(response), len(sample_data)
+            return True, response, len(sample_data)
 
         except Exception as e:
             logger.error(f"failed to submit {file.filename} to strelka: {e}")
