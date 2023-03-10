@@ -1,5 +1,6 @@
 import os
 import grpc
+import json
 import strelka.strelka_pb2 as strelka_pb2
 import strelka.strelka_pb2_grpc as strelka_pb2_grpc
 from flask import current_app
@@ -18,24 +19,23 @@ def submit_file_to_strelka(filename, data, host, metadict):
     while True:
         try:
             if os.environ.get("STRELKA_CERT"):
-                with open(os.environ.get("STRELKA_CERT"), 'rb') as f:
+                with open(os.environ.get("STRELKA_CERT"), "rb") as f:
                     cert = f.read()
                 credentials = grpc.ssl_channel_credentials(cert)
-                with grpc.secure_channel(target=host,
-                                         credentials=credentials) as chan:
+                with grpc.secure_channel(target=host, credentials=credentials) as chan:
                     stub = strelka_pb2_grpc.FrontendStub(chan)
-                    responses = stub.ScanFile(yield_file(filename, data, metadict), timeout=960)
-                    responses = list(responses)
-                    for r in responses:
-                        return r.event
+                    responses = stub.ScanFile(
+                        yield_file(filename, data, metadict), timeout=960
+                    )
+                    return [json.loads(response.event) for response in responses]
+
             else:
                 chan = grpc.insecure_channel(host)
                 stub = strelka_pb2_grpc.FrontendStub(chan)
-                responses = stub.ScanFile(yield_file(filename, data, metadict), timeout=960)
-
-                responses = list(responses)
-                for r in responses:
-                    return r.event
+                responses = stub.ScanFile(
+                    yield_file(filename, data, metadict), timeout=960
+                )
+                return [json.loads(response.event) for response in responses]
 
         except Exception as e:
             current_app.logger.error("error submitting %s: %s", filename, e)

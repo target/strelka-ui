@@ -13,13 +13,13 @@ from models import User
 auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 loginSchema = {
-        'type': 'object',
-        'properties': {
-            'username': { 'type': 'string', 'minLength': 2 },
-            'password': { 'type': 'string', 'minLength': 3 },
-            },
-        'required': ['username', 'password']
-        }
+    "type": "object",
+    "properties": {
+        "username": {"type": "string", "minLength": 2},
+        "password": {"type": "string", "minLength": 3},
+    },
+    "required": ["username", "password"],
+}
 
 
 @auth.route("logout")
@@ -36,7 +36,9 @@ def login():
     password = request.form.get("password")
 
     try:
-        validate(instance={"username": username, "password": password }, schema=loginSchema)
+        validate(
+            instance={"username": username, "password": password}, schema=loginSchema
+        )
     except ValidationError as err:
         current_app.logger.error("Failed login validation: %s", err)
         return jsonify({"error": "Failed to validate username/password"}), 400
@@ -65,7 +67,7 @@ def login():
                 session["last_name"],
                 loginTime,
                 1,
-                0
+                0,
             )
             db.session.add(dbUser)
         db.session.commit()

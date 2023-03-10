@@ -33,21 +33,21 @@ class FileSubmission(db.Model):
     processed_at = db.Column(db.DateTime())
 
     def __init__(
-            self,
-            file_id,
-            file_name,
-            file_size,
-            strelka_response,
-            mime_types,
-            yara_hits,
-            scanners_run,
-            hashes,
-            submitted_from_ip,
-            submitted_from_client,
-            submitted_by_user_id,
-            submitted_description,
-            submitted_at,
-            processed_at,
+        self,
+        file_id,
+        file_name,
+        file_size,
+        strelka_response,
+        mime_types,
+        yara_hits,
+        scanners_run,
+        hashes,
+        submitted_from_ip,
+        submitted_from_client,
+        submitted_by_user_id,
+        submitted_description,
+        submitted_at,
+        processed_at,
     ):
         self.file_id = file_id
         self.file_name = file_name
@@ -85,7 +85,9 @@ class User(db.Model):
 
     submissions = db.relationship("FileSubmission", back_populates="user")
 
-    def __init__(self, user_cn, first_name, last_name, last_login, login_count, files_submitted):
+    def __init__(
+        self, user_cn, first_name, last_name, last_login, login_count, files_submitted
+    ):
         self.user_cn = user_cn
         self.first_name = first_name
         self.last_name = last_name
