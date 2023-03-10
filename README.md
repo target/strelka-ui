@@ -42,7 +42,7 @@ See https://github.com/target/strelka for more information.
 ```
 # Terminal 1
 # From the ./strelka-ui directory
-$ docker-compose -f docker-compose.yaml up
+$ docker-compose -f docker-compose.yml up
 ```
 
 #### Step 3: Access Strelka UI
