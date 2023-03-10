@@ -1,4 +1,4 @@
-import { Layout, Menu} from "antd";
+import { Layout, Menu } from "antd";
 import { BarChartOutlined, UploadOutlined } from "@ant-design/icons";
 
 import { Link } from "react-router-dom";
@@ -38,16 +38,23 @@ const AppLayout = () => {
             title="Submissions"
           >
             <Menu.Item key="my-submissions">
-              <Link to="/submissions?just_mine=true" key={window.location.pathname}>My Submissions</Link>
+              <Link
+                to="/submissions?just_mine=true"
+                key={window.location.pathname}
+              >
+                My Submissions
+              </Link>
             </Menu.Item>
             <Menu.Item key="all-submissions">
-              <Link to="/submissions" key={window.location.pathname}>All Submissions</Link>
+              <Link to="/submissions" key={window.location.pathname}>
+                All Submissions
+              </Link>
             </Menu.Item>
           </SubMenu>
           <Menu.Item key="logout" onClick={doLogout}>
             Logout
           </Menu.Item>
-          <Menu.Item disabled key="status" style={{marginLeft: "auto"}}>
+          <Menu.Item disabled key="status" style={{ marginLeft: "auto" }}>
             <SystemStatus></SystemStatus>
           </Menu.Item>
         </Menu>

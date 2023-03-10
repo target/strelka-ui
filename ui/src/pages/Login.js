@@ -10,7 +10,7 @@ import { fetchWithTimeout } from "../util";
 
 const LoginPage = () => {
   const { isAuthenticated, login } = useContext(AuthCtx);
-  
+
   if (isAuthenticated) {
     return <Redirect to="/dashboard" />;
   }

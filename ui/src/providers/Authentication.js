@@ -1,11 +1,13 @@
 import { memo, useState } from "react";
-import { message } from "antd"
+import { message } from "antd";
 
 const Authentication = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(window.localStorage.getItem("isAuthenticated") || false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    window.localStorage.getItem("isAuthenticated") || false
+  );
 
   const handle401 = () => {
-    message.info("Please log in, your session may have timed out.")
+    message.info("Please log in, your session may have timed out.");
     window.localStorage.removeItem("isAuthenticated");
     setIsAuthenticated(false);
   };
@@ -13,7 +15,7 @@ const Authentication = ({ children }) => {
   const logout = () => {
     window.localStorage.removeItem("isAuthenticated");
     setIsAuthenticated(false);
-    message.success("You have successfully logged out")
+    message.success("You have successfully logged out");
   };
 
   const login = () => {
