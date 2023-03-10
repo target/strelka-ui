@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Table, Space, Dropdown, Menu, message, Input } from "antd";
+import { Table, Tooltip, Space, Dropdown, Menu, message, Input } from "antd";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
@@ -51,9 +51,10 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const filteredData = data.filter((item) => {
     return (
       item.file_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.submitted_description.toLowerCase().includes(searchQuery.toLowerCase()) 
+      (item.submitted_description && item.submitted_description.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   });
+  
 
   const fetchTableData = (params = {}) => {
     setIsLoading(true);
@@ -107,7 +108,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
     return (
       <Menu>
         {record.hashes.map((kv) => (
-          <Menu.Item data-hash={kv[1]}>
+          <Menu.Item key={kv[0]} data-hash={kv[1]}>
             <CopyToClipboard
               text={kv[1]}
               onCopy={() => message.success("Hash copied to clipboard!")}
@@ -138,15 +139,10 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "file_id",
       width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, full) => (
-        <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
+        <Tooltip title={full.submitted_description}>
+          <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
+        </Tooltip>
       ),
-    },
-    {
-      title: "Description",
-      dataIndex: "submitted_description",
-      key: "submitted_description",
-      width: 200,
-      render: (_, full) => <p style={{"overflow-wrap": "anywhere"}}>{full.submitted_description}</p>,
     },
     {
       title: "Submitted by",
@@ -162,11 +158,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       width: minimalView ? componentWidth / 4 : 200,
       render: (submitted_at, full) => {
         return submitted_at ? (
-          <p>{new Date(submitted_at).toUTCString()}</p>
+          <p>{new Date(submitted_at).toISOString().split('.')[0]+"Z"}</p>
         ) : (
           <p></p>
         );
       },
+    },
+    {
+      title: "Files Analyzed",
+      dataIndex: "file_count",
+      key: "file_count",
+      width: 200,
+      render: (_, full) => <p>{full.strelka_response.length}</p>,
     },
     {
       title: "MIME Types",
@@ -180,9 +183,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "yara_hits",
       key: "yara_hits",
       width: 200,
-      render: (_, record) => (
-        <TagSet items={record?.strelka_response?.scan?.yara?.matches} />
-      ),
+        render: (yara_hits) => <TagSet items={yara_hits} />,
     },
     {
       title: "Scanners Run",
@@ -205,7 +206,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
 
   let tableProps = [...columns];
   if (minimalView) {
-    tableProps = [tableProps[0], tableProps[1], tableProps[2], tableProps[6]];
+    tableProps = [tableProps[0], tableProps[1], tableProps[2], tableProps[7]];
   }
 
   return (
@@ -220,7 +221,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
         loading={isLoading}
         columns={tableProps}
         pagination={pagination}
-        dataSource={filteredData}
+        dataSource={filteredData.map(item => ({ ...item, key: item.id }))}
         onChange={handleTableChange}
         scroll={{ x: 600 }}
       />

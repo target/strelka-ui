@@ -12,6 +12,7 @@ import {
   Card,
   List,
   Typography,
+  Select,
   Spin,
   message,
 } from "antd";
@@ -28,13 +29,30 @@ const { Title, Text } = Typography;
 const SubmissionsPage = (props) => {
   const { handle401 } = useContext(AuthCtx);
 
+  const { Option } = Select;
+  const [FilenameView, setFileNameView] = useState("");
+  const [FiledepthView, setFileDepthView] = useState("");
+
+  const handleEventView = (value, depth) => {
+    if (value === "parent") {
+      setFileNameView(data.strelka_response[0].file.name);
+      setFileDepthView(data.strelka_response[0].file.depth);
+    } else if (value === "all") {
+      setFileNameView(data.strelka_response[0].file.name);
+      setFileDepthView(data.strelka_response[0].file.depth);
+    } else {
+      setFileNameView(value);
+      setFileDepthView(depth.children[1]);
+    }
+  };
+
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState({});
 
   const { id } = useParams();
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true;   
 
     fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/scans/${id}`, {
       method: "GET",
@@ -54,13 +72,16 @@ const SubmissionsPage = (props) => {
         if (mounted) {
           setData(res);
           setIsLoading(false);
+          setFileNameView(res.strelka_response[0].file.name);
+          setFileDepthView(res.strelka_response[0].file.depth);
         }
-      });
+      })
+      ;
 
     return function cleanup() {
       mounted = false;
     };
-  }, [id]);
+  }, [handle401, id]);
 
   const copyRecord = () => {
     navigator.clipboard.writeText(JSON.stringify(data.strelka_response));
@@ -73,6 +94,7 @@ const SubmissionsPage = (props) => {
       .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
       .join(" ");
   };
+  
 
   return isLoading ? (
     <div
@@ -107,21 +129,31 @@ const SubmissionsPage = (props) => {
           </Button>,
         ]}
       >
-        <Descriptions size="small" column={3}>
+        <Descriptions bordered size="small" column={3}>
           <Descriptions.Item label="Submitted by">
             {data.user.user_cn}
+          </Descriptions.Item>
+          <Descriptions.Item label="Upload Description">
+            <div>
+                {data.submitted_description}
+            </div>
+          </Descriptions.Item>
+          <Descriptions.Item label="Files Analyzed">
+            <div>
+                {data.strelka_response.length}
+            </div>
           </Descriptions.Item>
           <Descriptions.Item label="Creation Time">
             <p>
               {data.submitted_at
-                ? new Date(data?.submitted_at).toUTCString()
+                ? new Date(data?.submitted_at).toISOString().split('.')[0]+"Z"
                 : ""}{" "}
             </p>
           </Descriptions.Item>
           <Descriptions.Item label="Scan Time">
             <p>
               {data?.processed_at
-                ? new Date(data?.processed_at).toUTCString()
+                ? new Date(data?.processed_at).toISOString().split('.')[0]+"Z"
                 : ""}{" "}
             </p>
           </Descriptions.Item>
@@ -140,7 +172,9 @@ const SubmissionsPage = (props) => {
           </Descriptions.Item>
           <Descriptions.Item label="YARA Hits">
             <div>
-            {data?.strelka_response?.scan?.['scan_yara' in data.strelka_response ? 'scan_yara' : 'yara'].matches.map((type) => (
+              {data?.strelka_response[0]?.scan?.[
+                "scan_yara" in data.strelka_response[0] ? "scan_yara" : "yara"
+              ].matches.map((type) => (
                 <Tag style={{ marginBottom: "4px" }} key={type}>
                   {type}
                 </Tag>
@@ -166,7 +200,7 @@ const SubmissionsPage = (props) => {
             <List
               bordered
               dataSource={Object.entries(
-                data.strelka_response.request.attributes.metadata
+                data.strelka_response[0].request.attributes.metadata
               )}
               renderItem={(item) => (
                 <List.Item
@@ -205,10 +239,73 @@ const SubmissionsPage = (props) => {
 
           <br />
 
+          <Card>
+            <Typography>
+              <Title level={3}>Expand Results</Title>
+              <Text type="secondary">Expand specific events</Text>
+            </Typography>
+            <br />
+
+            <List bordered>
+              <List.Item>
+                <div>
+                  <div style={{ paddingBottom: '8px' }}>
+                  <b>{FormatListItemName("Expand Parent Scan Only")}</b>
+                  </div>
+
+                  <Button onClick={() => handleEventView("parent")}>
+                    Expand
+                  </Button>
+                </div>
+              </List.Item>
+              <List.Item>
+              <div>
+              <div style={{ paddingBottom: '8px' }}>
+                  <b>{FormatListItemName("Expand All Scans")}</b>
+                  </div>
+             
+                    <div/>
+                  <Button onClick={() => handleEventView("all")}>
+                    Expand All
+                  </Button>
+                </div>
+              </List.Item>
+              <List.Item>
+              <div>
+              <div style={{ paddingBottom: '8px' }}>
+                  <b>{FormatListItemName("Only Expand Specific Scan")}</b>
+                  </div>
+            
+                  <Select
+                    id="expandSelect"
+                    defaultValue="Select Filename"
+                    style={{ width: "100%" }}
+                    onChange={(FilenameView, FiledepthView) =>
+                      handleEventView(FilenameView, FiledepthView)
+                    }
+                    value={FilenameView}
+                  >
+                    {data.strelka_response.map((event) => (
+                      <Option
+                        on
+                        key={event.file.name + event.file.depth}
+                        value={event.file.name + event.file.depth}
+                      >
+                        Depth: {event.file.depth} - {event.file.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </div>
+              </List.Item>
+            </List>
+          </Card>
+
+          <br />
+
           <Card style={{ width: "100%" }}>
             <Typography>
               <Title level={3}>Scan Results</Title>
-              <Text type="secondary">Results of named scans</Text>
+              <Text type="secondary">Results of named scans for the submitted file</Text>
             </Typography>
             <br />
 
@@ -227,7 +324,7 @@ const SubmissionsPage = (props) => {
                   >
                     <ScanDisplayCard
                       scanner_name={scanner_name}
-                      data={data.strelka_response}
+                      data={data.strelka_response[0]}
                     />
                   </List.Item>
                 );
@@ -244,7 +341,27 @@ const SubmissionsPage = (props) => {
                 <Text type="secondary">Raw response JSON data</Text>
               </Typography>
               <br />
-              <ReactJson src={data} />
+
+              <ReactJson
+                src={data}
+                shouldCollapse={(field) => {
+                  if (field.name === "hashes") {
+                    return true;
+                  }
+                  if (field.namespace.length === 3) {
+                    if (field.namespace.includes("strelka_response")) {
+                      if (
+                        field.src.file.depth !== FiledepthView &&
+                        field.src.file.name !== FilenameView
+                      ) {
+                        return true;
+                      }
+                    }
+                  }
+                  // Otherwise, show the field.
+                  return false;
+                }}
+              />
             </Card>
           </Row>
         </Col>
