@@ -264,7 +264,7 @@ const SubmissionsPage = (props) => {
                   </Button>
                 </div>
               </List.Item>
-              <List.Item>
+              <List.Item style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 <div>
                   <div style={{ paddingBottom: "8px" }}>
                     <b>{FormatListItemName("Only Expand Specific Scan")}</b>
@@ -273,7 +273,13 @@ const SubmissionsPage = (props) => {
                   <Select
                     id="expandSelect"
                     defaultValue="Select Filename"
-                    style={{ width: "100%" }}
+                    style={{
+                      width: "250px",
+                      maxWidth: "100%",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis"
+                    }}
                     onChange={(FilenameView, FiledepthView) =>
                       handleEventView(FilenameView, FiledepthView)
                     }

@@ -14,9 +14,9 @@ flask-expects-json==1.7.0
 Flask-Migrate==2.7.0
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.5.1
-greenlet==1.1.0
-grpcio==1.37.1
-grpcio-tools==1.37.1
+greenlet==2.0.2
+grpcio==1.41.0
+grpcio-tools==1.41.0
 icmplib==3.0.3
 idna==2.10
 isort==5.10.1
