@@ -1,5 +1,7 @@
-import { Layout, Menu } from "antd";
-import { BarChartOutlined, UploadOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { Avatar, Layout, Menu, message } from "antd";
+import { BarChartOutlined, UploadOutlined, KeyOutlined } from "@ant-design/icons";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import { Link } from "react-router-dom";
 import { InternalRouter } from "../routes/InternalRouter";
@@ -13,6 +15,7 @@ const { SubMenu } = Menu;
 
 const AppLayout = () => {
   const { logout } = useContext(AuthCtx);
+    const [apiKey, setApiKey] = useState("");
 
   const doLogout = () => {
     fetch(`${APP_CONFIG.BACKEND_URL}/auth/logout`, {
@@ -23,6 +26,25 @@ const AppLayout = () => {
       logout();
     });
   };
+
+    const getApiKey = () => {
+      fetch(`${APP_CONFIG.BACKEND_URL}/auth/apikey`, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      }).then((response) => {
+        if (response.ok) {
+          response.json().then((data) => {
+            const apiKey = data.api_key;
+            setApiKey(apiKey);
+
+          });
+        } else {
+          message.error("Failed to retrieve API key.");
+        }
+      });
+    };
+
 
   return (
     <Layout className="layout">
@@ -51,9 +73,16 @@ const AppLayout = () => {
               </Link>
             </Menu.Item>
           </SubMenu>
+           <Menu.Item key={apiKey} onClick={getApiKey}>
+              <CopyToClipboard text={apiKey}>
+                <Avatar style={{ background: "none" }} icon={<KeyOutlined />} />
+                </CopyToClipboard>
+            </Menu.Item>
           <Menu.Item key="logout" onClick={doLogout}>
             Logout
           </Menu.Item>
+
+
           <Menu.Item disabled key="status" style={{ marginLeft: "auto" }}>
             <SystemStatus></SystemStatus>
           </Menu.Item>

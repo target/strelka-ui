@@ -139,6 +139,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       title: "Filename",
       dataIndex: "file_id",
       key: "file_id",
+      width: '20%',
       width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, full) => (
         <Tooltip title={full.submitted_description}>

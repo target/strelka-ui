@@ -1,11 +1,11 @@
 import datetime
-import json
 
 from flask import Blueprint, current_app, request, session, jsonify
 from sqlalchemy.orm import joinedload
 
 from database import db
 from services.strelka import submit_file, get_frontend_status
+from services.auth import auth_required
 from models import User, FileSubmission
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
@@ -13,18 +13,17 @@ strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
 @strelka.route("/status", methods=["GET"])
 def getServerStatus():
-
     try:
         if get_frontend_status():
             return jsonify({"message": "Server is reachable"}, 200)
         else:
             return jsonify({"message": "Server is not reachable"}, 500)
     except Exception as e:
-        current_app.logger.info("failed to submit %s to strelka: %s", file.filename, e)
         return "strelka submission was not successful", 500
 
 
 @strelka.route("/upload", methods=["POST"])
+@auth_required
 def submitFile():
     if not session.get("logged_in"):
         return jsonify({"message": "unauthenticated"}, 401)
@@ -147,9 +146,8 @@ def getHashes(response):
 
 
 @strelka.route("/scans/stats")
-def getScanStats():
-    if not session.get("logged_in"):
-        return "unauthenticated", 401
+@auth_required
+def getScanStats(user):
 
     all_time = db.session.query(FileSubmission).count()
     thirty_days = (
@@ -186,10 +184,8 @@ def getTimeDelta(days):
 
 
 @strelka.route("/scans/<id>")
+@auth_required
 def getScan(id):
-
-    if not session.get("logged_in"):
-        return "unauthenticated", 401
 
     submission = (
         db.session.query(FileSubmission)
@@ -205,10 +201,8 @@ def getScan(id):
 
 
 @strelka.route("/scans", methods=["GET"])
-def view():
-
-    if not session.get("logged_in"):
-        return "unauthenticated", 401
+@auth_required
+def view(user):
 
     page = request.args.get("page", default=1, type=int)
     per_page = request.args.get("per_page", default=1, type=int)

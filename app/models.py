@@ -33,21 +33,21 @@ class FileSubmission(db.Model):
     processed_at = db.Column(db.DateTime())
 
     def __init__(
-        self,
-        file_id,
-        file_name,
-        file_size,
-        strelka_response,
-        mime_types,
-        yara_hits,
-        scanners_run,
-        hashes,
-        submitted_from_ip,
-        submitted_from_client,
-        submitted_by_user_id,
-        submitted_description,
-        submitted_at,
-        processed_at,
+            self,
+            file_id,
+            file_name,
+            file_size,
+            strelka_response,
+            mime_types,
+            yara_hits,
+            scanners_run,
+            hashes,
+            submitted_from_ip,
+            submitted_from_client,
+            submitted_by_user_id,
+            submitted_description,
+            submitted_at,
+            processed_at,
     ):
         self.file_id = file_id
         self.file_name = file_name
@@ -86,7 +86,7 @@ class User(db.Model):
     submissions = db.relationship("FileSubmission", back_populates="user")
 
     def __init__(
-        self, user_cn, first_name, last_name, last_login, login_count, files_submitted
+            self, user_cn, first_name, last_name, last_login, login_count, files_submitted
     ):
         self.user_cn = user_cn
         self.first_name = first_name
@@ -100,3 +100,12 @@ class User(db.Model):
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class ApiKey(db.Model):
+    __tablename__ = "api_key"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    key = db.Column(db.String(), unique=True, nullable=False)
+    user_cn = db.Column(db.String(), db.ForeignKey('user.user_cn'), nullable=False)
+    expiration = db.Column(db.DateTime())

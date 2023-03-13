@@ -2,13 +2,18 @@
 Authentication controller
 """
 
-import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, current_app, request, session, jsonify
 from jsonschema import validate, ValidationError
 
 from database import db
-from services.auth import check_credentials
-from models import User
+from services.auth import check_credentials, auth_required
+from models import User, ApiKey
+
+from random import choice
+from string import ascii_letters, digits
+
+from sqlalchemy.exc import IntegrityError
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -22,7 +27,28 @@ loginSchema = {
 }
 
 
-@auth.route("logout")
+@auth.route('/apikey', methods=['GET'])
+@auth_required
+def get_api_key(user):
+    dbUser = db.session.query(User).filter_by(user_cn=user.user_cn).first()
+    if not dbUser:
+        return jsonify({'error': 'User not found'}), 404
+    existing_key = db.session.query(ApiKey).filter_by(user_cn=user.user_cn).first()
+    if existing_key:
+        if existing_key.expiration > datetime.now():
+            return jsonify({'api_key': existing_key.key}), 200
+        else:
+            db.session.delete(existing_key)
+            db.session.commit()
+    key = ''.join(choice(ascii_letters + digits) for _ in range(32))
+    expiration = datetime.now() + timedelta(days=30)
+    api_key = ApiKey(key=key, user_cn=user.user_cn, expiration=expiration)
+    db.session.add(api_key)
+    db.session.commit()
+    return jsonify({'api_key': key}), 201
+
+
+@auth.route("/logout")
 def logout():
     """Clears user session and returns logout message"""
     session.clear()
@@ -56,7 +82,7 @@ def login():
     # upsert the user record with the new last logged in time
     try:
         dbUser = db.session.query(User).filter_by(user_cn=session["user_cn"]).first()
-        loginTime = str(datetime.datetime.utcnow())
+        loginTime = str(datetime.utcnow())
         if dbUser is not None:
             dbUser.last_login = loginTime
             dbUser.login_count += 1
