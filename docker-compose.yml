@@ -1,10 +1,5 @@
 version: '3'
 
-networks:
-  strelkanet:
-    name: build_net
-    external: true
-
 services:
   app:
     build:
@@ -21,10 +16,6 @@ services:
       - DATABASE_PASSWORD=postgres
       - DATABASE_USERNAME=postgres
       - STRELKA_HOST=strelka_frontend_1
-    links:
-      - postgresdb
-    networks:
-      - strelkanet
     ports:
       - "8080:8080"
 
@@ -34,7 +25,10 @@ services:
       - POSTGRESQL_DATABASE=strelka_ui
       - POSTGRESQL_PASSWORD=postgres
       - POSTGRESQL_USERNAME=postgres
-    networks:
-      - strelkanet
     ports:
       - "5432:5432"
+    volumes:
+      - data:/bitnami/postgresql
+
+volumes:
+  data:

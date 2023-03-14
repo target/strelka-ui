@@ -176,4 +176,3 @@ def check_credentials(username, password):
 
     # LDAP authentication failed
     return False, {"error": "Invalid username or password"}
-

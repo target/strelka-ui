@@ -1,13 +1,30 @@
 import os
-from flask import Blueprint, send_from_directory, current_app
+from typing import Any
 
-ui = Blueprint("ui", __name__, url_prefix="")
+from flask import Blueprint, current_app, send_from_directory
+
+ui: Blueprint = Blueprint("ui", __name__, url_prefix="")
 
 
 @ui.route("/", defaults={"path": ""})
 @ui.route("/<path:path>")
-def serve(path):
-    if path != "" and os.path.exists(current_app.static_folder + "/" + path):
-        return send_from_directory(current_app.static_folder, path)
+def serve(path: str) -> Any:
+    """
+    Serve the static files from the Flask app's static folder.
+
+    Parameters:
+    -----------
+    path: str
+        The path to the file to serve.
+
+    Returns:
+    --------
+    response: Any
+        The Flask response object.
+    """
+    static_folder: str = current_app.static_folder
+
+    if path and os.path.exists(os.path.join(static_folder, path)):
+        return send_from_directory(static_folder, path)
     else:
-        return send_from_directory(current_app.static_folder, "index.html")
+        return send_from_directory(static_folder, "index.html")

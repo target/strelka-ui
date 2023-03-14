@@ -17,7 +17,7 @@ class Config(object):
 
     HTTP_PORT = 80
     UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "/opt")
-    STRELKA_HOST = os.environ.get("STRELKA_HOST", "strelka_frontend_1")
+    STRELKA_HOST = os.environ.get("STRELKA_HOST", "0.0.0.0")
     STRELKA_PORT = os.environ.get("STRELKA_PORT", "57314")
     STRELKA_CERT = os.environ.get("STRELKA_CERT", "")
     LDAP_URL = os.environ.get("LDAP_URL", "")

@@ -3,17 +3,15 @@ Authentication controller
 """
 
 from datetime import datetime, timedelta
-from flask import Blueprint, current_app, request, session, jsonify
-from jsonschema import validate, ValidationError
-
-from database import db
-from services.auth import check_credentials, auth_required
-from models import User, ApiKey
-
 from random import choice
 from string import ascii_letters, digits
 
-from sqlalchemy.exc import IntegrityError
+from flask import Blueprint, current_app, jsonify, request, session
+from jsonschema import ValidationError, validate
+
+from database import db
+from models import ApiKey, User
+from services.auth import auth_required, check_credentials
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -27,25 +25,25 @@ loginSchema = {
 }
 
 
-@auth.route('/apikey', methods=['GET'])
+@auth.route("/apikey", methods=["GET"])
 @auth_required
 def get_api_key(user):
     dbUser = db.session.query(User).filter_by(user_cn=user.user_cn).first()
     if not dbUser:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({"error": "User not found"}), 404
     existing_key = db.session.query(ApiKey).filter_by(user_cn=user.user_cn).first()
     if existing_key:
         if existing_key.expiration > datetime.now():
-            return jsonify({'api_key': existing_key.key}), 200
+            return jsonify({"api_key": existing_key.key}), 200
         else:
             db.session.delete(existing_key)
             db.session.commit()
-    key = ''.join(choice(ascii_letters + digits) for _ in range(32))
+    key = "".join(choice(ascii_letters + digits) for _ in range(32))
     expiration = datetime.now() + timedelta(days=30)
     api_key = ApiKey(key=key, user_cn=user.user_cn, expiration=expiration)
     db.session.add(api_key)
     db.session.commit()
-    return jsonify({'api_key': key}), 201
+    return jsonify({"api_key": key}), 201
 
 
 @auth.route("/logout")
