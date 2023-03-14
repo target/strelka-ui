@@ -95,7 +95,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
     fetchTableData({
       pagination,
     });
-  }, [filesUploaded, filterJustMine]);
+  }, [filesUploaded, filterJustMine, ]);
 
   const handleTableChange = (pagination, filters, sorter) => {
     fetchTableData({
@@ -126,10 +126,14 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const copyHashes = (record) => {
     return (
       <Dropdown overlay={copyHashMenu(record)}>
-        <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+        <button
+          type="button"
+          className="ant-dropdown-link"
+          onClick={(e) => e.preventDefault()}
+        >
           Hashes
           {/* <DownOutlined /> */}
-        </a>
+        </button>
       </Dropdown>
     );
   };
@@ -140,10 +144,10 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "file_id",
       key: "file_id",
       render: (file_id, full) => (
-      <div style={{ width: '200px', overflow: 'hidden' }}>
-        <Tooltip title={full.submitted_description} style="max-width: 50px">
-          <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
-        </Tooltip>
+        <div style={{ width: "200px", overflow: "hidden" }}>
+          <Tooltip title={full.submitted_description} style={{ "max-width": "50px" }}>
+            <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
+          </Tooltip>
         </div>
       ),
     },
@@ -200,7 +204,21 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "action",
       width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, record) => (
-        <Space size="middle">{copyHashes(record)}</Space>
+        <Space size="middle">
+          {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+            <a
+              target="_blank"
+              href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                "<REPLACE>",
+                record.file_id
+              )}
+              rel="noreferrer"
+            >
+              {APP_CONFIG.SEARCH_NAME}
+            </a>
+          )}
+          {copyHashes(record)}
+        </Space>
       ),
     },
   ];
