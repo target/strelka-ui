@@ -19,6 +19,7 @@ import {
 
 import PageWrapper from "../components/PageWrapper";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+
 import ScanDisplayCard from "../components/ScanDisplayCard";
 import { APP_CONFIG } from "../config";
 import AuthCtx from "../contexts/auth";
@@ -82,11 +83,6 @@ const SubmissionsPage = (props) => {
     };
   }, [handle401, id]);
 
-  const copyRecord = () => {
-    navigator.clipboard.writeText(JSON.stringify(data.strelka_response));
-    message.success("Value copied to clipboard!");
-  };
-
   const FormatListItemName = (item) => {
     return item
       .split("_")
@@ -122,9 +118,26 @@ const SubmissionsPage = (props) => {
           </Tag>
         ))}
         extra={[
-          <Button key="1" onClick={copyRecord}>
-            Copy record as JSON
-          </Button>,
+          APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+            <a
+              key="1"
+              href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                "<REPLACE>",
+                data.file_id
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button>{APP_CONFIG.SEARCH_NAME}</Button>
+            </a>
+          ),
+
+          <CopyToClipboard
+            text={JSON.stringify(data.strelka_response)}
+            onCopy={() => message.success("Event copied to clipboard!")}
+          >
+            <Button key="2">Copy record as JSON</Button>
+          </CopyToClipboard>,
         ]}
       >
         <Descriptions bordered size="small" column={3}>
@@ -264,7 +277,13 @@ const SubmissionsPage = (props) => {
                   </Button>
                 </div>
               </List.Item>
-              <List.Item style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <List.Item
+                style={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 <div>
                   <div style={{ paddingBottom: "8px" }}>
                     <b>{FormatListItemName("Only Expand Specific Scan")}</b>
@@ -278,7 +297,7 @@ const SubmissionsPage = (props) => {
                       maxWidth: "100%",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
-                      textOverflow: "ellipsis"
+                      textOverflow: "ellipsis",
                     }}
                     onChange={(FilenameView, FiledepthView) =>
                       handleEventView(FilenameView, FiledepthView)
