@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Tag, Tooltip } from "antd";
+import { Avatar, Tooltip } from "antd";
 import { CloudServerOutlined } from "@ant-design/icons";
 import { fetchWithTimeout } from "../util";
 import { APP_CONFIG } from "../config";
 
 function SystemStatus() {
-  const [isOnline, setIsOnline] = useState(false);
+  const [isStrelkaOnline, setIsStrelkaOnline] = useState(false);
 
   useEffect(() => {
     fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/status/strelka`, {
@@ -14,13 +14,13 @@ function SystemStatus() {
     })
       .then((response) => {
         if (response.status === 200) {
-          setIsOnline(true);
+          setIsStrelkaOnline(true);
         } else {
-          setIsOnline(false);
+          setIsStrelkaOnline(false);
         }
       })
       .catch((error) => {
-        setIsOnline(false);
+        setIsStrelkaOnline(false);
       });
   }, []);
 
@@ -28,15 +28,15 @@ function SystemStatus() {
     <div>
       <Tooltip
         title={
-          isOnline
+          isStrelkaOnline
             ? "Strelka server is available."
             : "Cannot connect to Strelka. File submission may not work. Contact your administrator for details."
         }
       >
-      <Avatar
-        style={{ backgroundColor: isOnline ? "#52c41a" : "#eb2f96" }}
-        icon={<CloudServerOutlined />}
-      />
+        <Avatar
+          style={{ backgroundColor: isStrelkaOnline ? "#52c41a" : "#eb2f96" }}
+          icon={<CloudServerOutlined />}
+        />
       </Tooltip>
     </div>
   );
