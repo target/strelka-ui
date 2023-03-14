@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar, Layout, Menu, message, Modal, Tag, Typography } from "antd";
+import { Layout, Menu, message, Modal, Tag, Typography } from "antd";
 import {
   BarChartOutlined,
   UploadOutlined,
