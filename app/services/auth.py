@@ -54,7 +54,7 @@ def authenticate_user():
             logging.warning("API key %s has expired", api_key)
             raise APIKeyExpired("API key has expired")
 
-    logging.warning("User not authenticated")
+    #logging.warning("User not authenticated")
     return None
 
 
@@ -137,14 +137,14 @@ def ldap_authenticate(username, password):
                 }
 
             # User not found in LDAP directory
-            current_app.logger.info(
-                "login failure for %s: failed to find username", username
-            )
+            # current_app.logger.info(
+            #     "login failure for %s: failed to find username", username
+            # )
             return None
 
     # Handle LDAP authentication errors
     except ldap3.core.exceptions.LDAPBindError as e:
-        current_app.logger.info("login failure for %s: %s", username, e)
+        #current_app.logger.info("login failure for %s: %s", username, e)
         return None
 
 

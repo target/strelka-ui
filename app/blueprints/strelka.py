@@ -95,9 +95,9 @@ def submit_file(user: User) -> Tuple[Any, int]:
                 )
             # If the Strelka submission was successful, save the analysis results to the database.
             else:
-                current_app.logger.info(
-                    "Saving new submission for user %s", user.user_cn
-                )
+                # current_app.logger.info(
+                #     "Saving new submission for user %s", user.user_cn
+                # )
 
                 # Get the submitted file object from the analysis results.
                 submitted_file = response[0]
@@ -133,9 +133,9 @@ def submit_file(user: User) -> Tuple[Any, int]:
 
         # If an exception occurs, log the error and return an error message.
         except Exception as e:
-            current_app.logger.info(
-                "Failed to submit %s to Strelka: %s", file.filename, e
-            )
+            # current_app.logger.info(
+            #     "Failed to submit %s to Strelka: %s", file.filename, e
+            # )
             return jsonify({"message": "Strelka submission was not successful."}, 500)
 
 

@@ -66,5 +66,5 @@ def submit_file_to_strelka(
             return [json.loads(response.event) for response in responses]
 
     except Exception as e:
-        current_app.logger.error("error submitting %s: %s", filename, e)
+        #current_app.logger.error("error submitting %s: %s", filename, e)
         return ""
