@@ -139,12 +139,12 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       title: "Filename",
       dataIndex: "file_id",
       key: "file_id",
-      width: '20%',
-      width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, full) => (
-        <Tooltip title={full.submitted_description}>
+      <div style={{ width: '200px', overflow: 'hidden' }}>
+        <Tooltip title={full.submitted_description} style="max-width: 50px">
           <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
         </Tooltip>
+        </div>
       ),
     },
     {
