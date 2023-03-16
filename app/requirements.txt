@@ -9,12 +9,17 @@ Flask-Expects-Json==1.7.0
 Flask-Migrate==2.7.0
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.5.1
+Paste==3.5.2
 
 # Database
 Alembic==1.6.2
 SQLAlchemy==1.4.15
 SQLAlchemy-JSON==0.4.0
 Psycopg2-Binary==2.9.4
+
+# Remote Procedure Call
+grpcio==1.41.0
+grpcio-tools==1.41.0
 
 # Security
 Cryptography==39.0.1
