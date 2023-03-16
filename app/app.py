@@ -10,6 +10,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
+from flask_migrate import Migrate, upgrade
 from paste.translogger import TransLogger
 from waitress import serve
 
@@ -44,6 +45,9 @@ def create_app() -> Flask:
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     CORS(app, supports_credentials=True)
     db.init_app(app)
+
+    # Initialize Flask-Migrate and associate it with the app
+    migrate = Migrate(app, db)
 
     # register routes
     app.register_blueprint(ui)
