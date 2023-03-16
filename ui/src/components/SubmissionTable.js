@@ -126,16 +126,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const copyHashes = (record) => {
     return (
       <Dropdown overlay={copyHashMenu(record)}>
-        <span
+        <a
+          href="/"
           className="ant-dropdown-link"
           onClick={(e) => e.preventDefault()}
         >
           Hashes
           {/* <DownOutlined /> */}
-        </span>
+        </a>
       </Dropdown>
     );
   };
+  
 
   const columns = [
     {
