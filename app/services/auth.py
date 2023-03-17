@@ -35,7 +35,7 @@ def authenticate_user():
     # Check for session authentication
     if SESSION_USER_ID_KEY in session:
         # Authenticate using session
-        user = User.query.filter_by(user_cn=session['user_cn']).first()
+        user = User.query.filter_by(user_cn=session["user_cn"]).first()
         if user:
             return user
 
@@ -54,7 +54,7 @@ def authenticate_user():
             logging.warning("API key %s has expired", api_key)
             raise APIKeyExpired("API key has expired")
 
-    #logging.warning("User not authenticated")
+    # logging.warning("User not authenticated")
     return None
 
 
@@ -105,7 +105,7 @@ def ldap_authenticate(username, password):
     """
     try:
         # Configure LDAP server
-        if os.environ.get("STRELKA_CERT"):
+        if current_app.config["STRELKA_CERT"]:
             # Use TLS encryption if STRELKA_CERT environment variable is set
             tls = ldap3.Tls(ca_certs_path=current_app.config["CA_CERT_PATH"])
             ldap_server = ldap3.Server(
@@ -116,35 +116,68 @@ def ldap_authenticate(username, password):
             ldap_server = ldap3.Server(current_app.config["LDAP_URL"], port=636)
 
         # Connect to LDAP server with provided credentials
-        with ldap3.Connection(ldap_server, username, password, auto_bind=True) as conn:
+        with ldap3.Connection(
+            ldap_server,
+            current_app.config["LDAP_USERNAME_ORGANIZATION"] + username,
+            password,
+            auto_bind=True,
+        ) as conn:
             # Search for user in LDAP directory
             conn.search(
-                search_base="OU=*,DC=*,DC=*,DC=*",
-                search_filter="(sAMAccountName=" + username + ")",
+                search_base=current_app.config["LDAP_SEARCH_BASE"],
+                search_filter=f'({current_app.config["LDAP_ATTRIBUTE_ACCOUNT_NAME_FIELD"]}='
+                + username
+                + ")",
                 search_scope="SUBTREE",
-                attributes=["AccountName", "FirstName", "LastName"],
+                attributes=[
+                    current_app.config["LDAP_ATTRIBUTE_ACCOUNT_NAME_FIELD"],
+                    current_app.config["LDAP_ATTRIBUTE_FIRST_NAME_FIELD"],
+                    current_app.config["LDAP_ATTRIBUTE_LAST_NAME_FIELD"],
+                    current_app.config["LDAP_ATTRIBUTE_MEMBER_OF_FIELD"],
+                ],
             )
 
             # Get search results
             result = conn.response
 
-            # Return user information if found
+            # Must have a record in AD as well as be a member of specific attribute.
             if result:
+                if current_app.config["LDAP_ATTRIBUTE_MEMBER_REQUIREMENT_FIELD"]:
+                    if not current_app.config[
+                        "LDAP_ATTRIBUTE_MEMBER_REQUIREMENT_FIELD"
+                    ] in str(result[0]["attributes"]["memberOf"]):
+                        current_app.logger.info(
+                            f"login failure for %s: requires {current_app.config['LDAP_ATTRIBUTE_MEMBER_REQUIREMENT_FIELD']} entitlement.",
+                            username,
+                        )
+                        return None
                 return {
-                    "user_cn": str(result[0]["attributes"]._store["AccountName"]),
-                    "first_name": str(result[0]["attributes"]._store["FirstName"]),
-                    "last_name": str(result[0]["attributes"]._store["LastName"]),
+                    "user_cn": str(
+                        result[0]["attributes"]._store[
+                            current_app.config["LDAP_ATTRIBUTE_ACCOUNT_NAME_FIELD"]
+                        ]
+                    ),
+                    "first_name": str(
+                        result[0]["attributes"]._store[
+                            current_app.config["LDAP_ATTRIBUTE_FIRST_NAME_FIELD"]
+                        ]
+                    ),
+                    "last_name": str(
+                        result[0]["attributes"]._store[
+                            current_app.config["LDAP_ATTRIBUTE_LAST_NAME_FIELD"]
+                        ]
+                    ),
                 }
 
             # User not found in LDAP directory
-            # current_app.logger.info(
-            #     "login failure for %s: failed to find username", username
-            # )
+            current_app.logger.info(
+                "login failure for %s: failed to find username", username
+            )
             return None
 
     # Handle LDAP authentication errors
     except ldap3.core.exceptions.LDAPBindError as e:
-        #current_app.logger.info("login failure for %s: %s", username, e)
+        current_app.logger.info("login failure for %s: %s", username, e)
         return None
 
 

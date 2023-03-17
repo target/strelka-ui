@@ -77,9 +77,7 @@ def get_db_status() -> bool:
             return False
 
 
-def submit_data(
-    file: Any, meta: Dict[str, Any]
-) -> Tuple[bool, Dict[str, Any], int]:
+def submit_data(file: Any, meta: Dict[str, Any]) -> Tuple[bool, Dict[str, Any], int]:
     """
     Submit a file to Strelka for analysis and return the result.
 
