@@ -39,7 +39,6 @@ services:
 volumes:
   data:
 
-
 networks:
   build_net:
     external: true
