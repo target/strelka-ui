@@ -95,7 +95,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
     fetchTableData({
       pagination,
     });
-  }, [filesUploaded, filterJustMine, ]);
+  }, [filesUploaded, filterJustMine]);
 
   const handleTableChange = (pagination, filters, sorter) => {
     fetchTableData({
@@ -137,7 +137,6 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       </Dropdown>
     );
   };
-  
 
   const columns = [
     {
@@ -146,11 +145,16 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "file_id",
       render: (file_id, full) => (
         <div style={{ width: "200px", overflow: "hidden" }}>
-          <Tooltip title={full.submitted_description} style={{ "max-width": "50px" }}>
-            <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
-          </Tooltip>
+          <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
         </div>
       ),
+    },
+    {
+      title: "Description",
+      dataIndex: "submitted_description",
+      key: "submitted_description",
+      width: minimalView ? componentWidth / 4 : 120,
+      render: (_, full) => <p>{full.submitted_description}</p>,
     },
     {
       title: "Submitted by",
@@ -226,7 +230,13 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
 
   let tableProps = [...columns];
   if (minimalView) {
-    tableProps = [tableProps[0], tableProps[1], tableProps[2], tableProps[7]];
+    tableProps = [
+      tableProps[0],
+      tableProps[1],
+      tableProps[2],
+      tableProps[3],
+      tableProps[7],
+    ];
   }
 
   return (
