@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Tag, Tooltip } from "antd";
+import { Avatar, Tooltip } from "antd";
+import { CloudServerOutlined } from "@ant-design/icons";
 import { fetchWithTimeout } from "../util";
 import { APP_CONFIG } from "../config";
 
 function SystemStatus() {
-  const [isOnline, setIsOnline] = useState(false);
+  const [isStrelkaOnline, setIsStrelkaOnline] = useState(false);
 
   useEffect(() => {
-    fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/status`, {
+    fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/status/strelka`, {
       method: "GET",
       timeout: 5000,
     })
       .then((response) => {
-        if (response.ok) {
-          setIsOnline(true);
+        if (response.status === 200) {
+          setIsStrelkaOnline(true);
         } else {
-          setIsOnline(false);
+          setIsStrelkaOnline(false);
         }
       })
       .catch((error) => {
-        setIsOnline(false);
+        setIsStrelkaOnline(false);
       });
   }, []);
 
@@ -27,14 +28,15 @@ function SystemStatus() {
     <div>
       <Tooltip
         title={
-          isOnline
-            ? "File submission is available."
-            : "File submission will likely not work. Contact your administrator."
+          isStrelkaOnline
+            ? "Strelka server is available."
+            : "Cannot connect to Strelka. File submission may not work. Contact your administrator for details."
         }
       >
-        <Tag color={isOnline ? "green" : "red"}>
-          {isOnline ? "Strelka: Online" : "Strelka: Offline"}
-        </Tag>
+        <Avatar
+          style={{ backgroundColor: isStrelkaOnline ? "#52c41a" : "#eb2f96" }}
+          icon={<CloudServerOutlined />}
+        />
       </Tooltip>
     </div>
   );

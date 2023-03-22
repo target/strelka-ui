@@ -1,100 +1,154 @@
 import datetime
-import json
+from typing import Any, Dict, Tuple
 
-from flask import Blueprint, current_app, request, session, jsonify
+from flask import Blueprint, current_app, jsonify, request, session
 from sqlalchemy.orm import joinedload
 
 from database import db
-from services.strelka import submit_file, get_frontend_status
-from models import User, FileSubmission
+from models import FileSubmission, User
+from services.auth import auth_required
+from services.strelka import get_db_status, get_frontend_status, submit_data
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
 
-@strelka.route("/status", methods=["GET"])
-def getServerStatus():
+@strelka.route("/status/strelka", methods=["GET"])
+def get_server_status() -> Tuple[str, int]:
+    """
+    Returns the status of the Strelka service.
 
+    Returns:
+        A Flask response object with a JSON-encoded message indicating whether
+        Strelka is reachable (200) or not (500).
+    """
     try:
         if get_frontend_status():
-            return jsonify({"message": "Server is reachable"}, 200)
+            return jsonify({"message": "Strelka is reachable"}), 200
         else:
-            return jsonify({"message": "Server is not reachable"}, 500)
-    except Exception as e:
-        current_app.logger.info("failed to submit %s to strelka: %s", file.filename, e)
-        return "strelka submission was not successful", 500
+            return jsonify({"message": "Strelka is not reachable"}), 500
+    except Exception:
+        return jsonify({"message": "Strelka is not reachable"}), 500
+
+
+@strelka.route("/status/database", methods=["GET"])
+def get_database_status() -> Tuple[str, int]:
+    """
+    Returns the status of the database.
+
+    Returns:
+        A Flask response object with a JSON-encoded message indicating whether
+        the database is reachable (200) or not (500).
+    """
+    try:
+        if get_db_status():
+            return jsonify({"message": "Database is reachable"}), 200
+        else:
+            return jsonify({"message": "Database is not reachable"}), 500
+    except Exception:
+        return jsonify({"message": "Database is not reachable"}), 500
 
 
 @strelka.route("/upload", methods=["POST"])
-def submitFile():
-    if not session.get("logged_in"):
-        return jsonify({"message": "unauthenticated"}, 401)
+@auth_required
+def submit_file(user: User) -> Tuple[Any, int]:
+    """
+    Submit a file to the Strelka file analysis engine and save the analysis results to the database.
 
+    Args:
+        user: User object representing the authenticated user submitting the file.
+
+    Returns:
+        If successful, returns the Strelka analysis results and a 200 status code.
+        If unsuccessful, returns an error message and a 500 status code.
+
+    Raises:
+        None.
+    """
+
+    # Check if a file was included in the request.
     if "file" not in request.files:
-        return jsonify({"message": "no file in request"}, 400)
+        return jsonify({"message": "No file in request."}, 400)
 
+    # Get the submitted file.
     file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"message": "submitted filename is empty"}, 400)
 
+    # Check if the submitted filename is empty.
+    if file.filename == "":
+        return jsonify({"message": "Submitted filename is empty."}, 400)
+
+    # Submit the file to the Strelka analysis engine.
     if file:
         try:
+            # Get the current timestamp and the file description from the request.
             submitted_at = str(datetime.datetime.utcnow())
             submitted_description = request.form["description"]
 
-            succeeded, response, file_size = submit_file(
-                file, {"source": "fileshot-webui", "user_name": session.get("user_cn")}
+            # Submit the file to Strelka and get the analysis results.
+            succeeded, response, file_size = submit_data(
+                file, {"source": "fileshot-webui", "user_name": user.user_cn}
             )
 
+            # If the Strelka submission was not successful, return an error message.
             if not succeeded:
                 return jsonify(
-                    {"message": "strelka submission was not successful"}, 500
+                    {"message": "Strelka submission was not successful."}, 500
                 )
+            # If the Strelka submission was successful, save the analysis results to the database.
             else:
-                user_id = session.get("user_id")
-                current_app.logger.info("saving new submission for user %s", user_id)
+                # current_app.logger.info(
+                #     "Saving new submission for user %s", user.user_cn
+                # )
 
-                # Submitted File (For Top Level Metadata Parsing)
+                # Get the submitted file object from the analysis results.
                 submitted_file = response[0]
 
-                # Save Submission to Submission Table
-                newSubmission = FileSubmission(
-                    getRequestID(submitted_file),
+                # Create a new submission object and add it to the database.
+                new_submission = FileSubmission(
+                    get_request_id(submitted_file),
                     file.filename,
                     file_size,
                     response,
-                    getMimeTypes(response),
-                    getYaraHits(response),
-                    getScannersRun(response),
-                    getHashes(submitted_file),
+                    get_mimetypes(response),
+                    get_yara_hits(response),
+                    get_scanners_run(response),
+                    get_hashes(submitted_file),
                     request.remote_addr,
                     request.headers.get("User-Agent"),
-                    user_id,
+                    user.id,
                     submitted_description,
                     submitted_at,
-                    getRequestTime(submitted_file),
+                    get_request_time(submitted_file),
                 )
 
-                db.session.add(newSubmission)
+                db.session.add(new_submission)
 
-                # Increase Submission Stat for User
-                # Upsert the user record with an additional submission counter
-                user_name = session.get("user_cn")
-                dbUser = db.session.query(User).filter_by(user_cn=user_name).first()
-                dbUser.files_submitted += 1
+                # Increase the user's submission count.
+                user.files_submitted += 1
 
                 db.session.flush()
                 db.session.commit()
 
+                # Return the analysis results and a 200 status code.
                 return response, 200
 
+        # If an exception occurs, log the error and return an error message.
         except Exception as e:
-            current_app.logger.info(
-                "failed to submit %s to strelka: %s", file.filename, e
-            )
-            return jsonify({"message": "strelka submission was not successful"}, 500)
+            # current_app.logger.info(
+            #     "Failed to submit %s to Strelka: %s", file.filename, e
+            # )
+            return jsonify({"message": "Strelka submission was not successful."}, 500)
 
 
-def getRequestID(response):
+def get_request_id(response: dict) -> str:
+    """
+    Get the ID of the request from the Strelka response.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        str: The ID of the request if it exists, otherwise an empty string.
+    """
     return (
         response["request"]["id"]
         if "request" in response and "id" in response["request"]
@@ -102,7 +156,16 @@ def getRequestID(response):
     )
 
 
-def getRequestTime(response):
+def get_request_time(response: dict) -> str:
+    """
+    Get the time of the request from the Strelka response.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        str: The time of the request if it exists, otherwise an empty string.
+    """
     return (
         str(datetime.datetime.fromtimestamp(response["request"]["time"]))
         if "request" in response and "time" in response["request"]
@@ -110,7 +173,16 @@ def getRequestTime(response):
     )
 
 
-def getMimeTypes(response):
+def get_mimetypes(response: list) -> list:
+    """
+    Get a list of unique MIME types found in the Strelka response.
+
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of unique MIME types.
+    """
     mimetypes = set()
 
     for r in response:
@@ -119,7 +191,16 @@ def getMimeTypes(response):
     return list(mimetypes)
 
 
-def getScannersRun(response):
+def get_scanners_run(response: list) -> list:
+    """
+    Get a list of scanners that were run on the file in the Strelka response.
+
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of scanner names.
+    """
     scanners = set()
 
     for r in response:
@@ -127,7 +208,16 @@ def getScannersRun(response):
     return list(scanners)
 
 
-def getYaraHits(response):
+def get_yara_hits(response: list) -> list:
+    """
+    Get a list of unique YARA rules that matched the file in the Strelka response.
+
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of YARA rule names.
+    """
     yarahits = set()
 
     for r in response:
@@ -136,7 +226,16 @@ def getYaraHits(response):
     return list(yarahits)
 
 
-def getHashes(response):
+def get_hashes(response: dict) -> list:
+    """
+    Get a dictionary of hashes and their values from the Strelka response.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        list: A list of (hash_type, hash_value) tuples.
+    """
     hashes = (
         response["scan"]["hash"].copy()
         if "scan" in response and "hash" in response["scan"]
@@ -147,27 +246,52 @@ def getHashes(response):
 
 
 @strelka.route("/scans/stats")
-def getScanStats():
-    if not session.get("logged_in"):
-        return "unauthenticated", 401
+@auth_required
+def get_scan_stats(user: User) -> Tuple[jsonify, int]:
+    """Return scan statistics for the user.
 
+    Args:
+        user: A User object representing the authenticated user.
+
+    Returns:
+        A tuple containing the scan statistics in JSON format and an HTTP status code.
+
+    """
+
+    # Get total number of submissions
     all_time = db.session.query(FileSubmission).count()
+
+    # Get number of submissions in the past 30 days
     thirty_days = (
         db.session.query(FileSubmission)
-        .filter(FileSubmission.submitted_at >= getTimeDelta(30))
-        .count()
-    )
-    seven_days = (
-        db.session.query(FileSubmission)
-        .filter(FileSubmission.submitted_at >= getTimeDelta(7))
-        .count()
-    )
-    twentyfour_hours = (
-        db.session.query(FileSubmission)
-        .filter(FileSubmission.submitted_at >= getTimeDelta(1))
+        .filter(
+            FileSubmission.submitted_at
+            >= datetime.datetime.utcnow() - datetime.timedelta(30)
+        )
         .count()
     )
 
+    # Get number of submissions in the past 7 days
+    seven_days = (
+        db.session.query(FileSubmission)
+        .filter(
+            FileSubmission.submitted_at
+            >= datetime.datetime.utcnow() - datetime.timedelta(7)
+        )
+        .count()
+    )
+
+    # Get number of submissions in the past 24 hours
+    twentyfour_hours = (
+        db.session.query(FileSubmission)
+        .filter(
+            FileSubmission.submitted_at
+            >= datetime.datetime.utcnow() - datetime.timedelta(1)
+        )
+        .count()
+    )
+
+    # Return scan statistics in JSON format and HTTP status code 200
     return (
         jsonify(
             {
@@ -181,16 +305,20 @@ def getScanStats():
     )
 
 
-def getTimeDelta(days):
-    return datetime.datetime.utcnow() - datetime.timedelta(days)
-
-
 @strelka.route("/scans/<id>")
-def getScan(id):
+@auth_required
+def get_scan(user: User, id: str) -> Tuple[str, int]:
+    """
+    Retrieves the scan results for the given submission ID.
 
-    if not session.get("logged_in"):
-        return "unauthenticated", 401
+    Args:
+        user: The authenticated user.
+        id: The ID of the submission to retrieve.
 
+    Returns:
+        A JSON representation of the scan results if the submission is found,
+        otherwise a "not found" string and a 404 status code.
+    """
     submission = (
         db.session.query(FileSubmission)
         .options(joinedload(FileSubmission.user))
@@ -199,17 +327,25 @@ def getScan(id):
     )
 
     if submission is not None:
-        return submissionsToJson(submission), 200
+        return submissions_to_json(submission), 200
     else:
         return "not found", 404
 
 
 @strelka.route("/scans", methods=["GET"])
-def view():
+@auth_required
+def view(user: User) -> Tuple[Dict[str, any], int]:
+    """
+    Returns a paginated list of submissions, optionally filtered to only show
+    the current user's submissions.
 
-    if not session.get("logged_in"):
-        return "unauthenticated", 401
+    Args:
+        user: The authenticated user.
 
+    Returns:
+        A JSON representation of the paginated list of submissions, including
+        pagination information and a list of submissions.
+    """
     page = request.args.get("page", default=1, type=int)
     per_page = request.args.get("per_page", default=1, type=int)
     just_mine = request.args.get("just_mine", default=False, type=bool)
@@ -236,13 +372,24 @@ def view():
         "per_page": submissions.per_page,
         "has_next": submissions.has_next,
         "has_prev": submissions.has_prev,
-        "items": list(map(lambda x: submissionsToJson(x), submissions.items)),
+        "items": list(map(lambda x: submissions_to_json(x), submissions.items)),
     }
 
     return paginated_ui, 200
 
 
-def submissionsToJson(submission):
+def submissions_to_json(submission: FileSubmission) -> Dict[str, any]:
+    """
+    Converts the given submission to a dictionary representation that can be
+    returned as JSON.
+
+    Args:
+        submission: The submission to convert.
+
+    Returns:
+        A dictionary representation of the submission, including its metadata
+        and the metadata of the user who submitted it.
+    """
     val = submission.as_dict()
     val["user"] = submission.user.as_dict()
     return val
