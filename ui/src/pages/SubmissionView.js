@@ -14,11 +14,15 @@ import {
   Typography,
   Select,
   Spin,
+  Tooltip,
   message,
 } from "antd";
 
+import { QuestionCircleOutlined } from "@ant-design/icons";
+
 import PageWrapper from "../components/PageWrapper";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+
 import ScanDisplayCard from "../components/ScanDisplayCard";
 import { APP_CONFIG } from "../config";
 import AuthCtx from "../contexts/auth";
@@ -32,18 +36,48 @@ const SubmissionsPage = (props) => {
   const { Option } = Select;
   const [FilenameView, setFileNameView] = useState("");
   const [FiledepthView, setFileDepthView] = useState("");
+  const [hideMetadata, setHideMetadata] = useState(true);
+  const [showAll, setShowAll] = useState(true);
+
+  const getFilteredData = () => {
+    let filteredData = { ...data };
+    if (hideMetadata) {
+      const filteredKeys = Object.keys(filteredData).filter(
+        (key) => key !== "strelka_response"
+      );
+      filteredKeys.forEach((key) => {
+        delete filteredData[key];
+      });
+    }
+
+    if (showAll) {
+      return {
+        strelka_response: filteredData.strelka_response,
+        ...filteredData,
+      };
+    }
+
+    const filteredResponse = [];
+    for (let i = 0; i < filteredData.strelka_response.length; i++) {
+      const item = filteredData.strelka_response[i];
+      if (
+        item.file.name === FilenameView &&
+        item.file.depth === FiledepthView
+      ) {
+        filteredResponse.push(item);
+        break; // exit the loop once the conditions are met
+      }
+    }
+    filteredData.strelka_response = filteredResponse;
+
+    const strelka_response = filteredData.strelka_response;
+    delete filteredData.strelka_response;
+    return { strelka_response, ...filteredData };
+  };
 
   const handleEventView = (value, depth) => {
-    if (value === "parent") {
-      setFileNameView(data.strelka_response[0].file.name);
-      setFileDepthView(data.strelka_response[0].file.depth);
-    } else if (value === "all") {
-      setFileNameView(data.strelka_response[0].file.name);
-      setFileDepthView(data.strelka_response[0].file.depth);
-    } else {
-      setFileNameView(value);
-      setFileDepthView(depth.children[1]);
-    }
+    setFileNameView(depth.children[3]);
+    setFileDepthView(depth.children[1]);
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -82,11 +116,6 @@ const SubmissionsPage = (props) => {
     };
   }, [handle401, id]);
 
-  const copyRecord = () => {
-    navigator.clipboard.writeText(JSON.stringify(data.strelka_response));
-    message.success("Value copied to clipboard!");
-  };
-
   const FormatListItemName = (item) => {
     return item
       .split("_")
@@ -122,9 +151,26 @@ const SubmissionsPage = (props) => {
           </Tag>
         ))}
         extra={[
-          <Button key="1" onClick={copyRecord}>
-            Copy record as JSON
-          </Button>,
+          APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+            <a
+              key="1"
+              href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                "<REPLACE>",
+                data.file_id
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button>{APP_CONFIG.SEARCH_NAME}</Button>
+            </a>
+          ),
+
+          <CopyToClipboard
+            text={JSON.stringify(data.strelka_response)}
+            onCopy={() => message.success("Event copied to clipboard!")}
+          >
+            <Button key="2">Copy record as JSON</Button>
+          </CopyToClipboard>,
         ]}
       >
         <Descriptions bordered size="small" column={3}>
@@ -235,8 +281,8 @@ const SubmissionsPage = (props) => {
 
           <Card>
             <Typography>
-              <Title level={3}>Expand Results</Title>
-              <Text type="secondary">Expand specific events</Text>
+              <Title level={3}>Display Results</Title>
+              <Text type="secondary">Options for displaying events.</Text>
             </Typography>
             <br />
 
@@ -244,36 +290,55 @@ const SubmissionsPage = (props) => {
               <List.Item>
                 <div>
                   <div style={{ paddingBottom: "8px" }}>
-                    <b>{FormatListItemName("Expand Parent Scan Only")}</b>
+                    <b>{FormatListItemName("Metadata Display")}</b>
                   </div>
-
-                  <Button onClick={() => handleEventView("parent")}>
-                    Expand
+                  <Button
+                    onClick={() => setHideMetadata(!hideMetadata)}
+                    style={{ marginBottom: "8px" }}
+                  >
+                    {hideMetadata ? "Show Metadata" : "Hide Metadata"}
                   </Button>
                 </div>
               </List.Item>
               <List.Item>
                 <div>
                   <div style={{ paddingBottom: "8px" }}>
-                    <b>{FormatListItemName("Expand All Scans")}</b>
+                    <b>{FormatListItemName("Event Display")}</b>
                   </div>
 
-                  <div />
-                  <Button onClick={() => handleEventView("all")}>
-                    Expand All
+                  <Button onClick={() => setShowAll(!showAll)}>
+                    {showAll ? "Specific Event Display" : "Show All Events"}
                   </Button>
                 </div>
               </List.Item>
-              <List.Item>
-                <div>
-                  <div style={{ paddingBottom: "8px" }}>
-                    <b>{FormatListItemName("Only Expand Specific Scan")}</b>
-                  </div>
 
+              <List.Item
+                style={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <div style={{ alignItems: "center" }}>
+                  <div style={{ paddingBottom: "8px" }}>
+                    <b>{FormatListItemName("Display Specific Scans")}</b>
+                    {showAll && (
+                      <Tooltip title="Must change above to Specific Event Display">
+                        <QuestionCircleOutlined style={{ marginLeft: 8 }} />
+                      </Tooltip>
+                    )}
+                  </div>
                   <Select
+                    disabled={showAll}
                     id="expandSelect"
                     defaultValue="Select Filename"
-                    style={{ width: "100%" }}
+                    style={{
+                      width: "250px",
+                      maxWidth: "100%",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
                     onChange={(FilenameView, FiledepthView) =>
                       handleEventView(FilenameView, FiledepthView)
                     }
@@ -339,23 +404,19 @@ const SubmissionsPage = (props) => {
               <br />
 
               <ReactJson
-                src={data}
+                src={getFilteredData()}
+                collapsed={3}
                 shouldCollapse={(field) => {
-                  if (field.name === "hashes") {
-                    return true;
+                  if (field.name === "scan") {
+                    return false;
                   }
-                  if (field.namespace.length === 3) {
-                    if (field.namespace.includes("strelka_response")) {
-                      if (
-                        field.src.file.depth !== FiledepthView &&
-                        field.src.file.name !== FilenameView
-                      ) {
-                        return true;
-                      }
-                    }
+                  if (
+                    typeof field.src !== "object" ||
+                    Array.isArray(field.src)
+                  ) {
+                    return false;
                   }
-                  // Otherwise, show the field.
-                  return false;
+                  return field.level > 2;
                 }}
               />
             </Card>

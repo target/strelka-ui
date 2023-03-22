@@ -126,7 +126,11 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const copyHashes = (record) => {
     return (
       <Dropdown overlay={copyHashMenu(record)}>
-        <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+        <a
+          href="/"
+          className="ant-dropdown-link"
+          onClick={(e) => e.preventDefault()}
+        >
           Hashes
           {/* <DownOutlined /> */}
         </a>
@@ -139,12 +143,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       title: "Filename",
       dataIndex: "file_id",
       key: "file_id",
-      width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, full) => (
-        <Tooltip title={full.submitted_description}>
+        <div style={{ width: "200px", overflow: "hidden" }}>
           <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
-        </Tooltip>
+        </div>
       ),
+    },
+    {
+      title: "Description",
+      dataIndex: "submitted_description",
+      key: "submitted_description",
+      width: minimalView ? componentWidth / 4 : 120,
+      render: (_, full) => <p>{full.submitted_description}</p>,
     },
     {
       title: "Submitted by",
@@ -199,14 +209,34 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "action",
       width: minimalView ? componentWidth / 4 : 200,
       render: (file_id, record) => (
-        <Space size="middle">{copyHashes(record)}</Space>
+        <Space size="middle">
+          {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+            <a
+              target="_blank"
+              href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                "<REPLACE>",
+                record.file_id
+              )}
+              rel="noreferrer"
+            >
+              {APP_CONFIG.SEARCH_NAME}
+            </a>
+          )}
+          {copyHashes(record)}
+        </Space>
       ),
     },
   ];
 
   let tableProps = [...columns];
   if (minimalView) {
-    tableProps = [tableProps[0], tableProps[1], tableProps[2], tableProps[7]];
+    tableProps = [
+      tableProps[0],
+      tableProps[1],
+      tableProps[2],
+      tableProps[3],
+      tableProps[7],
+    ];
   }
 
   return (

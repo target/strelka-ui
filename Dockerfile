@@ -29,13 +29,11 @@ ENV ENV=production
 
 # Set Runtime Variables
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV RUNTIME_VERSION=v2.4.2
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH /app
 
 COPY ./app/requirements.txt .
 RUN pip install -r requirements.txt
-
 
 COPY ./app .
 

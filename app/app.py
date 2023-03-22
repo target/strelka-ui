@@ -5,6 +5,7 @@ App entrypoint
 import logging
 import os
 import sys
+from typing import Optional
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -19,16 +20,16 @@ from blueprints.ui import ui
 from models import db
 
 
-def create_app():
+def create_app() -> Flask:
     """Start and serve app assets and API endpoints"""
     load_dotenv()
 
-    uiFolder = os.environ.get("STATIC_ASSET_FOLDER")
-    if uiFolder is None:
-        uiFolder = "react-app"
+    ui_folder: Optional[str] = os.environ.get("STATIC_ASSET_FOLDER", None)
+    if ui_folder is None:
+        ui_folder = "react-app"
 
-    app = Flask(__name__, static_folder=uiFolder)
-    app.logger.info("Serving app static assets from %s", uiFolder)
+    app: Flask = Flask(__name__, static_folder=ui_folder)
+    app.logger.info("Serving app static assets from %s", ui_folder)
 
     if app.config["ENV"] == "production":
         app.config.from_object("config.config.ProductionConfig")
@@ -59,9 +60,9 @@ def create_app():
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-    mainApp = create_app()
+    main_app: Flask = create_app()
 
-    serve(TransLogger(mainApp, setup_console_handler=False), host="0.0.0.0", port=8080)
+    serve(TransLogger(main_app, setup_console_handler=False), host="0.0.0.0", port=8080)
 
     # uncomment below for local flask app development with hot reloading
-    #mainApp.run(host='0.0.0.0', port=80, threaded=True)
+    main_app.run(host="0.0.0.0", port=80, threaded=True)

@@ -1,39 +1,44 @@
-version: '3'
-
-networks:
-  strelkanet:
-    name: build_net
+version: '3.8'
 
 services:
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         REACT_APP_BACKEND_URL: /api
-    container_name: fileshot-webui
-    depends_on:
-      - "postgresdb"
-    environment:
-      - DATABASE_HOST=postgresdb
-      - DATABASE_NAME=strelka_ui
-      - DATABASE_PASSWORD=postgres
-      - DATABASE_USERNAME=postgres
-      - STRELKA_HOST=strelka_frontend_1
-    links:
-      - postgresdb
-    networks:
-      - strelkanet
+    container_name: strelka-ui-webapp
     ports:
       - "8080:8080"
+    depends_on:
+      - postgresdb
+    environment:
+      DATABASE_HOST: postgresdb
+      DATABASE_NAME: strelka_ui
+      DATABASE_PASSWORD: postgres
+      DATABASE_USERNAME: postgres
+      STRELKA_HOST: strelka_frontend_1
+    networks:
+      - build_net
 
   postgresdb:
     image: docker.io/bitnami/postgresql:11
+    container_name: strelka-ui-postgresdb
     environment:
-      - POSTGRESQL_DATABASE=strelka_ui
-      - POSTGRESQL_PASSWORD=postgres
-      - POSTGRESQL_USERNAME=postgres
-    networks:
-      - strelkanet
+      POSTGRESQL_DATABASE: strelka_ui
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_USERNAME: postgres
     ports:
       - "5432:5432"
+    volumes:
+      - data:/bitnami/postgresql
+    networks:
+      - build_net
+
+volumes:
+  data:
+
+networks:
+  build_net:
+    external: true
