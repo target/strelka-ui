@@ -1,6 +1,12 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2023-03-22
+### Changed
+- Added API suppport
+- Added functionality to multiple pages
+- Updated code with improved formatting / types
+
 ## 2023-03-10
 ### Changed
 - Added extracted file support
