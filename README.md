@@ -37,14 +37,14 @@ The file submission UI provides the following features:
 
 By default, the Strelka UI is configured to use a minimal "quickstart" deployment that allows users to test the system. This deployment will target a local Strelka instance and start a local database. Users will be able to access this system with whatever username / password they want. For additional information on targeting a remote Strelka instance, database, or using LDAP for authentication, see the [Additional Setup](#quick-start) section:
 
-#### Step 0: Ensure a Strelka Cluster is Ready
+#### Step 1: Ensure a Strelka Cluster is Ready
 
 ```
 Start or ensure Strelka cluster is ready and accessible.
 See https://github.com/target/strelka for more information.
 ```
 
-#### Step 1: Build and Start Strelka UI (Docker)
+#### Step 2: Build and Start Strelka UI (Docker)
 
 ```
 # Terminal 1
