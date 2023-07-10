@@ -1,6 +1,9 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2023-07-10
+- Dependency upgrades (`requests`, `grpcio`, `tough-cookie`, `cryptography`)
+
 ## 2023-05-16
 ### Changed
 - Added Docker Hub support for repo tags
