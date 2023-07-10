@@ -57,7 +57,7 @@ Pyasn1==0.4.8
 Pycparser==2.20
 Pyrsistent==0.18.0
 Python-Dateutil==2.8.1
-Requests==2.25.1
+Requests==2.31.0
 Six==1.16.0
 Toml==0.10.2
 Tomli==1.2.3
