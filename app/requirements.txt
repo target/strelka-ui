@@ -22,7 +22,7 @@ grpcio==1.53.0
 grpcio-tools==1.41.0
 
 # Security
-Cryptography==41.0.0
+Cryptography==41.0.2
 PyJWT==2.4.0
 PyOpenSSL==20.0.1
 
