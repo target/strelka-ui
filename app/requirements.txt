@@ -41,7 +41,7 @@ Waitress==2.1.2
 Astroid==2.9.2
 Attrs==21.4.0
 Black==21.12b0
-Certifi==2022.12.7
+Certifi==2023.7.22
 Cffi==1.14.5
 Chardet==4.0.0
 Jsonschema==4.3.3
