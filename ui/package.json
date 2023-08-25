@@ -2,6 +2,7 @@
   "name": "ui",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@ant-design/pro-form": "^1.69.4",
     "@ant-design/pro-layout": "^6.38.9",
