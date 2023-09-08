@@ -190,13 +190,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       width: 200,
       render: (mime_types) => <TagSet items={mime_types} />,
     },
-    {
-      title: "YARA Hits",
-      dataIndex: "yara_hits",
-      key: "yara_hits",
-      width: 200,
-      render: (yara_hits) => <TagSet items={yara_hits} />,
-    },
+{
+  title: "YARA Hits",
+  dataIndex: "yara_hits",
+  key: "yara_hits",
+  width: 200,
+  render: (yara_hits = []) => {
+    if (!Array.isArray(yara_hits) || yara_hits.length === 0) {
+      return "No YARA Hits";
+    }
+    return <TagSet items={yara_hits} />;
+  },
+},
     {
       title: "Scanners Run",
       key: "scanners_run",

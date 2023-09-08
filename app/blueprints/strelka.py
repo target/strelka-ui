@@ -221,7 +221,15 @@ def get_yara_hits(response: list) -> list:
     yarahits = set()
 
     for r in response:
-        for yarahit in r["scan"]["yara"]["matches"]:
+        matches = (r
+                   .get("scan", {})
+                   .get("yara", {})
+                   .get("matches"))
+
+        if not isinstance(matches, list):
+            continue
+
+        for yarahit in matches:
             yarahits.add(yarahit)
     return list(yarahits)
 
