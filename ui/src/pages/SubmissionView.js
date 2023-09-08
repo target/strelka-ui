@@ -210,17 +210,22 @@ const SubmissionsPage = (props) => {
               })}
             </div>
           </Descriptions.Item>
-          <Descriptions.Item label="YARA Hits">
-            <div>
-              {data?.strelka_response[0]?.scan?.[
-                "scan_yara" in data.strelka_response[0] ? "scan_yara" : "yara"
-              ].matches.map((type) => (
-                <Tag style={{ marginBottom: "4px" }} key={type}>
-                  {type}
-                </Tag>
-              ))}
-            </div>
-          </Descriptions.Item>
+            <Descriptions.Item label="YARA Hits">
+              <div>
+                {
+                  data?.strelka_response?.[0]?.scan &&
+                  (
+                    "scan_yara" in data.strelka_response[0]
+                    ? data.strelka_response[0].scan.scan_yara
+                    : data.strelka_response[0].scan.yara
+                  )?.matches?.map((type, index) => (
+                    <Tag style={{ marginBottom: "4px" }} key={type + '-' + index}>
+                      {type}
+                    </Tag>
+                  ))
+                }
+              </div>
+            </Descriptions.Item>
         </Descriptions>
       </PageHeader>
 
