@@ -32,6 +32,7 @@ The file submission UI provides the following features:
 - Docker
 - Docker-compose
 - Python 3.9+
+- Entitlement: `CN=APP-DHB-DetectHubUser`
 
 ## Quick Start
 
