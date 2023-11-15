@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, Tuple
 
-from flask import Blueprint, current_app, jsonify, request, session
+from flask import Blueprint, current_app, jsonify, request, session, Response
 from sqlalchemy.orm import joinedload
 
 from database import db
@@ -13,7 +13,7 @@ strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
 
 @strelka.route("/status/strelka", methods=["GET"])
-def get_server_status() -> Tuple[str, int]:
+def get_server_status() -> Tuple[Response, int]:
     """
     Returns the status of the Strelka service.
 
@@ -31,7 +31,7 @@ def get_server_status() -> Tuple[str, int]:
 
 
 @strelka.route("/status/database", methods=["GET"])
-def get_database_status() -> Tuple[str, int]:
+def get_database_status() -> Tuple[Response, int]:
     """
     Returns the status of the database.
 
@@ -50,7 +50,7 @@ def get_database_status() -> Tuple[str, int]:
 
 @strelka.route("/upload", methods=["POST"])
 @auth_required
-def submit_file(user: User) -> Tuple[Any, int]:
+def submit_file(user: User) -> Tuple[Response, int]:
     """
     Submit a file to the Strelka file analysis engine and save the analysis results to the database.
 
@@ -67,14 +67,30 @@ def submit_file(user: User) -> Tuple[Any, int]:
 
     # Check if a file was included in the request.
     if "file" not in request.files:
-        return jsonify({"message": "No file in request."}, 400)
+        return (
+            jsonify(
+                {
+                    "error": "Strelka submission was not successful.",
+                    "details": "No file in request.",
+                }
+            ),
+            400,
+        )
 
     # Get the submitted file.
     file = request.files["file"]
 
     # Check if the submitted filename is empty.
     if file.filename == "":
-        return jsonify({"message": "Submitted filename is empty."}, 400)
+        return (
+            jsonify(
+                {
+                    "error": "Strelka submission was not successful.",
+                    "details": "Submitted filename is empty.",
+                }
+            ),
+            400,
+        )
 
     # Submit the file to the Strelka analysis engine.
     if file:
@@ -90,53 +106,57 @@ def submit_file(user: User) -> Tuple[Any, int]:
 
             # If the Strelka submission was not successful, return an error message.
             if not succeeded:
-                return jsonify(
-                    {"message": "Strelka submission was not successful."}, 500
+                return (
+                    jsonify(
+                        {"error": "Failed to submit file", "details": str(response)}
+                    ),
+                    415,
                 )
+
             # If the Strelka submission was successful, save the analysis results to the database.
-            else:
-                # current_app.logger.info(
-                #     "Saving new submission for user %s", user.user_cn
-                # )
+            # Get the submitted file object from the analysis results.
+            submitted_file = response[0]
 
-                # Get the submitted file object from the analysis results.
-                submitted_file = response[0]
+            # Create a new submission object and add it to the database.
+            new_submission = FileSubmission(
+                get_request_id(submitted_file),
+                file.filename,
+                file_size,
+                response,
+                get_mimetypes(response),
+                get_yara_hits(response),
+                get_scanners_run(response),
+                get_hashes(submitted_file),
+                request.remote_addr,
+                request.headers.get("User-Agent"),
+                user.id,
+                submitted_description,
+                submitted_at,
+                get_request_time(submitted_file),
+            )
 
-                # Create a new submission object and add it to the database.
-                new_submission = FileSubmission(
-                    get_request_id(submitted_file),
-                    file.filename,
-                    file_size,
-                    response,
-                    get_mimetypes(response),
-                    get_yara_hits(response),
-                    get_scanners_run(response),
-                    get_hashes(submitted_file),
-                    request.remote_addr,
-                    request.headers.get("User-Agent"),
-                    user.id,
-                    submitted_description,
-                    submitted_at,
-                    get_request_time(submitted_file),
-                )
+            db.session.add(new_submission)
 
-                db.session.add(new_submission)
+            # Increase the user's submission count.
+            user.files_submitted += 1
 
-                # Increase the user's submission count.
-                user.files_submitted += 1
+            db.session.flush()
+            db.session.commit()
 
-                db.session.flush()
-                db.session.commit()
-
-                # Return the analysis results and a 200 status code.
-                return response, 200
+            # Return the analysis results and a 200 status code.
+            return jsonify(response), 200
 
         # If an exception occurs, log the error and return an error message.
         except Exception as e:
-            # current_app.logger.info(
-            #     "Failed to submit %s to Strelka: %s", file.filename, e
-            # )
-            return jsonify({"message": "Strelka submission was not successful."}, 500)
+            return (
+                jsonify(
+                    {
+                        "error": "Strelka submission was not successful.",
+                        "details": str(e),
+                    }
+                ),
+                500,
+            )
 
 
 def get_request_id(response: dict) -> str:
@@ -221,10 +241,7 @@ def get_yara_hits(response: list) -> list:
     yarahits = set()
 
     for r in response:
-        matches = (r
-                   .get("scan", {})
-                   .get("yara", {})
-                   .get("matches"))
+        matches = r.get("scan", {}).get("yara", {}).get("matches")
 
         if not isinstance(matches, list):
             continue
@@ -315,7 +332,7 @@ def get_scan_stats(user: User) -> Tuple[jsonify, int]:
 
 @strelka.route("/scans/<id>")
 @auth_required
-def get_scan(user: User, id: str) -> Tuple[str, int]:
+def get_scan(user: User, id: str) -> Tuple[Response, int]:
     """
     Retrieves the scan results for the given submission ID.
 
@@ -334,10 +351,18 @@ def get_scan(user: User, id: str) -> Tuple[str, int]:
         .first()
     )
 
-    if submission is not None:
-        return submissions_to_json(submission), 200
+    if submission:
+        return jsonify(submissions_to_json(submission)), 200
     else:
-        return "not found", 404
+        return (
+            jsonify(
+                {
+                    "error": "Strelka scan unable to be retrieved.",
+                    "details": f"Scan {id} not found.",
+                }
+            ),
+            404,
+        )
 
 
 @strelka.route("/scans", methods=["GET"])
