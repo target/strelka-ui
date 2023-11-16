@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "strelka-ui"
 version = "0.1.0"
-description = "Strelka's File ubmission Portal"
+description = "Strelka's File Submission Portal"
 authors = [
     "Paul Hutelmyer <Paul.Hutelmyer@Target.com>",
 ]
