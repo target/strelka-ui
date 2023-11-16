@@ -32,9 +32,22 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH /app
 
-COPY ./app/requirements.txt .
-RUN pip install -r requirements.txt
+# Install Poetry globally and copy project files
+RUN python3 -m pip install -U pip setuptools && \
+    python3 -m pip install poetry && \
+    rm -rf /root/.cache/pip
 
+# Set the working directory and copy the project files
+COPY ./app/pyproject.toml ./app/poetry.lock ./
+
+# Use Poetry to install the project dependencies globally
+# This step is after the COPY step because it is more likely to change,
+# and therefore should not be included in earlier layers that can be cached.
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-dev && \
+    rm -rf /root/.cache/pypoetry
+
+WORKDIR /app
 COPY ./app .
 
 # Copy the production UI assets into the new base image.  
