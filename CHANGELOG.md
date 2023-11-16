@@ -1,6 +1,10 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2023-11-16
+- Transition to Poetry for Python Package Management
+- Refinement of HTTP Response Codes
+  
 ## 2023-09-08
 - Adding base_url support (Defaults to `/strelkaui/`
 - Bug fix for files without YARA matches
