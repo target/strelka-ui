@@ -70,7 +70,7 @@ const DashboardPage = (props) => {
         message.success(`${info.file.name} file uploaded successfully`);
         setFilesUploaded(filesUploaded + 1);
       } else if (info.file.status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
+        message.error(`${info.file.response.details}`);
       }
     },
     showUploadList: {
