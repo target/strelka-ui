@@ -112,14 +112,24 @@ def submit_data(file: Any, meta: Dict[str, Any]) -> Tuple[bool, str, int]:
             if response:
                 return True, response, len(sample_data)
             else:
-                logger.error(f"failed to submit {file.filename} to strelka. Please check the submitted file.")
+                logger.error(
+                    f"Failed to submit {file.filename} to strelka. Please check the submitted file."
+                )
                 # Return a tuple indicating failure, an empty dictionary, and a file size of 0
-                return False, f"failed to submit {file.filename} to strelka. Please check the submitted file.", 0
+                return (
+                    False,
+                    f"Failed to submit {file.filename} to strelka. Please check the submitted file.",
+                    0,
+                )
 
         except Exception as e:
-            logger.error(f"failed to submit {file.filename} to strelka: {e}")
+            logger.error(f"Failed to submit {file.filename} to strelka: {e}")
             # Return a tuple indicating failure, an empty dictionary, and a file size of 0
-            return False, f"failed to submit {file.filename} to strelka: {e}", 0
+            return False, f"Failed to submit {file.filename} to strelka: {e}", 0
 
     # Return a tuple indicating failure, an empty dictionary, and a file size of 0
-    return False, f"failed to submit {file.filename} to strelka. Please check the submitted file.", 0
+    return (
+        False,
+        f"Failed to submit {file.filename} to strelka. Please check the submitted file.",
+        0,
+    )
