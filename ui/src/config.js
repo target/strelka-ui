@@ -1,5 +1,5 @@
 const APP_CONFIG = {
-  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || "http://localhost:8080/api",
+  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || "/api",
   API_TIMEOUT: 8000,
   LOGIN_TIMEOUT: 30000,
   SEARCH_URL: process.env.REACT_APP_SEARCH_URL,
