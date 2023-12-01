@@ -58,7 +58,7 @@ Six = "1.16.0"
 Toml = "0.10.2"
 Tomli = "1.2.3"
 Typing-Extensions = "4.0.1"
-Urllib3 = "1.26.7"
+Urllib3 = "1.26.18"
 Wrapt = "1.13.3"
 
 [tool.poetry.dev-dependencies]
