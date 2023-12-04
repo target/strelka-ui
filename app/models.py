@@ -28,6 +28,7 @@ class FileSubmission(db.Model):
         user (User): The user who submitted the file.
         submitted_at (datetime.datetime): The date and time the file was submitted.
         processed_at (datetime.datetime): The date and time the file was processed.
+        virustotal_positives (int): Amount of positives returned by VirusTotal.
     """
 
     __tablename__ = "file_submission"
@@ -60,6 +61,9 @@ class FileSubmission(db.Model):
     )
     processed_at: datetime.datetime = db.Column(db.DateTime())
 
+    # Enrichments
+    virustotal_positives: int = db.Column(db.Integer)
+
     def __init__(
         self,
         file_id: str,
@@ -76,6 +80,7 @@ class FileSubmission(db.Model):
         submitted_description: str,
         submitted_at: datetime.datetime,
         processed_at: datetime.datetime,
+        virustotal_positives: int,
     ):
         self.file_id = file_id
         self.file_name = file_name
@@ -91,6 +96,7 @@ class FileSubmission(db.Model):
         self.submitted_description = submitted_description
         self.submitted_at = submitted_at
         self.processed_at = processed_at
+        self.virustotal_positives = virustotal_positives
 
     def __repr__(self):
         return "<id {}>".format(self.id)
