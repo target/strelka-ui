@@ -120,18 +120,25 @@ def submit_file(user: User) -> Tuple[Response, int]:
             # Get the submitted file object from the analysis results.
             submitted_file = response[0]
 
-            # If VirusTotal API key provided, get positives
+            # If VirusTotal API key provided, get positives (VIRUSTOTAL_API_LIMIT determined Max Scans per Request)
             # -1    = VirusTotal Lookup Error
             # -2    = VirusTotal API Key Not Provided
             # >= 0  = Response Positives from VirusTotal
-            virustotal_positives = -2
-
             if os.environ.get("VIRUSTOTAL_API_KEY"):
+                total_scanned = 0
                 try:
-                    virustotal_positives = get_virustotal_positives(
-                        api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
-                        file_hash=file["response"]["scan"]["hash"],
-                    )
+                    for scanned_file in response:
+                        if total_scanned <= int(os.environ.get("VIRUSTOTAL_API_LIMIT")):
+                            scanned_file["enrichment"] = {"virustotal": -2}
+                            scanned_file["enrichment"][
+                                "virustotal"
+                            ] = get_virustotal_positives(
+                                api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
+                                file_hash=scanned_file["scan"]["hash"]["md5"],
+                            )
+                            total_scanned += 1
+                        else:
+                            pass
                 except Exception as e:
                     logging.warning(
                         f"Could not process VirusTotal search with error: {e} "
@@ -153,7 +160,6 @@ def submit_file(user: User) -> Tuple[Response, int]:
                 submitted_description,
                 submitted_at,
                 get_request_time(submitted_file),
-                virustotal_positives,
             )
 
             db.session.add(new_submission)

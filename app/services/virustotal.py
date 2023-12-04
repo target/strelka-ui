@@ -23,5 +23,5 @@ def get_virustotal_positives(api_key: str, file_hash: str) -> int:
             return file_analysis.last_analysis_stats["malicious"]
 
         except vt.error.APIError as e:
-            logging.warning(f"API Error: {e}")
+            logging.warning(f"VirusTotal Response: {e}")
             return -1

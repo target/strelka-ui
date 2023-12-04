@@ -36,6 +36,7 @@ class Config(object):
 
     # API Details
     VIRUSTOTAL_API_KEY = os.environ.get("VIRUSTOTAL_API_KEY", "")
+    VIRUSTOTAL_API_LIMIT = os.environ.get("VIRUSTOTAL_API_LIMIT", 30)
     API_KEY_EXPIRATION = os.environ.get("API_KEY_EXPIRATION", "999")
 
     # LDAP Details
