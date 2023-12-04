@@ -87,6 +87,7 @@ The following detail the configuration items in `./app/config/config.py`.
 | STRELKA_CERT                            | Path to certificate for Strelka, if needed (e.g., `/path/to/cert.pem`)  | No       |
 | CA_CERT_PATH                            | Path to CA certificates for LDAP, if needed (e.g., `/path/to/ca_certs`) | No       |
 | VIRUSTOTAL_API_KEY                      | API Key for VirusTotal Hash Lookup                                      | Yes      |
+| VIRUSTOTAL_API_LIMIT                    | Limit how many files should be scanned by VirusTotal (Default: `30`)    | Yes      |
 | LDAP_URL                                | URL to LDAP server (e.g., `ldaps://ldap.example.com:636`)               | No       |
 | LDAP_SEARCH_BASE                        | Search base for LDAP queries (e.g., `DC=example,DC=com`)                | No       |
 | LDAP_USERNAME_ORGANIZATION              | Username organization for LDAP queries (e.g., `org//`)                  | No       |
