@@ -1,4 +1,6 @@
 import datetime
+import logging
+import os
 from typing import Any, Dict, Tuple
 
 from flask import Blueprint, current_app, jsonify, request, session, Response
@@ -8,6 +10,7 @@ from database import db
 from models import FileSubmission, User
 from services.auth import auth_required
 from services.strelka import get_db_status, get_frontend_status, submit_data
+from services.virustotal import get_virustotal_positives
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
@@ -117,6 +120,23 @@ def submit_file(user: User) -> Tuple[Response, int]:
             # Get the submitted file object from the analysis results.
             submitted_file = response[0]
 
+            # If VirusTotal API key provided, get positives
+            # -1    = VirusTotal Lookup Error
+            # -2    = VirusTotal API Key Not Provided
+            # >= 0  = Response Positives from VirusTotal
+            virustotal_positives = -2
+
+            if os.environ.get("VIRUSTOTAL_API_KEY"):
+                try:
+                    virustotal_positives = get_virustotal_positives(
+                        api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
+                        file_hash=file["response"]["scan"]["hash"],
+                    )
+                except Exception as e:
+                    logging.warning(
+                        f"Could not process VirusTotal search with error: {e} "
+                    )
+
             # Create a new submission object and add it to the database.
             new_submission = FileSubmission(
                 get_request_id(submitted_file),
@@ -133,6 +153,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
                 submitted_description,
                 submitted_at,
                 get_request_time(submitted_file),
+                virustotal_positives,
             )
 
             db.session.add(new_submission)

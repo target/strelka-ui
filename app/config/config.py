@@ -35,6 +35,7 @@ class Config(object):
     DATABASE_DBNAME = os.environ.get("DATABASE_DBNAME", "strelka_ui")
 
     # API Details
+    VIRUSTOTAL_API_KEY = os.environ.get("VIRUSTOTAL_API_KEY", "")
     API_KEY_EXPIRATION = os.environ.get("API_KEY_EXPIRATION", "999")
 
     # LDAP Details

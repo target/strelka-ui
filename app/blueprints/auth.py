@@ -102,6 +102,7 @@ def login():
         # without a lookup on the user submitting it.
         session["user_id"] = dbUser.id
         session["logged_in"] = True
+
     except Exception as err:
         # current_app.logger.error("Failed connection to database: %s", err)
         return jsonify({"error": "Failed to connect to database"}), 400

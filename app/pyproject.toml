@@ -60,6 +60,7 @@ Tomli = "1.2.3"
 Typing-Extensions = "4.0.1"
 Urllib3 = "1.26.18"
 Wrapt = "1.13.3"
+vt-py = "0.17.5"
 
 [tool.poetry.dev-dependencies]
 
