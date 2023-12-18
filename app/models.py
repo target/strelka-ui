@@ -28,6 +28,8 @@ class FileSubmission(db.Model):
         user (User): The user who submitted the file.
         submitted_at (datetime.datetime): The date and time the file was submitted.
         processed_at (datetime.datetime): The date and time the file was processed.
+        insights (list): A list of insights observed for submitted files.
+        iocs (list): A list of iocs observed for submitted files.
     """
 
     __tablename__ = "file_submission"
@@ -46,6 +48,8 @@ class FileSubmission(db.Model):
     yara_hits: list = db.Column(db.ARRAY(db.String(), dimensions=1))
     scanners_run: list = db.Column(db.ARRAY(db.String(), dimensions=1))
     hashes: list = db.Column(db.ARRAY(db.String(), dimensions=2))
+    insights: list = db.Column(db.ARRAY(db.String(), dimensions=1))
+    iocs: list = db.Column(db.ARRAY(db.String(), dimensions=1))
 
     # Submission Metadata
     submitted_from_ip: str = db.Column(db.String())
@@ -70,6 +74,8 @@ class FileSubmission(db.Model):
         yara_hits: list,
         scanners_run: list,
         hashes: list,
+        insights: list,
+        iocs: list,
         submitted_from_ip: str,
         submitted_from_client: str,
         submitted_by_user_id: int,
@@ -85,6 +91,8 @@ class FileSubmission(db.Model):
         self.yara_hits = yara_hits
         self.scanners_run = scanners_run
         self.hashes = hashes
+        self.insights = insights
+        self.iocs = iocs
         self.submitted_from_ip = submitted_from_ip
         self.submitted_from_client = submitted_from_client
         self.submitted_by_user_id = submitted_by_user_id

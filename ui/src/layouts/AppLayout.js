@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { Layout, Menu, message, Modal, Tag, Typography } from "antd";
-import {
-  BarChartOutlined,
-  UploadOutlined,
-  KeyOutlined,
-  CopyOutlined,
-} from "@ant-design/icons";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { BarChartOutlined, KeyOutlined, CopyOutlined } from "@ant-design/icons";
 
 import { Link } from "react-router-dom";
 import { InternalRouter } from "../routes/InternalRouter";
@@ -17,8 +11,6 @@ import SystemStatus from "../components/SystemStatus";
 import DatabaseStatus from "../components/DatabaseStatus";
 
 const { Paragraph, Text } = Typography;
-const { Header } = Layout;
-const { SubMenu } = Menu;
 
 const AppLayout = () => {
   const { logout } = useContext(AuthCtx);
@@ -31,6 +23,16 @@ const AppLayout = () => {
 
   const handleKeyModalCancel = () => {
     setIsKeyModalVisible(false);
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      message.success("API key copied to clipboard!");
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to copy API key to clipboard.");
+    }
   };
 
   const doLogout = () => {
@@ -61,68 +63,81 @@ const AppLayout = () => {
     });
   };
 
-  return (
-    <Layout className="layout">
-      <Header>
-        <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["2"]}>
-          <Menu.Item key="dashboard" icon={<BarChartOutlined />}>
-            <Link to="/">Dashboard</Link>
-          </Menu.Item>
-          <SubMenu
-            key="submissions"
-            icon={<UploadOutlined />}
-            title="Submissions"
-          >
-            <Menu.Item key="my-submissions">
-              <Link
-                to="/submissions?just_mine=true"
-                key={window.location.pathname}
-              >
-                My Submissions
-              </Link>
-            </Menu.Item>
-            <Menu.Item key="all-submissions">
-              <Link to="/submissions" key={window.location.pathname}>
-                All Submissions
-              </Link>
-            </Menu.Item>
-          </SubMenu>
-          <Menu.Item key="key" icon={<KeyOutlined />} onClick={getApiKey}>
-            <Link to="/">Get API Key</Link>
-          </Menu.Item>
-          <Menu.Item key="logout" onClick={doLogout}>
-            Logout
-          </Menu.Item>
+  const menuItems = [
+    {
+      key: 'home',
+      label: (
 
-          <Menu.Item disabled key="status" style={{ marginLeft: "auto", background: "none", cursor: "pointer" }}>
-            <SystemStatus></SystemStatus>
-          </Menu.Item>
-          <Menu.Item disabled key="status" style={{ background: "none", cursor: "pointer" }}>
-            <DatabaseStatus></DatabaseStatus>
-          </Menu.Item>
-        </Menu>
-      </Header>
+          <img
+            style={{ marginTop: '7px', paddingRight: '25px' }}
+            src="/logo192.png"
+            alt="Logo"
+            height="30px"
+          />
+
+      ),
+    },
+    {
+      key: 'dashboard',
+      icon: <BarChartOutlined />,
+      label: <Link to="/">Dashboard</Link>,
+    },
+    {
+      key: 'key',
+      icon: <KeyOutlined />,
+      label: <Link to="/" onClick={getApiKey}>Get API Key</Link>,
+    },
+    {
+      key: 'logout',
+      label: <span onClick={doLogout}>Logout</span>,
+    },
+    {
+      key: 'system-status',
+      label: <SystemStatus />,
+      disabled: true,
+      style: { marginLeft: 'auto', background: 'none', cursor: 'pointer' },
+    },
+    {
+      key: 'database-status',
+      label: <DatabaseStatus />,
+      disabled: true,
+      style: { background: 'none', cursor: 'pointer' },
+    },
+  ];
+
+  return (
+    <Layout>
+      <Menu
+        theme="light"
+        style={{
+          boxShadow:
+            "0px 4px 6px -1px rgba(0, 0, 0, 0.1),0px 2px 4px -1px rgba(0, 0, 0, 0.06)",
+          paddingLeft: "50px",
+          paddingRight: "50px",
+        }}
+        mode="horizontal"
+        defaultSelectedKeys={["2"]}
+        items={menuItems}
+
+      >
+
+      </Menu>
 
       <Modal
         title="API Key"
-        visible={isKeyModalVisible}
+        open={isKeyModalVisible}
         onCancel={handleKeyModalCancel}
         footer={null}
       >
         <center>
-          <CopyToClipboard
-            text={apiKey}
-            onCopy={() => message.success("API key copied to clipboard!")}
+          <Tag
+            style={{ cursor: "pointer", fontSize: "16px" }}
+            icon={<CopyOutlined />}
+            color="success"
+            onClick={() => copyToClipboard(apiKey)}
           >
-            <Tag
-              style={{ cursor: "pointer", fontSize: "16px" }}
-              icon={<CopyOutlined />}
-              color="success"
-            >
-              {apiKey}
-            </Tag>
-          </CopyToClipboard>
+            {apiKey}
+          </Tag>
         </center>
         <br />
         <Paragraph>
@@ -181,8 +196,9 @@ else:
           </pre>
         </Text>
       </Modal>
-
-      <InternalRouter />
+      <div className="main-content">
+        <InternalRouter />
+      </div>
     </Layout>
   );
 };

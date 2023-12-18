@@ -1,22 +1,45 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Table, Tooltip, Space, Dropdown, Menu, message, Input } from "antd";
+import {
+  Table,
+  Typography,
+  Row,
+  Col,
+  Select,
+  Tag,
+  Tooltip,
+  Space,
+  message,
+  Input,
+} from "antd";
+import { InfoCircleOutlined, CopyOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
+import { getIconConfig } from "../utils/iconMappingTable";
 import { APP_CONFIG } from "../config";
 import AuthCtx from "../contexts/auth";
 import { fetchWithTimeout } from "../util";
 import useResize from "../providers/Resize";
-import TagSet from "./TagSet";
+
+
+const { Text } = Typography;
 
 const SubmissionTable = ({ filesUploaded, page_size }) => {
+  const isMountedRef = useRef(true);
   const { handle401 } = useContext(AuthCtx);
   const [data, setData] = useState([]);
+  const defaultSorter = {
+    field: "submitted_at",
+    order: "descend",
+  };
+  const [sorter, setSorter] = useState(defaultSorter);
 
   const [minimalView, setMinimalView] = useState(false);
   const [componentWidth, setComponentWidth] = useState(1000);
+
+  const [excludedSubmitters, setExcludedSubmitters] = useState(
+    APP_CONFIG.DEFAULT_EXCLUDED_SUBMITTERS
+  );
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -39,13 +62,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
   const filterJustMine = query.get("just_mine");
 
   const [isLoading, setIsLoading] = useState(true);
-
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Handle search input
-  const handleSearch = (event) => {
-    setSearchQuery(event.target.value);
-  };
 
   // Filter table data based on search query
   const filteredData = data.filter((item) => {
@@ -58,13 +75,17 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
     );
   });
 
+  const handleSearch = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    const newPagination = { ...pagination, current: 1 };
+    fetchTableData({ searchQuery: query, pagination: newPagination });
+  };
+
   const fetchTableData = (params = {}) => {
     setIsLoading(true);
-
-    let search_url = `${APP_CONFIG.BACKEND_URL}/strelka/scans?page=${params.pagination.current}&per_page=${params.pagination.pageSize}`;
-    if (filterJustMine) {
-      search_url = `${search_url}&just_mine=${filterJustMine}`;
-    }
+    const currentSorter = params.sorter || defaultSorter;
+    let search_url = `${APP_CONFIG.BACKEND_URL}/strelka/scans?search=${params.searchQuery || ""}&page=${params.pagination.current}&per_page=${params.pagination.pageSize}&sortField=${currentSorter.field}&sortOrder=${currentSorter.order}&exclude_submitters=${excludedSubmitters.join(",")}`;
 
     fetchWithTimeout(search_url, {
       method: "GET",
@@ -75,10 +96,15 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       .then((res) => {
         if (res.status === 401) {
           handle401();
+          throw new Error('Unauthorized');
+        }
+        if (!res.ok) {
+          throw new Error('Response not ok');
         }
         return res.json();
       })
       .then((res) => {
+        if (!isMountedRef.current) return;
         setData(res.items);
         setPagination({
           current: res.page,
@@ -86,150 +112,367 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
           total: res.total,
         });
       })
+      .catch((error) => {
+        console.error('Fetch table data failed:', error);
+        message.error('Failed to fetch table data.');
+      })
       .finally(() => {
-        setIsLoading(false);
+        if (isMountedRef.current) setIsLoading(false);
       });
-  };
+};
+
 
   useEffect(() => {
-    fetchTableData({
-      pagination,
+    const fetchData = async () => {
+      await fetchTableData({ pagination, searchQuery });
+    };
+    fetchData();
+
+    // Cleanup function for useEffect
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [filesUploaded, filterJustMine, excludedSubmitters]);
+
+  const handleTableChange = (newPagination, filters, sorter) => {
+    setPagination(newPagination);
+    setSorter({ 
+      field: sorter.field || defaultSorter.field, 
+      order: sorter.order || defaultSorter.order 
     });
-  }, [filesUploaded, filterJustMine]);
-
-  const handleTableChange = (pagination, filters, sorter) => {
     fetchTableData({
-      sortField: sorter.field,
-      sortOrder: sorter.order,
-      pagination,
-      ...filters,
+      pagination: newPagination,
+      searchQuery: searchQuery || "",
+      sorter: { 
+        field: sorter.field || defaultSorter.field, 
+        order: sorter.order || defaultSorter.order 
+      }
     });
-  };
-
-  const copyHashMenu = (record) => {
-    return (
-      <Menu>
-        {record.hashes.map((kv) => (
-          <Menu.Item key={kv[0]} data-hash={kv[1]}>
-            <CopyToClipboard
-              text={kv[1]}
-              onCopy={() => message.success("Hash copied to clipboard!")}
-            >
-              <span>{kv[0]}</span>
-            </CopyToClipboard>
-          </Menu.Item>
-        ))}
-      </Menu>
-    );
-  };
-
-  const copyHashes = (record) => {
-    return (
-      <Dropdown overlay={copyHashMenu(record)}>
-        <a
-          href="/"
-          className="ant-dropdown-link"
-          onClick={(e) => e.preventDefault()}
-        >
-          Hashes
-          {/* <DownOutlined /> */}
-        </a>
-      </Dropdown>
-    );
   };
 
   const columns = [
     {
-      title: "Filename",
-      dataIndex: "file_id",
-      key: "file_id",
-      render: (file_id, full) => (
-        <div style={{ width: "200px", overflow: "hidden" }}>
-          <Link to={`/submissions/${file_id}`}>{full.file_name}</Link>
-        </div>
-      ),
-    },
-    {
-      title: "Description",
-      dataIndex: "submitted_description",
-      key: "submitted_description",
-      width: minimalView ? componentWidth / 4 : 120,
-      render: (_, full) => <p>{full.submitted_description}</p>,
-    },
-    {
-      title: "Submitted by",
-      dataIndex: "user.user_cn",
-      key: "user.user_cn",
-      width: minimalView ? componentWidth / 4 : 120,
-      render: (_, full) => <p>{full.user?.user_cn}</p>,
-    },
-    {
-      title: "Date of Submission",
+      title: "Submitted",
       dataIndex: "submitted_at",
       key: "submitted_at",
-      width: minimalView ? componentWidth / 4 : 200,
+      width: 1,
+      sorter: (a, b) => new Date(a.submitted_at) - new Date(b.submitted_at),
+      defaultSortOrder: sorter.order,
       render: (submitted_at, full) => {
         return submitted_at ? (
-          <p>{new Date(submitted_at).toISOString().split(".")[0] + "Z"}</p>
+          <p>
+            {new Date(submitted_at).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })}
+          </p>
         ) : (
           <p></p>
         );
       },
     },
     {
-      title: "Files Analyzed",
+      title: "VT +",
+      dataIndex: "strelka_response",
+      key: "vt",
+      width: 1,
+      render: (strelkaResponse) => {
+        // Find the highest VirusTotal enrichment number in the responses
+        const highestVtEnrichment = strelkaResponse.reduce((max, response) => {
+          const enrichmentNumber = response?.enrichment?.virustotal;
+          return enrichmentNumber > max ? enrichmentNumber : max;
+        }, -1); // Start with -1 to handle cases where there are no positive numbers
+
+        const tagStyle = {
+          fontSize: "10px",
+          fontWeight: "bold",
+          width: "80%",
+          textAlignLast: "center",
+          maxWidth: "75px",
+        };
+
+        let tagColor = "default";
+        let vtText =
+          highestVtEnrichment >= 0 ? highestVtEnrichment.toString() : "N/A";
+
+        if (highestVtEnrichment >= 5) {
+          tagColor = "error"; // red
+        } else if (highestVtEnrichment >= 0) {
+          tagColor = "success"; // green
+        }
+
+        return (
+          <Tag color={tagColor} style={tagStyle}>
+            {vtText}
+          </Tag>
+        );
+      },
+    },
+
+    {
+      title: "Filename",
+      dataIndex: "file_id",
+      key: "file_id",
+      width: 1,
+      render: (file_id, full) => (
+        <div
+          style={{ maxWidth: "200px", display: "flex", alignItems: "center" }}
+        >
+          <Link
+            to={`/submissions/${file_id}`}
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {full.file_name}
+          </Link>
+
+          {/* Tooltip Icon */}
+          <Tooltip title={full.submitted_description}>
+            <InfoCircleOutlined style={{ marginLeft: "8px" }} />
+          </Tooltip>
+        </div>
+      ),
+    },
+
+    {
+      title: "Uploader",
+      dataIndex: "user.user_cn",
+      key: "user.user_cn",
+      width: 1,
+      render: (_, full) => <p>{full.user?.user_cn}</p>,
+    },
+    {
+      title: "Size",
+      dataIndex: "file_size",
+      key: "file_size",
+      width: 1,
+      sorter: (a, b) => a.file_size - b.file_size,
+      render: (_, full) => {
+        const fileSize = full.file_size;
+        let size = 0;
+        let unit = "B";
+
+        if (fileSize >= 1024 * 1024) {
+          size = (fileSize / (1024 * 1024)).toFixed(2);
+          unit = "MB";
+        } else if (fileSize >= 1024) {
+          size = (fileSize / 1024).toFixed(2);
+          unit = "KB";
+        } else {
+          size = fileSize;
+        }
+
+        return <p>{`${size}${unit}`}</p>;
+      },
+    },
+    {
+      title: "Files",
       dataIndex: "file_count",
       key: "file_count",
-      width: 200,
+      width: 1,
+      sorter: (a, b) => a.strelka_response.length - b.strelka_response.length,
       render: (_, full) => <p>{full.strelka_response.length}</p>,
     },
+
     {
-      title: "MIME Types",
+      title: "IOCs",
+      dataIndex: "iocs",
+      key: "iocs",
+      width: 1,
+      sorter: (a, b) =>
+        (a.iocs ? a.iocs.length : 0) - (b.iocs ? b.iocs.length : 0),
+      render: (iocs) => {
+
+        const tagStyle = {
+          fontSize: "10px",
+          fontWeight: "bold",
+          width: "80%",
+          textAlignLast: "center",
+          maxWidth: "75px",
+        };
+
+        const iocsCount = iocs ? iocs.length : 0;
+        const textColor =
+          iocsCount > 2 ? "red" : iocsCount > 0 ? "orange" : "default";
+
+        return (
+          <div style={{ textAlign: "center" }}>
+            <Tag color={textColor} style={tagStyle}>
+              {iocsCount}
+            </Tag>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Insights",
+      dataIndex: "insights",
+      key: "insights",
+      width: 1,
+      sorter: (a, b) =>
+        (a.insights ? a.insights.length : 0) -
+        (b.insights ? b.insights.length : 0),
+      render: (insights) => {
+        const insightCount = insights ? insights.length : 0;
+        const textColor =
+          insightCount > 5 ? "red" : insightCount > 3 ? "orange" : "default";
+          const tagStyle = {
+            fontSize: "10px",
+            fontWeight: "bold",
+            width: "80%",
+            textAlignLast: "center",
+            maxWidth: "75px",
+          };
+          
+
+        return (
+          <div style={{ textAlign: "center" }}>
+            <Tag color={textColor} style={tagStyle}>
+              {insightCount}
+            </Tag>
+          </div>
+        );
+      },
+    },
+
+    {
+      title: "Type",
       dataIndex: "mime_types",
       key: "mime_types",
-      width: 200,
-      render: (mime_types) => <TagSet items={mime_types} />,
+      width: 1,
+      sorter: (a, b) => a.mime_types.length - b.mime_types.length,
+      render: (_, full) => {
+        let mimeType = "N/A";
+
+        const tagStyle = {
+          fontSize: "10px",
+          fontWeight: "bold",
+          width: "100%",
+          textAlignLast: "center",
+          maxWidth: "150px",
+          paddingLeft: "5px",
+          paddingRight: "5px",
+          paddingTop: "0px",
+          paddingBottom: "0px",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        };
+
+        if (full.strelka_response && full.strelka_response.length > 0) {
+          // Check if the first record is a zip
+          if (
+            full.strelka_response[0].file.flavors.mime[0] === "application/zip"
+          ) {
+            // Use the second record's MIME type if it exists
+            if (full.strelka_response.length > 1) {
+              mimeType = full.strelka_response[1].file.flavors.mime[0];
+            }
+          } else {
+            // Use the first record's MIME type
+            mimeType = full.strelka_response[0].file.flavors.mime[0];
+          }
+        }
+
+        const mappingEntry = getIconConfig("strelka", mimeType.toLowerCase());
+        const IconComponent = mappingEntry?.icon;
+        const bgColor = mappingEntry?.color || "defaultBackgroundColor";
+
+        return (
+          <Tag style={tagStyle} color={bgColor}>
+            {mimeType}
+          </Tag>
+        );
+      },
     },
-{
-  title: "YARA Hits",
-  dataIndex: "yara_hits",
-  key: "yara_hits",
-  width: 200,
-  render: (yara_hits = []) => {
-    if (!Array.isArray(yara_hits) || yara_hits.length === 0) {
-      return "No YARA Hits";
-    }
-    return <TagSet items={yara_hits} />;
-  },
-},
     {
-      title: "Scanners Run",
+      title: "YARAs",
+      dataIndex: "yara_hits",
+      key: "yara_hits",
+      width: 1,
+      sorter: (a, b) =>
+        (a.yara_hits ? a.yara_hits.length : 0) -
+        (b.yara_hits ? b.yara_hits.length : 0),
+      render: (yara_hits) => {
+        const yarasCount = yara_hits ? yara_hits.length : 0;
+        const textColor =
+          yarasCount > 25 ? "red" : yarasCount > 10 ? "orange" : "default";
+          const tagStyle = {
+            fontSize: "10px",
+            fontWeight: "bold",
+            width: "80%",
+            textAlignLast: "center",
+            maxWidth: "75px",
+          };
+        return (
+          <div style={{ textAlign: "center" }}>
+            <Tag color={textColor} style={tagStyle}>
+              {yarasCount}
+            </Tag>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Scanners",
       key: "scanners_run",
       dataIndex: "scanners_run",
-      width: 200,
-      render: (scanners_run) => <TagSet items={scanners_run} />,
+      width: 1,
+      sorter: (a, b) => a.scanners_run.length - b.scanners_run.length,
+      render: (scanners_run) => (
+        <p style={{ textAlign: "center" }}>{scanners_run.length}</p>
+      ),
     },
     {
-      title: "Action",
+      title: "Actions",
       key: "action",
-      width: minimalView ? componentWidth / 4 : 200,
-      render: (file_id, record) => (
-        <Space size="middle">
-          {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-            <a
-              target="_blank"
-              href={`${APP_CONFIG.SEARCH_URL}`.replace(
-                "<REPLACE>",
-                record.file_id
-              )}
-              rel="noreferrer"
-            >
-              {APP_CONFIG.SEARCH_NAME}
-            </a>
-          )}
-          {copyHashes(record)}
-        </Space>
-      ),
+      width: 1,
+      render: (text, record) => {
+        // Find the sha256 hash in the array of hashes
+        const sha256Array = record.hashes.find(
+          (hashArray) => hashArray[0] === "sha256"
+        );
+        const sha256Value = sha256Array ? sha256Array[1] : "N/A";
+
+        return (
+          <Space size="middle">
+            {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+              <a
+                target="_blank"
+                href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                  "<REPLACE>",
+                  record.file_id
+                )}
+                rel="noreferrer"
+              >
+                {APP_CONFIG.SEARCH_NAME}
+              </a>
+            )}
+            <Space size="middle">
+              <Tooltip title="Copy SHA256">
+                <a
+                  href="/"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (sha256Value !== "N/A") {
+                      navigator.clipboard.writeText(sha256Value);
+                      message.success("SHA256 copied to clipboard!");
+                    } else {
+                      message.error("SHA256 is undefined!");
+                    }
+                  }}
+                >
+                  <CopyOutlined style={{ cursor: "pointer" }} />
+                </a>
+              </Tooltip>
+            </Space>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -246,11 +489,42 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
 
   return (
     <div ref={refElem}>
-      <Input.Search
-        placeholder="Search by File Name or Submission Description..."
-        onChange={handleSearch}
-        style={{ marginBottom: 16 }}
-      />
+      <Row gutter={16} style={{ marginBottom: "16px" }}>
+        <Col span={18}>
+          <div>
+            <Text
+              type="secondary"
+              style={{ fontSize: "12px", marginBottom: 8 }}
+            >
+              Search Filter
+            </Text>
+            <Input.Search
+              placeholder="Search by File Name or Submission Description..."
+              onChange={handleSearch}
+              style={{ fontSize: "12px" }}
+            />
+          </div>
+        </Col>
+
+        <Col span={6}>
+          <div style={{ textAlign: "left" }}>
+            <Text
+              type="secondary"
+              style={{ fontSize: "12px", marginBottom: 8 }}
+            >
+              Exclude Submitters
+            </Text>
+            <Select
+              mode="tags"
+              style={{ width: "100%", fontSize: "12px" }}
+              placeholder="Submitters to exclude..."
+              defaultValue={excludedSubmitters}
+              onChange={(selected) => setExcludedSubmitters(selected)}
+            />
+          </div>
+        </Col>
+      </Row>
+
       <Table
         size={minimalView ? "small" : "middle"}
         loading={isLoading}
