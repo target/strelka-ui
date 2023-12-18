@@ -1,0 +1,19 @@
+/* YaraOverview.css */
+
+/* Rule block container */
+.yara-overview .yara-rule-block {
+  border-left: 5px solid;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+/* Rule header */
+.yara-overview .yara-rule-header {
+  padding: 4px;
+  color: white;
+}
+
+/* Rule description */
+.yara-overview .yara-rule-description {
+  padding: 4px;
+}

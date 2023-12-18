@@ -112,8 +112,9 @@ You can also set a reference in the UI submission table to allow users to quickl
 Supported modification fields in `./ui/src/config.js`:
 | Field Name | Value | Example |
 |--------------|------------------------------------------------------------------------------------------------|----------|
-| SEARCH_URL | Search URL for the external application | https://search.com/?q=request.id=<REPLACE> |
-| SEARCH_NAME | Search name for the exterbak application | Search.com |
+| SEARCH_URL | Search URL for the external application | Ex: https://search.com/?q=request.id=<REPLACE> |
+| SEARCH_NAME | Search name for the external application | Ex: Splunk |
+| DEFAULT_EXCLUDED_SUBMITTERS | Default users to be exluded from Submission table view. Useful for hiding automations by default. | Ex: SearchBot |
 
 ## API
 
