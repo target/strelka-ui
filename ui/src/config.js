@@ -1,5 +1,5 @@
 const APP_CONFIG = {
-  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || "http://localhost:8080/api",
+  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || "/api",
   DEFAULT_EXCLUDED_SUBMITTERS: process.env.EXCLUDED_SUBMITTERS || [""],
   VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY || "",
   API_TIMEOUT: 30000,
