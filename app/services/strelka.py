@@ -77,13 +77,16 @@ def get_db_status() -> bool:
             return False
 
 
-def submit_data(file: Any, meta: Dict[str, Any]) -> Tuple[bool, str, int]:
+def submit_data(
+    file: Any, meta: Dict[str, Any], file_hash: str
+) -> Tuple[bool, str, int]:
     """
     Submit a file to Strelka for analysis and return the result.
 
     Args:
         file (Any): The file to be submitted.
         meta (dict): A dictionary of metadata to be included with the submission.
+        file_hash (str): Used as a filename if uploading via VirusTotal
 
     Returns:
         tuple: A tuple containing a boolean indicating whether the submission was successful,
@@ -99,10 +102,15 @@ def submit_data(file: Any, meta: Dict[str, Any]) -> Tuple[bool, str, int]:
     if file:
         sample_data = file.read()
 
+        if file_hash:
+            file_name = file_hash
+        else:
+            file_name = file.filename
+
         try:
             # Submit the file to Strelka using the submit_file_to_strelka() function
             response = submit_file_to_strelka(
-                file.filename,
+                file_name,
                 sample_data,
                 f"{strelka_host}:{strelka_port}",
                 meta,
@@ -113,23 +121,23 @@ def submit_data(file: Any, meta: Dict[str, Any]) -> Tuple[bool, str, int]:
                 return True, response, len(sample_data)
             else:
                 logger.error(
-                    f"Failed to submit {file.filename} to strelka. Please check the submitted file."
+                    f"Failed to submit {file_name} to strelka. Please check the submitted file."
                 )
                 # Return a tuple indicating failure, an empty dictionary, and a file size of 0
                 return (
                     False,
-                    f"Failed to submit {file.filename} to strelka. Please check the submitted file.",
+                    f"Failed to submit {file_name} to strelka. Please check the submitted file.",
                     0,
                 )
 
         except Exception as e:
-            logger.error(f"Failed to submit {file.filename} to strelka: {e}")
+            logger.error(f"Failed to submit {file_name} to strelka: {e}")
             # Return a tuple indicating failure, an empty dictionary, and a file size of 0
-            return False, f"Failed to submit {file.filename} to strelka: {e}", 0
+            return False, f"Failed to submit {file_name} to strelka: {e}", 0
 
     # Return a tuple indicating failure, an empty dictionary, and a file size of 0
     return (
         False,
-        f"Failed to submit {file.filename} to strelka. Please check the submitted file.",
+        f"Failed to submit file to strelka. Please check the submitted file.",
         0,
     )

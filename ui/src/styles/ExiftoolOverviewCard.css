@@ -1,0 +1,36 @@
+/* ExiftoolOverviewCard.css */
+
+/* Container for the entire Exif overview */
+.exif-overview {
+  padding: 10px;
+}
+
+/* List of Exif data */
+.exif-data-list {
+  margin-top: 10px;
+}
+  
+/* Individual Exif data entry */
+.exif-data-entry {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+/* Label for Exif data entry */
+.exif-data-entry Text {
+  margin-right: 4px;
+}
+
+/* Line number for Exif data entry */
+.line-number {
+  text-align: right;
+  font-size: 12px;
+  padding-right: 16px;
+  margin-right: 15px;
+  font-family: monospace;
+  vertical-align: top;
+  color: #999;
+  border-right: 1px solid #ddd;
+  white-space: nowrap;
+}

@@ -1,0 +1,41 @@
+/* IocOverviewCard.css */
+
+/* Container for the entire IOC overview */
+.ioc-overview {
+  padding: 10px;
+}
+
+/* List of IOC data */
+.ioc-data-list {
+  margin-top: 10px;
+}
+  
+/* Individual IOC data entry */
+.ioc-data-entry {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+/* Label for IOC data entry */
+.ioc-data-entry Text {
+  margin-right: 4px;
+}
+
+/* Line number for IOC data entry */
+.line-number {
+  text-align: right;
+  font-size: 12px;
+  padding-right: 16px;
+  margin-right: 15px;
+  font-family: monospace;
+  vertical-align: top;
+  color: #999;
+  border-right: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+/* Table cell styles within IOC table */
+.ioc-table .ant-table-cell {
+  font-size: 12px;
+}

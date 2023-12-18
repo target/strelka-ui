@@ -1,0 +1,23 @@
+.file-overview-box {
+  background-color: #ccc;
+  color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  width: 35px;
+  height: 35px;
+}
+
+.file-type-box {
+  background-color: #ccc;
+  color: #ffffff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  width: 15px;
+  height: 15px;
+}

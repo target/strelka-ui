@@ -1,6 +1,11 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2023-12-18
+- Updated UI
+- Updated many / most files / packages
+- Added VirusTotal scan / upload support
+  
 ## 2023-11-16
 - Transition to Poetry for Python Package Management
 - Refinement of HTTP Response Codes

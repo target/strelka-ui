@@ -1,16 +1,23 @@
 import datetime
 import logging
+import json
 import os
-from typing import Any, Dict, Tuple
+from collections import defaultdict
+
+from io import BytesIO
+from typing import Dict, Tuple
 
 from flask import Blueprint, current_app, jsonify, request, session, Response
+from sqlalchemy import or_, desc, asc, func, case
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import joinedload
 
 from database import db
 from models import FileSubmission, User
 from services.auth import auth_required
 from services.strelka import get_db_status, get_frontend_status, submit_data
-from services.virustotal import get_virustotal_positives
+from services.virustotal import get_virustotal_positives, create_vt_zip_and_download
+from services.insights import get_insights
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
@@ -55,7 +62,7 @@ def get_database_status() -> Tuple[Response, int]:
 @auth_required
 def submit_file(user: User) -> Tuple[Response, int]:
     """
-    Submit a file to the Strelka file analysis engine and save the analysis results to the database.
+    Submit a file (or hash) to the Strelka file analysis engine and save the analysis results to the database.
 
     Args:
         user: User object representing the authenticated user submitting the file.
@@ -67,9 +74,9 @@ def submit_file(user: User) -> Tuple[Response, int]:
     Raises:
         None.
     """
+    submitted_hash = ""
 
-    # Check if a file was included in the request.
-    if "file" not in request.files:
+    if "file" not in request.files and b"hash" not in request.data:
         return (
             jsonify(
                 {
@@ -80,31 +87,59 @@ def submit_file(user: User) -> Tuple[Response, int]:
             400,
         )
 
+    # File Upload Function
     # Get the submitted file.
-    file = request.files["file"]
+    if "file" in request.files:
+        file = request.files["file"]
+        submitted_description = request.form["description"]
 
-    # Check if the submitted filename is empty.
-    if file.filename == "":
-        return (
-            jsonify(
-                {
-                    "error": "Strelka submission was not successful.",
-                    "details": "Submitted filename is empty.",
-                }
-            ),
-            400,
-        )
+        # Check if the submitted filename is empty.
+        if file.filename == "":
+            return (
+                jsonify(
+                    {
+                        "error": "Strelka submission was not successful.",
+                        "details": "Submitted filename is empty.",
+                    }
+                ),
+                400,
+            )
+
+    # VirusTotal Upload Function
+    else:
+        submission = json.loads(request.data)
+        submitted_description = submission["description"]
+        submitted_hash = submission["hash"]
+
+        if os.environ.get("VIRUSTOTAL_API_KEY"):
+            file = create_vt_zip_and_download(
+                api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
+                file_hashes=[submitted_hash],
+                password="infected",
+            )
+            if "Error" in str(file):
+                return (
+                    jsonify(
+                        {
+                            "error": "VirusTotal request was not successful.",
+                            "details": str(file.args[0]),
+                        }
+                    ),
+                    400,
+                )
+            file.filename = submitted_hash
 
     # Submit the file to the Strelka analysis engine.
     if file:
         try:
             # Get the current timestamp and the file description from the request.
             submitted_at = str(datetime.datetime.utcnow())
-            submitted_description = request.form["description"]
 
             # Submit the file to Strelka and get the analysis results.
             succeeded, response, file_size = submit_data(
-                file, {"source": "fileshot-webui", "user_name": user.user_cn}
+                file,
+                {"source": "fileshot-webui", "user_name": user.user_cn},
+                submitted_hash,
             )
 
             # If the Strelka submission was not successful, return an error message.
@@ -134,7 +169,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
                                 "virustotal"
                             ] = get_virustotal_positives(
                                 api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
-                                file_hash=scanned_file["scan"]["hash"]["md5"],
+                                file_hash=scanned_file["scan"]["hash"]["sha256"],
                             )
                             total_scanned += 1
                         else:
@@ -143,6 +178,34 @@ def submit_file(user: User) -> Tuple[Response, int]:
                     logging.warning(
                         f"Could not process VirusTotal search with error: {e} "
                     )
+
+            # Get Strelka Submission IoCs
+            # Store a set of IoCs in IoCs field
+            try:
+                iocs = set()
+                for scanned_file in response:
+                    if "iocs" in scanned_file:
+                        for ioc in scanned_file["iocs"]:
+                            iocs.add(ioc["ioc"])
+                    else:
+                        pass
+            except Exception as e:
+                logging.warning(f"Could not process Insights search with error: {e} ")
+
+            # Get Strelka Submission Insights
+            # Store a set of insights in Insights field
+            # Store a set of insights at the file level
+            try:
+                insights = set()
+                for index, scanned_file in enumerate(response):
+                    file_insights = get_insights(scanned_file)
+                    if file_insights:
+                        response[index]["insights"] = list(file_insights)
+                        insights.update(file_insights)
+                    else:
+                        pass
+            except Exception as e:
+                logging.warning(f"Could not process Insights search with error: {e} ")
 
             # Create a new submission object and add it to the database.
             new_submission = FileSubmission(
@@ -154,6 +217,8 @@ def submit_file(user: User) -> Tuple[Response, int]:
                 get_yara_hits(response),
                 get_scanners_run(response),
                 get_hashes(submitted_file),
+                list(insights),
+                list(iocs),
                 request.remote_addr,
                 request.headers.get("User-Agent"),
                 user.id,
@@ -397,7 +462,7 @@ def get_scan(user: User, id: str) -> Tuple[Response, int]:
 def view(user: User) -> Tuple[Dict[str, any], int]:
     """
     Returns a paginated list of submissions, optionally filtered to only show
-    the current user's submissions.
+    the current user's submissions, with the ability to search and sort.
 
     Args:
         user: The authenticated user.
@@ -407,24 +472,109 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
         pagination information and a list of submissions.
     """
     page = request.args.get("page", default=1, type=int)
-    per_page = request.args.get("per_page", default=1, type=int)
+    per_page = request.args.get("per_page", default=10, type=int)
     just_mine = request.args.get("just_mine", default=False, type=bool)
+    search_query = request.args.get("search", default="", type=str)
+    sort_field = request.args.get("sortField", default="submitted_at", type=str)
+    sort_order = request.args.get("sortOrder", default="descend", type=str)
+    excluded_submitters = request.args.get("exclude_submitters", "")
+    excluded_submitters_list = (
+        excluded_submitters.split(",") if excluded_submitters else []
+    )
 
+    # Build the base query with a join to the User table
+    base_query = FileSubmission.query.join(User).options(
+        joinedload(FileSubmission.user)
+    )
+
+    # Exclude submissions from specific submitters
+    if excluded_submitters_list:
+        base_query = base_query.filter(~User.user_cn.in_(excluded_submitters_list))
+
+    # Apply the search filter if there is a search query
+    if search_query:
+        search_filter = or_(
+            FileSubmission.file_name.like(f"%{search_query}%"),
+            FileSubmission.submitted_description.like(f"%{search_query}%"),
+        )
+        base_query = base_query.filter(search_filter)
+
+    # Apply the "just mine" filter if requested
     if just_mine:
         user_id = session["user_id"]
-        submissions = (
-            FileSubmission.query.options(joinedload(FileSubmission.user))
-            .filter(FileSubmission.submitted_by_user_id == user_id)
-            .order_by(FileSubmission.submitted_at.desc())
-            .paginate(page, per_page, error_out=False)
-        )
-    else:
-        submissions = (
-            FileSubmission.query.options(joinedload(FileSubmission.user))
-            .order_by(FileSubmission.submitted_at.desc())
-            .paginate(page, per_page, error_out=False)
-        )
+        base_query = base_query.filter(FileSubmission.submitted_by_user_id == user_id)
 
+    # Apply sorting
+    # Conditional case statements for sorting
+    sort_cases = {
+        "file_count": case(
+            [
+                (
+                    FileSubmission.strelka_response != None,
+                    func.json_array_length(FileSubmission.strelka_response.cast(JSON)),
+                )
+            ],
+            else_=0,
+        ),
+        "size": case(
+            [(FileSubmission.file_size != None, FileSubmission.file_size)], else_=0
+        ),
+        "iocs": case(
+            [
+                (
+                    FileSubmission.iocs != None,
+                    func.cardinality(FileSubmission.iocs),
+                )
+            ],
+            else_=0,
+        ),
+        "insights": case(
+            [
+                (
+                    FileSubmission.insights != None,
+                    func.cardinality(FileSubmission.insights),
+                )
+            ],
+            else_=0,
+        ),
+        "yara_hits": case(
+            [
+                (
+                    FileSubmission.yara_hits != None,
+                    func.cardinality(FileSubmission.yara_hits),
+                )
+            ],
+            else_=0,
+        ),
+        "scanners_run": case(
+            [
+                (
+                    FileSubmission.scanners_run != None,
+                    func.cardinality(FileSubmission.scanners_run),
+                )
+            ],
+            else_=0,
+        ),
+    }
+
+    # Apply sorting
+    if sort_field in sort_cases:
+        sort_expression = sort_cases[sort_field]
+        if sort_order == "ascend":
+            base_query = base_query.order_by(sort_expression.asc())
+        elif sort_order == "descend":
+            base_query = base_query.order_by(sort_expression.desc())
+    else:
+        # Default sorting for other fields
+        sort_expression = (
+            desc(sort_field) if sort_order == "descend" else asc(sort_field)
+        )
+        base_query = base_query.order_by(sort_expression)
+
+    # Execute the paginated query
+    submissions = base_query.paginate(page, per_page)
+
+    # Convert submission objects to JSON
     paginated_ui = {
         "page": submissions.page,
         "pages": submissions.pages,
@@ -436,6 +586,36 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
     }
 
     return paginated_ui, 200
+
+
+@strelka.route("/scans/mime-type-stats", methods=["GET"])
+@auth_required
+def get_mime_type_stats(user: User) -> Tuple[Response, int]:
+    """
+    Get the count of file submissions for the last 6 months, categorized by MIME types.
+
+    Returns:
+        JSON response with counts of submissions by MIME type per month.
+    """
+
+    six_months_ago = datetime.datetime.utcnow() - datetime.timedelta(days=180)
+    results = (
+        db.session.query(
+            func.date_trunc("month", FileSubmission.submitted_at).label("month"),
+            FileSubmission.mime_types,
+            func.count(FileSubmission.id),
+        )
+        .filter(FileSubmission.submitted_at >= six_months_ago)
+        .group_by("month", FileSubmission.mime_types)
+        .all()
+    )
+
+    stats = defaultdict(lambda: defaultdict(int))
+    for month, mime_types, count in results:
+        for mime_type in mime_types:
+            stats[month.strftime("%Y-%m")][mime_type] += count
+
+    return jsonify(stats), 200
 
 
 def submissions_to_json(submission: FileSubmission) -> Dict[str, any]:

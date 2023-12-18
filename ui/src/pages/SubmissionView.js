@@ -1,46 +1,108 @@
 import React, { useState, useEffect, useContext } from "react";
 import ReactJson from "react-json-view";
 import { useParams } from "react-router-dom";
-
-import {
-  PageHeader,
-  Button,
-  Descriptions,
-  Tag,
-  Row,
-  Col,
-  Card,
-  List,
-  Typography,
-  Select,
-  Spin,
-  Tooltip,
-  message,
-} from "antd";
-
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Tag, Row, Col, Collapse, Typography, Spin } from "antd";
 
 import PageWrapper from "../components/PageWrapper";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import FileTreeCard from "../components/FileComponents/FileTreeCard";
+import FileHeaderOverviewCard from "../components/FileComponents/FileHeaderOverviewCard";
+import FileTypeOverviewCard from "../components/FileComponents/FileTypeOverviewCard";
+import YaraTypeOverviewCard from "../components/FileComponents/YaraTypeOverviewCard";
+import FileOverviewCard from "../components/FileComponents/FileOverviewCard";
+import YaraOverviewCard from "../components/FileComponents/YaraOverviewCard";
+import OcrOverviewCard from "../components/FileComponents/OcrOverviewCard";
+import FileHeaderFooterCard from "../components/FileComponents/FileHeaderFooterCard";
+import FileExiftoolCard from "../components/FileComponents/ExiftoolOverviewCard";
+import IocOverviewCard from "../components/FileComponents/IocOverviewCard";
+import PeOverviewCard from "../components/FileComponents/PeOverviewCard";
+import InsightsCard from "../components/FileComponents/InsightsCard";
+import FileHighlightsOverviewCard from "../components/FileComponents/FileHighlightsOverviewCard";
 
-import ScanDisplayCard from "../components/ScanDisplayCard";
+import { getIconConfig } from "../utils/iconMappingTable";
+
 import { APP_CONFIG } from "../config";
 import AuthCtx from "../contexts/auth";
 import { fetchWithTimeout } from "../util";
 
-const { Title, Text } = Typography;
+import "../styles/IconContainer.css";
 
+const { Text } = Typography;
+
+/**
+ * SubmissionsPage component to display strelka scan results
+ * @returns JSX.Element
+ */
 const SubmissionsPage = (props) => {
   const { handle401 } = useContext(AuthCtx);
-
-  const { Option } = Select;
   const [FilenameView, setFileNameView] = useState("");
   const [FiledepthView, setFileDepthView] = useState("");
-  const [hideMetadata, setHideMetadata] = useState(true);
-  const [showAll, setShowAll] = useState(true);
+  const [hideMetadata] = useState(true);
+  const [showAll] = useState(true);
+  const [selectedNodeData, setSelectedNodeData] = useState("");
+
+  const handleNodeSelect = (nodeData) => {
+    setSelectedNodeData(nodeData);
+  };
+
+  const getFileIcon = () => {
+    const mappingEntry = getIconConfig(
+      "strelka",
+      selectedNodeData["file"]["flavors"]["mime"][0].toLowerCase()
+    );
+    const IconComponent = mappingEntry?.icon;
+    const bgColor = mappingEntry?.color || "defaultBackgroundColor";
+
+    // Return a JSX element with the container class
+    return (
+      <div className="file-overview-box" style={{ backgroundColor: bgColor }}>
+        {IconComponent ? <IconComponent style={{ fontSize: "24px" }} /> : null}
+      </div>
+    );
+  };
+
+  const getFileDisposition = () => {
+    const virustotalPositives = selectedNodeData["enrichment"]?.["virustotal"];
+    let disposition = "";
+    let color = "";
+
+    if (virustotalPositives || virustotalPositives === 0) {
+      if (typeof virustotalPositives === "number") {
+        if (virustotalPositives === -1) {
+          disposition = "Not Found on VirusTotal";
+          color = "default";
+        } else if (virustotalPositives === -2) {
+          disposition = "VirusTotal Not Enabled";
+          color = "default";
+        } else if (virustotalPositives > 5) {
+          disposition = "Malicious";
+          color = "error";
+        } else {
+          disposition = "Benign";
+          color = "success";
+        }
+      }
+    } else {
+      disposition = "Not Found on VirusTotal";
+      color = "default";
+    }
+    return {
+      tag: (
+        <Tag color={color}>
+          <b>{disposition}</b>
+        </Tag>
+      ),
+      text: disposition,
+    };
+  };
 
   const getFilteredData = () => {
-    let filteredData = { ...data };
+    let filteredData = "";
+    if (selectedNodeData) {
+      filteredData = { ...selectedNodeData };
+      filteredData = { strelka_response: filteredData };
+    } else {
+      filteredData = { ...data };
+    }
     if (hideMetadata) {
       const filteredKeys = Object.keys(filteredData).filter(
         (key) => key !== "strelka_response"
@@ -73,11 +135,6 @@ const SubmissionsPage = (props) => {
     const strelka_response = filteredData.strelka_response;
     delete filteredData.strelka_response;
     return { strelka_response, ...filteredData };
-  };
-
-  const handleEventView = (value, depth) => {
-    setFileNameView(depth.children[3]);
-    setFileDepthView(depth.children[1]);
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -116,13 +173,6 @@ const SubmissionsPage = (props) => {
     };
   }, [handle401, id]);
 
-  const FormatListItemName = (item) => {
-    return item
-      .split("_")
-      .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
-      .join(" ");
-  };
-
   return isLoading ? (
     <div
       style={{
@@ -140,291 +190,361 @@ const SubmissionsPage = (props) => {
       />
     </div>
   ) : (
-    <PageWrapper title="Strelka Scan Results">
-      <PageHeader
-        ghost={false}
-        onBack={() => window.history.back()}
-        title={data.file_name}
-        subTitle={data.mime_types.map((type) => (
-          <Tag style={{ marginBottom: "4px" }} key={type}>
-            {type}
-          </Tag>
-        ))}
-        extra={[
-          APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-            <a
-              key="1"
-              href={`${APP_CONFIG.SEARCH_URL}`.replace(
-                "<REPLACE>",
-                data.file_id
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button>{APP_CONFIG.SEARCH_NAME}</Button>
-            </a>
-          ),
-
-          <CopyToClipboard
-            text={JSON.stringify(data.strelka_response)}
-            onCopy={() => message.success("Event copied to clipboard!")}
-          >
-            <Button key="2">Copy record as JSON</Button>
-          </CopyToClipboard>,
-        ]}
-      >
-        <Descriptions bordered size="small" column={3}>
-          <Descriptions.Item label="Submitted by">
-            {data.user.user_cn}
-          </Descriptions.Item>
-          <Descriptions.Item label="Upload Description">
-            <div>{data.submitted_description}</div>
-          </Descriptions.Item>
-          <Descriptions.Item label="Files Analyzed">
-            <div>{data.strelka_response.length}</div>
-          </Descriptions.Item>
-          <Descriptions.Item label="Creation Time">
-            <p>
-              {data.submitted_at
-                ? new Date(data?.submitted_at).toISOString().split(".")[0] + "Z"
-                : ""}{" "}
-            </p>
-          </Descriptions.Item>
-          <Descriptions.Item label="Scan Time">
-            <p>
-              {data?.processed_at
-                ? new Date(data?.processed_at).toISOString().split(".")[0] + "Z"
-                : ""}{" "}
-            </p>
-          </Descriptions.Item>
-          <Descriptions.Item label="Scanners Run">
-            <div>
-              {data?.scanners_run?.map((tag) => {
-                return (
-                  <Tag style={{ marginBottom: "4px" }} key={tag}>
-                    {tag.toUpperCase().substring(0, 4) === "SCAN"
-                      ? tag.toUpperCase().substring(4)
-                      : tag}
-                  </Tag>
-                );
-              })}
-            </div>
-          </Descriptions.Item>
-            <Descriptions.Item label="YARA Hits">
-              <div>
-                {
-                  data?.strelka_response?.[0]?.scan &&
-                  (
-                    "scan_yara" in data.strelka_response[0]
-                    ? data.strelka_response[0].scan.scan_yara
-                    : data.strelka_response[0].scan.yara
-                  )?.matches?.map((type, index) => (
-                    <Tag style={{ marginBottom: "4px" }} key={type + '-' + index}>
-                      {type}
-                    </Tag>
-                  ))
-                }
-              </div>
-            </Descriptions.Item>
-        </Descriptions>
-      </PageHeader>
-
+    <PageWrapper>
+      <Row gutter={{ xs: 32, sm: 32, md: 32, lg: 32 }}>
+        <Col
+          className="gutter-row"
+          xs={24}
+          sm={24}
+          md={24}
+          lg={24}
+          style={{ paddingRight: "0px" }}
+        >
+          <FileHeaderOverviewCard data={data} />
+        </Col>
+      </Row>
       <br />
 
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-        <Col className="gutter-row" xs={24} sm={24} md={8} lg={8}>
-          <Card>
-            <Typography>
-              <Title level={3}>Request Attributes</Title>
-              <Text type="secondary">
-                Metadata associated with the scan request.
-              </Text>
-            </Typography>
-            <br />
-
-            <List
-              bordered
-              dataSource={Object.entries(
-                data.strelka_response[0].request.attributes.metadata
-              )}
-              renderItem={(item) => (
-                <List.Item
-                  actions={[
-                    <CopyToClipboard
-                      text={item}
-                      onCopy={() =>
-                        message.success("Value copied to clipboard!")
-                      }
-                    >
-                      <a key="list-copy">Copy</a>
-                    </CopyToClipboard>,
-                  ]}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      width: "calc(100% - 100px)",
-                      flexDirection: "column",
-                      wordWrap: "break-word",
-                    }}
-                  >
-                    <div>
-                      <b>{FormatListItemName(item[0])}:</b>
-                    </div>
-                    <div>{item[1]}</div>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Card>
-
-          <br />
-
-          <Card>
-            <Typography>
-              <Title level={3}>Display Results</Title>
-              <Text type="secondary">Options for displaying events.</Text>
-            </Typography>
-            <br />
-
-            <List bordered>
-              <List.Item>
-                <div>
-                  <div style={{ paddingBottom: "8px" }}>
-                    <b>{FormatListItemName("Metadata Display")}</b>
-                  </div>
-                  <Button
-                    onClick={() => setHideMetadata(!hideMetadata)}
-                    style={{ marginBottom: "8px" }}
-                  >
-                    {hideMetadata ? "Show Metadata" : "Hide Metadata"}
-                  </Button>
-                </div>
-              </List.Item>
-              <List.Item>
-                <div>
-                  <div style={{ paddingBottom: "8px" }}>
-                    <b>{FormatListItemName("Event Display")}</b>
-                  </div>
-
-                  <Button onClick={() => setShowAll(!showAll)}>
-                    {showAll ? "Specific Event Display" : "Show All Events"}
-                  </Button>
-                </div>
-              </List.Item>
-
-              <List.Item
-                style={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
+        <Col className="gutter-row" xs={6} sm={6} md={6} lg={6}>
+          <Collapse
+            defaultActiveKey={[1]}
+            style={{ width: "100%", marginBottom: "10px", borderRadius: "20px" }}
+          >
+            <Collapse.Panel header="Submission Highlights" key="1">
+              <FileHighlightsOverviewCard data={data} />
+            </Collapse.Panel>
+          </Collapse>
+          <Collapse
+                defaultActiveKey={[1]}
+                style={{ width: "100%", marginBottom: "10px" }}
               >
-                <div style={{ alignItems: "center" }}>
-                  <div style={{ paddingBottom: "8px" }}>
-                    <b>{FormatListItemName("Display Specific Scans")}</b>
-                    {showAll && (
-                      <Tooltip title="Must change above to Specific Event Display">
-                        <QuestionCircleOutlined style={{ marginLeft: 8 }} />
-                      </Tooltip>
-                    )}
-                  </div>
-                  <Select
-                    disabled={showAll}
-                    id="expandSelect"
-                    defaultValue="Select Filename"
-                    style={{
-                      width: "250px",
-                      maxWidth: "100%",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                    onChange={(FilenameView, FiledepthView) =>
-                      handleEventView(FilenameView, FiledepthView)
-                    }
-                    value={FilenameView}
-                  >
-                    {data.strelka_response.map((event) => (
-                      <Option
-                        on
-                        key={event.file.name + event.file.depth}
-                        value={event.file.name + event.file.depth}
-                      >
-                        Depth: {event.file.depth} - {event.file.name}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
-              </List.Item>
-            </List>
-          </Card>
-
-          <br />
-
-          <Card style={{ width: "100%" }}>
-            <Typography>
-              <Title level={3}>Scan Results</Title>
-              <Text type="secondary">
-                Results of named scans for the submitted file
-              </Text>
-            </Typography>
-            <br />
-
-            <List
-              bordered
-              dataSource={data?.scanners_run}
-              renderItem={(scanner_name) => {
-                return (
-                  <List.Item
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      width: "100%",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <ScanDisplayCard
-                      scanner_name={scanner_name}
-                      data={data.strelka_response[0]}
-                    />
-                  </List.Item>
-                );
-              }}
-            />
-          </Card>
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text>Submission File Types</Text>
+                      <div style={{ float: "right" }}></div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <FileTypeOverviewCard data={data} />
+                </Collapse.Panel>
+              </Collapse>
+              <Collapse
+                defaultActiveKey={[1]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text>Submission File YARA Matches</Text>
+                      <div style={{ float: "right" }}></div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <YaraTypeOverviewCard data={data} />
+                </Collapse.Panel>
+              </Collapse>
         </Col>
 
-        <Col className="gutter-row" xs={24} sm={24} md={16} lg={16}>
-          <Row>
-            <Card style={{ width: "100%" }}>
-              <Typography>
-                <Title level={3}>JSON View</Title>
-                <Text type="secondary">Raw response JSON data</Text>
-              </Typography>
-              <br />
+        <Col className="gutter-row" xs={24} sm={24} md={18} lg={18}>
+          <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+            <Collapse
+              defaultActiveKey={[1]}
+              style={{ width: "100%", marginBottom: "10px" }}
+            >
+              <Collapse.Panel header="Submission File Flow" key="1">
+                <FileTreeCard
+                  data={data.strelka_response}
+                  onNodeSelect={handleNodeSelect}
+                />
+              </Collapse.Panel>
+            </Collapse>
 
-              <ReactJson
-                src={getFilteredData()}
-                collapsed={3}
-                shouldCollapse={(field) => {
-                  if (field.name === "scan") {
-                    return false;
+
+            {selectedNodeData && (
+              <Collapse
+                defaultActiveKey={[1]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        {getFileIcon()}
+                        <div style={{ marginLeft: "8px" }}>
+                          {" "}
+                          <Text strong>{selectedNodeData.file.name}</Text>
+                          <div style={{ fontSize: "smaller", color: "#888" }}>
+                            {selectedNodeData.file.flavors.mime[0]}
+                          </div>
+                        </div>
+                      </div>
+                      <div>{getFileDisposition().tag}</div>
+                    </div>
                   }
-                  if (
-                    typeof field.src !== "object" ||
-                    Array.isArray(field.src)
-                  ) {
-                    return false;
+                  key="1"
+                >
+                  <FileOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && (
+              <Collapse
+                defaultActiveKey={[1]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text strong>Insights</Text>
+                      <div style={{ float: "right" }}></div>
+                    </div>
                   }
-                  return field.level > 2;
-                }}
-              />
-            </Card>
+                  key="1"
+                >
+                  <InsightsCard data={selectedNodeData?.insights} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && (
+              <Collapse
+                defaultActiveKey={[1]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text strong>YARA Signatures</Text>
+                      <div style={{ float: "right" }}>
+                        <Tag color="default">
+                          <b>
+                            Matches:{" "}
+                            {selectedNodeData.scan.yara.matches
+                              ? selectedNodeData.scan.yara.matches.length
+                              : 0}
+                          </b>
+                        </Tag>
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  {selectedNodeData.scan.yara.matches ? (
+                    <YaraOverviewCard data={selectedNodeData} />
+                  ) : (
+                    "No YARA Matches"
+                  )}
+                </Collapse.Panel>
+              </Collapse>
+            )}
+
+            {selectedNodeData &&
+              selectedNodeData.scan.header &&
+              selectedNodeData.scan.footer && (
+                <Collapse
+                  defaultActiveKey={[]}
+                  style={{ width: "100%", marginBottom: "10px" }}
+                >
+                  <Collapse.Panel
+                    header={
+                      <div style={{ marginLeft: "8px" }}>
+                        <Text strong>Header / Footer</Text>
+                        <div style={{ fontSize: "smaller", color: "#888" }}>
+                          Header: {selectedNodeData.scan.header.header}
+                        </div>
+                        <div style={{ fontSize: "smaller", color: "#888" }}>
+                          Footer: {selectedNodeData.scan.footer.footer}
+                        </div>
+                      </div>
+                    }
+                    key="1"
+                  >
+                    <FileHeaderFooterCard data={selectedNodeData} />
+                  </Collapse.Panel>
+                </Collapse>
+              )}
+            {selectedNodeData && selectedNodeData.scan.ocr && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginLeft: "8px" }}>
+                          {" "}
+                          <Text strong>Optical Character Recognition</Text>
+                          <div style={{ fontSize: "smaller", color: "#888" }}>
+                            {Array.isArray(selectedNodeData.scan.ocr.text)
+                              ? selectedNodeData.scan.ocr.text
+                                  .join(" ")
+                                  .substring(0, 47) + "..."
+                              : typeof selectedNodeData.scan.ocr.text ===
+                                  "string" &&
+                                selectedNodeData.scan.ocr.text.length > 0
+                              ? selectedNodeData.scan.ocr.text.substring(
+                                  0,
+                                  47
+                                ) + "..."
+                              : "No Text"}
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <Tag color="default">
+                          <b>
+                            Words Extracted:{" "}
+                            {selectedNodeData.scan.ocr?.text
+                              ? selectedNodeData.scan.ocr?.text.length
+                              : 0}
+                          </b>
+                        </Tag>
+                        <Tag
+                          color={
+                            selectedNodeData.scan.ocr?.base64_thumbnail
+                              ? "success"
+                              : "error"
+                          }
+                        >
+                          <b>
+                            {selectedNodeData.scan.ocr?.base64_thumbnail
+                              ? "Thumbnail Available"
+                              : "No Thumbnail"}
+                          </b>
+                        </Tag>
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <OcrOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && selectedNodeData.scan.exiftool && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text strong>File Metadata</Text>
+                      <div style={{ fontSize: "smaller", color: "#888" }}>
+                        Metadata Count:{" "}
+                        {Object.keys(selectedNodeData.scan.exiftool).length}
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <FileExiftoolCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && selectedNodeData.scan.pe && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        <Text strong>Executable Information</Text>
+                        <div style={{ fontSize: "smaller", color: "#888" }}>
+                          Product:{" "}
+                          {selectedNodeData.scan.pe?.file_info?.product_name}
+                        </div>
+                        <div style={{ fontSize: "smaller", color: "#888" }}>
+                          Compiled: {selectedNodeData.scan.pe.compile_time}
+                        </div>
+                      </div>
+                      <Tag
+                        style={{ alignSelf: "center" }}
+                        color={
+                          selectedNodeData.scan.pe?.security
+                            ? "success"
+                            : "error"
+                        }
+                      >
+                        <b>
+                          {selectedNodeData.scan.pe?.security
+                            ? "Signed"
+                            : "Not Signed"}
+                        </b>
+                      </Tag>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <PeOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && selectedNodeData.iocs && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text strong>Indicators of Compromise (IOCs)</Text>
+                      <div style={{ fontSize: "smaller", color: "#888" }}>
+                        {selectedNodeData.iocs[0].ioc} and{" "}
+                        {selectedNodeData.iocs.length - 1} more
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <IocOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            <Collapse style={{ width: "100%" }}>
+              <Collapse.Panel header={<Text strong>JSON View</Text>} key="1">
+                <ReactJson
+                  src={getFilteredData()}
+                  collapsed={3}
+                  shouldCollapse={(field) => {
+                    if (field.name === "scan") {
+                      return false;
+                    }
+                    if (
+                      typeof field.src !== "object" ||
+                      Array.isArray(field.src)
+                    ) {
+                      return false;
+                    }
+                    return field.level > 2;
+                  }}
+                />
+              </Collapse.Panel>
+            </Collapse>
           </Row>
         </Col>
       </Row>
