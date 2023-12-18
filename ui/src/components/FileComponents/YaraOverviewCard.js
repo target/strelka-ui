@@ -38,29 +38,44 @@ const YaraOverviewCard = ({ data }) => {
     return prefixColorMap[prefix];
   };
 
-  // This function will map the YARA matches to their respective descriptions if available.
   const mapDescriptions = () => {
     const descriptionMap = new Map();
-    data.scan.yara.meta.forEach((meta) => {
-      if (meta.identifier === "description") {
-        descriptionMap.set(meta.rule, meta.value);
-      }
-    });
+    if (
+      data &&
+      data.scan &&
+      data.scan.yara &&
+      Array.isArray(data.scan.yara.meta)
+    ) {
+      data.scan.yara.meta.forEach((meta) => {
+        if (meta.identifier === "description") {
+          descriptionMap.set(meta.rule, meta.value);
+        }
+      });
+    }
     return descriptionMap;
   };
 
-  // This function will create a unified list of rules with or without descriptions.
   const compileRulesList = () => {
     const descriptionMap = mapDescriptions();
-    return data.scan.yara.matches
-      .map((rule) => {
-        return {
-          rule: rule,
-          description: descriptionMap.get(rule) || "No description available.",
-          color: getConsistentColorForPrefix(rule.split("_")[0]),
-        };
-      })
-      .sort((a, b) => a.rule.localeCompare(b.rule)); // Sort alphabetically by rule name
+    if (
+      data &&
+      data.scan &&
+      data.scan.yara &&
+      Array.isArray(data.scan.yara.matches)
+    ) {
+      return data.scan.yara.matches
+        .map((rule) => {
+          return {
+            rule: rule,
+            description:
+              descriptionMap.get(rule) || "No description available.",
+            color: getConsistentColorForPrefix(rule.split("_")[0]),
+          };
+        })
+        .sort((a, b) => a.rule.localeCompare(b.rule)); // Sort alphabetically by rule name
+    } else {
+      return []; // Return an empty array if the data is not in the expected format
+    }
   };
 
   // Function to filter YARA data
@@ -92,17 +107,33 @@ const YaraOverviewCard = ({ data }) => {
       <List
         dataSource={yaraData}
         renderItem={(item) => (
-          <List.Item style={{ border: "None", display: 'flex', alignItems: 'center', fontSize: '12px', paddingBottom: "4px", paddingTop: "4px", height: '100%' }}>
+          <List.Item
+            style={{
+              border: "None",
+              display: "flex",
+              alignItems: "center",
+              fontSize: "12px",
+              paddingBottom: "4px",
+              paddingTop: "4px",
+              height: "100%",
+            }}
+          >
             <Tag
-              style={{ flexGrow: 1, display: 'flex', padding: "8px", alignItems: 'center', justifyContent: 'space-between' }}
+              style={{
+                flexGrow: 1,
+                display: "flex",
+                padding: "8px",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
               color={item.color}
             >
-              <Text strong style={{fontSize: "12px", paddingRight: "10px"}}>
-              {item.rule}
+              <Text strong style={{ fontSize: "12px", paddingRight: "10px" }}>
+                {item.rule}
               </Text>
               <Paragraph
                 ellipsis={{ rows: 1, expandable: true }}
-                style={{ margin: 0, textAlign: 'right', fontSize: "12px" }}
+                style={{ margin: 0, textAlign: "right", fontSize: "12px" }}
               >
                 {item.description}
               </Paragraph>
