@@ -9,6 +9,7 @@ from typing import Dict, Tuple
 
 from flask import Blueprint, current_app, jsonify, request, session, Response
 from sqlalchemy import or_, desc, asc, func, case
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import joinedload
 
 from database import db
@@ -510,7 +511,7 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
             [
                 (
                     FileSubmission.strelka_response != None,
-                    func.cardinality(FileSubmission.strelka_response),
+                    func.json_array_length(FileSubmission.strelka_response.cast(JSON)),
                 )
             ],
             else_=0,
@@ -571,7 +572,7 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
         base_query = base_query.order_by(sort_expression)
 
     # Execute the paginated query
-    submissions = base_query.paginate(page, per_page, error_out=False)
+    submissions = base_query.paginate(page, per_page)
 
     # Convert submission objects to JSON
     paginated_ui = {
