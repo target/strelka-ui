@@ -1,9 +1,31 @@
-@import '~antd/dist/antd.css';
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
 
+/* Center-align text in .App */
 .App {
   text-align: center;
 }
 
+/* Header Styles */
+.App-header {
+  background-color: #f5f5f5;
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+/* Logo Styles */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -15,21 +37,6 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -39,12 +46,21 @@
   }
 }
 
+/* Layout Styles */
+.main-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 20px 10px 20px;
+}
+
 .site-layout-content {
   min-height: 280px;
   padding: 24px;
   margin-top: 48px;
   background: #fff;
 }
+
+/* Header and Logo Styles */
 #components-layout-demo-top .logo {
   float: left;
   width: 120px;
@@ -52,15 +68,44 @@
   margin: 16px 24px 16px 0;
   background: rgba(255, 255, 255, 0.3);
 }
+
 .ant-row-rtl #components-layout-demo-top .logo {
   float: right;
   margin: 16px 0 16px 24px;
 }
 
-.react-json-view {
-  word-break: break-all;
+/* Card Styles */
+.ant-card,
+.submission-card-height,
+.ant-collapse-item {
+  border-radius: 20px;
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+/* Collapse Styles */
+.ant-collapse,
+.ant-collapse > .ant-collapse-item > .ant-collapse-header,
+.ant-collapse > .ant-collapse-item > .ant-collapse-content,
+.ant-collapse > .ant-collapse-item,
+.ant-collapse > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box,
+.ant-collapse-content,
+.ant-collapse-content-box {
+  border-radius: 20px !important;
+  background-color: #ffffff;
+  border: 0;
+}
+
+/* Table Styles */
+.ant-table table {
+  font-size: 12px;
+}
+
+.ant-table-cell {
+  padding: 2px !important;
+}
+
+/* Tag Styles */
 .tagOverflow {
   font-size: 12px;
   cursor: pointer;
@@ -71,4 +116,20 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+/* Miscellaneous Styles */
+.site-content-layout {
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Link Styles */
+.App-link {
+  color: #61dafb;
+}
+
+/* JSON View Styles */
+.react-json-view {
+  word-break: break-all;
 }

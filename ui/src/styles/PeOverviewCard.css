@@ -1,0 +1,20 @@
+/* PeOverviewCard.css */
+
+/* Styles for table headers */
+.pe-overview-card .ant-table-thead > tr > th {
+  background: none; /* Remove the header background color */
+  font-weight: bold; /* Make the header text bold */
+  border-bottom: none; /* Remove the header bottom border */
+  font-size: 12px; /* Set the font size for header text */
+}
+
+/* Styles for table cells */
+.pe-overview-card .ant-table-tbody > tr > td {
+  border: none; /* Remove the cell borders */
+  font-size: 12px; /* Set the font size for body text */
+}
+
+/* Styles for the entire table */
+.pe-overview-card .ant-table {
+  border: none; /* Remove the table border */
+}

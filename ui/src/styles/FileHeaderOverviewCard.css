@@ -1,0 +1,76 @@
+/* FileHeaderOverviewCard.css */
+
+/* Card container styles */
+.ant-card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 20px;
+}
+
+/* Card body styles */
+.ant-card-body {
+  padding: 16px;
+}
+
+/* Full-width row */
+.ant-row {
+  width: 100%;
+}
+
+/* Badge styles */
+.ant-badge {
+  background-color: #f5222d;
+}
+
+/* Badge count styles */
+.ant-badge-count {
+  box-shadow: none;
+}
+
+/* Column styles */
+.ant-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Tag styles */
+.ant-tag {
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+/* Custom styles for the score circle */
+.score-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: red;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Styles for the filename and file hash */
+.file-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 16px;
+}
+
+.file-info p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Styles for the buttons at the bottom */
+.action-buttons .ant-btn {
+  margin-left: 8px;
+}
+
+/* Custom tooltip styling if needed */
+.ant-tooltip-inner {
+  background-color: red;
+}

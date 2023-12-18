@@ -10,7 +10,7 @@ const UploadPage = (props) => {
       subtitle="Upload files for Strelka analysis."
     >
       <div className="site-layout-content">
-        <Dropzone height="calc(100vh - 500px)" />
+        <Dropzone />
       </div>
     </PageWrapper>
   );
