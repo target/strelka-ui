@@ -29,7 +29,11 @@ function getVirusTotalColor(virusTotalResponse) {
       return "error";
     } else if (virusTotalResponse === -1) {
       return "default";
-    } else {
+    } 
+    else if (virusTotalResponse === -3) {
+      return "warning";
+    } 
+    else {
       return "success";
     }
   }
@@ -40,7 +44,11 @@ function getVirusTotalStatus(virusTotalResponse) {
   if (typeof virusTotalResponse === "number") {
     if (virusTotalResponse === -1) {
       return "Not Found on VirusTotal";
-    } else if (virusTotalResponse > 5) {
+    } 
+    else if (virusTotalResponse === -3) {
+      return "Exceeded VirusTotal Limit";
+    }
+    else if (virusTotalResponse > 5) {
       return virusTotalResponse + " Positives";
     } else {
       return "Benign";
@@ -205,11 +213,11 @@ const EventNode = memo(({ data, selected }) => {
       {<PulsatingAnimation />}
       {data.nodeIocs && (
         <TagWrapper style={{ left: "-5px" }}>
-          <Tag color="purple"><strong>IOCs: {data.nodeIocs}</strong></Tag>
+          <Tag color="purple"><strong>Potential IOCs: {data.nodeIocs}</strong></Tag>
         </TagWrapper>
       )}
       {data.nodeInsights && (
-        <TagWrapper style={{ left: data.nodeIocs ? "75px" : "-5px" }}> 
+        <TagWrapper style={{ left: data.nodeIocs ? "125px" : "-5px" }}> 
                   <Tag color="blue"><strong>Insights: {data.nodeInsights}</strong></Tag>
         </TagWrapper>
       )}

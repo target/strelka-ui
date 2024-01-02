@@ -49,6 +49,7 @@ body {
 /* Layout Styles */
 .main-content {
   max-width: 1600px;
+  min-width: 1600px;
   margin: 0 auto;
   padding: 0 20px 10px 20px;
 }
@@ -94,7 +95,14 @@ body {
   border-radius: 20px !important;
   background-color: #ffffff;
   border: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
+
+.ant-collapse-header-text {
+  font-weight: 500
+}
+
 
 /* Table Styles */
 .ant-table table {

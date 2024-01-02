@@ -2,6 +2,14 @@ FROM node:16-slim AS UI_BUILDER
 # We are using a multi-stage build as we require node for 
 # building react. 
 
+# Define UI build arguments.
+ARG REACT_APP_SEARCH_NAME
+ARG REACT_APP_SEARCH_URL
+
+# Set the build arguments as environment variables.
+ENV REACT_APP_SEARCH_NAME=$REACT_APP_SEARCH_NAME
+ENV REACT_APP_SEARCH_URL=$REACT_APP_SEARCH_URL
+
 # Copy package.json and package-lock.json into the builder.
 # Copying just these files first allows us to take advantage 
 # of cached Docker layers.
