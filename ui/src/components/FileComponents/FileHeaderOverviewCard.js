@@ -159,9 +159,23 @@ const FileHeaderOverviewCard = ({ data }) => {
                     Insights: {data.insights.length}
                   </Tag>
                 )}
-                <span style={{ paddingLeft: "20px" }}>
+                <span style={{ padding: "5px" }}>
                   {getDisposition(data)}
                 </span>
+                {[
+                    APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+                      <a
+                        href={`${APP_CONFIG.SEARCH_URL.replace(
+                          "<REPLACE>",
+                          data.file_id
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <Button size="small" style={{fontSize: "12px"}}>View in {APP_CONFIG.SEARCH_NAME}</Button>
+                      </a>
+                    ),
+                  ]}
               </div>
             </Row>
             <Row>
@@ -233,20 +247,6 @@ const FileHeaderOverviewCard = ({ data }) => {
             </Row>
           </div>
         }
-        extra={[
-          APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-            <a
-              href={`${APP_CONFIG.SEARCH_URL.replace(
-                "<REPLACE>",
-                data.file_id
-              )}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button>{APP_CONFIG.SEARCH_NAME}</Button>
-            </a>
-          ),
-        ]}
       >
         <div
           style={{
