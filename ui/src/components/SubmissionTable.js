@@ -1,154 +1,129 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Table,
-  Typography,
+  Space,
+  Tooltip,
+  Tag,
+  Input,
+  Select,
   Row,
   Col,
-  Select,
-  Tag,
-  Tooltip,
-  Space,
+  Typography,
   message,
-  Input,
 } from "antd";
-import { InfoCircleOutlined, CopyOutlined } from "@ant-design/icons";
+import {
+  InfoCircleOutlined,
+  CopyOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
 import { getIconConfig } from "../utils/iconMappingTable";
-import { APP_CONFIG } from "../config";
-import AuthCtx from "../contexts/auth";
-import { fetchWithTimeout } from "../util";
-import useResize from "../providers/Resize";
 
+import { debounce } from "lodash";
+import { fetchWithTimeout } from "../util.js";
+import { APP_CONFIG } from "../config";
 
 const { Text } = Typography;
 
-const SubmissionTable = ({ filesUploaded, page_size }) => {
-  const isMountedRef = useRef(true);
-  const { handle401 } = useContext(AuthCtx);
+/**
+ * A table component for displaying submission data.
+ */
+const SubmissionTable = () => {
   const [data, setData] = useState([]);
-  const defaultSorter = {
-    field: "submitted_at",
-    order: "descend",
-  };
-  const [sorter, setSorter] = useState(defaultSorter);
-
-  const [minimalView, setMinimalView] = useState(false);
-  const [componentWidth, setComponentWidth] = useState(1000);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [excludedSubmitters, setExcludedSubmitters] = useState(
     APP_CONFIG.DEFAULT_EXCLUDED_SUBMITTERS
   );
+  const defaultSorter = { field: "submitted_at", order: "descend" };
+  const [sorter, setSorter] = useState(defaultSorter);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
 
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: page_size ? page_size : 10,
-  });
-
-  const refElem = useRef();
-  const { width } = useResize();
-
-  useEffect(() => {
-    setMinimalView(refElem?.current?.clientWidth < 1000);
-    setComponentWidth(refElem?.current?.clientWidth || 1000);
-  }, [width]);
-
-  function useQuery() {
-    return new URLSearchParams(useLocation().search);
-  }
-
-  let query = useQuery();
-  const filterJustMine = query.get("just_mine");
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Filter table data based on search query
-  const filteredData = data.filter((item) => {
-    return (
-      item.file_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.submitted_description &&
-        item.submitted_description
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()))
-    );
-  });
-
-  const handleSearch = (event) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-    const newPagination = { ...pagination, current: 1 };
-    fetchTableData({ searchQuery: query, pagination: newPagination });
-  };
-
-  const fetchTableData = (params = {}) => {
+  // Fetches Data from the Strelka UP API
+  const fetchData = useCallback(async () => {
+    // Sets Loading to True so table can reflect
     setIsLoading(true);
-    const currentSorter = params.sorter || defaultSorter;
-    let search_url = `${APP_CONFIG.BACKEND_URL}/strelka/scans?search=${params.searchQuery || ""}&page=${params.pagination.current}&per_page=${params.pagination.pageSize}&sortField=${currentSorter.field}&sortOrder=${currentSorter.order}&exclude_submitters=${excludedSubmitters.join(",")}`;
 
-    fetchWithTimeout(search_url, {
-      method: "GET",
-      mode: "cors",
-      credentials: "include",
-      timeout: APP_CONFIG.API_TIMEOUT,
-    })
-      .then((res) => {
-        if (res.status === 401) {
-          handle401();
-          throw new Error('Unauthorized');
-        }
-        if (!res.ok) {
-          throw new Error('Response not ok');
-        }
-        return res.json();
-      })
-      .then((res) => {
-        if (!isMountedRef.current) return;
-        setData(res.items);
-        setPagination({
-          current: res.page,
-          pageSize: res.per_page,
-          total: res.total,
-        });
-      })
-      .catch((error) => {
-        console.error('Fetch table data failed:', error);
-        message.error('Failed to fetch table data.');
-      })
-      .finally(() => {
-        if (isMountedRef.current) setIsLoading(false);
+    // Build updated Search Query URL
+    const searchUrl = `${
+      APP_CONFIG.BACKEND_URL
+    }/strelka/scans?search=${searchQuery}&page=${pagination.current}&per_page=${
+      pagination.pageSize
+    }&exclude_submitters=${excludedSubmitters.join(",")}&sortField=${
+      sorter.field
+    }&sortOrder=${sorter.order}`;
+
+    // Fetch the Table Data from the Strelka UI API
+    try {
+      const res = await fetchWithTimeout(searchUrl, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+        timeout: APP_CONFIG.API_TIMEOUT,
       });
-};
-
+      if (!res.ok) {
+        throw new Error("Network response was not ok.");
+      }
+      const result = await res.json();
+      setData(result.items);
+      setPagination((prev) => ({ ...prev, total: result.total }));
+    } catch (error) {
+      console.error("Fetch table data failed:", error);
+      message.error("Failed to fetch table data.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    searchQuery,
+    excludedSubmitters,
+    pagination.current,
+    pagination.pageSize,
+    sorter,
+  ]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchTableData({ pagination, searchQuery });
-    };
-    fetchData();
+    fetchData(); // Initial fetch
+  }, [fetchData]);
 
-    // Cleanup function for useEffect
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, [filesUploaded, filterJustMine, excludedSubmitters]);
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setPagination({ ...pagination, current: 1 });
+  };
 
-  const handleTableChange = (newPagination, filters, sorter) => {
-    setPagination(newPagination);
-    setSorter({ 
-      field: sorter.field || defaultSorter.field, 
-      order: sorter.order || defaultSorter.order 
-    });
-    fetchTableData({
-      pagination: newPagination,
-      searchQuery: searchQuery || "",
-      sorter: { 
-        field: sorter.field || defaultSorter.field, 
-        order: sorter.order || defaultSorter.order 
-      }
+  const handleExcludedSubmitterChange = (value) => {
+    setExcludedSubmitters(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleTableChange = (newPagination, filters, newSorter) => {
+    // If the newSorter object has a 'field' and 'order', it means a column was clicked for sorting.
+    if (newSorter.field && newSorter.order) {
+      setSorter({
+        field: newSorter.field,
+        order: newSorter.order,
+      });
+    } else {
+      // Reset to default sorter if the sorter is cleared.
+      setSorter(defaultSorter);
+    }
+    setPagination({
+      ...pagination,
+      current: newPagination.current,
+      pageSize: newPagination.pageSize,
     });
   };
+  <Input.Search
+    placeholder="Search by File Name or Submission Description..."
+    onChange={(e) => debouncedSearchChange(e)}
+    style={{ fontSize: "12px" }}
+  />;
+
+  const debouncedSearchChange = useCallback(
+    debounce((value) => handleSearchChange(value), 300),
+    []
+  );
 
   const columns = [
     {
@@ -156,7 +131,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "submitted_at",
       key: "submitted_at",
       width: 1,
-      sorter: (a, b) => new Date(a.submitted_at) - new Date(b.submitted_at),
+      sorter: true,
       defaultSortOrder: sorter.order,
       render: (submitted_at, full) => {
         return submitted_at ? (
@@ -250,7 +225,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "file_size",
       key: "file_size",
       width: 1,
-      sorter: (a, b) => a.file_size - b.file_size,
+      sorter: true,
       render: (_, full) => {
         const fileSize = full.file_size;
         let size = 0;
@@ -274,8 +249,8 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "file_count",
       key: "file_count",
       width: 1,
-      sorter: (a, b) => a.strelka_response.length - b.strelka_response.length,
-      render: (_, full) => <p>{full.strelka_response.length}</p>,
+      sorter: true,
+      render: (_, full) => <p>{full.files_seen}</p>,
     },
 
     {
@@ -283,10 +258,8 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "iocs",
       key: "iocs",
       width: 1,
-      sorter: (a, b) =>
-        (a.iocs ? a.iocs.length : 0) - (b.iocs ? b.iocs.length : 0),
+      sorter: true,
       render: (iocs) => {
-
         const tagStyle = {
           fontSize: "10px",
           fontWeight: "bold",
@@ -313,21 +286,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "insights",
       key: "insights",
       width: 1,
-      sorter: (a, b) =>
-        (a.insights ? a.insights.length : 0) -
-        (b.insights ? b.insights.length : 0),
+      sorter: true,
       render: (insights) => {
         const insightCount = insights ? insights.length : 0;
         const textColor =
           insightCount > 5 ? "red" : insightCount > 3 ? "orange" : "default";
-          const tagStyle = {
-            fontSize: "10px",
-            fontWeight: "bold",
-            width: "80%",
-            textAlignLast: "center",
-            maxWidth: "75px",
-          };
-          
+        const tagStyle = {
+          fontSize: "10px",
+          fontWeight: "bold",
+          width: "80%",
+          textAlignLast: "center",
+          maxWidth: "75px",
+        };
 
         return (
           <div style={{ textAlign: "center" }}>
@@ -344,7 +314,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "mime_types",
       key: "mime_types",
       width: 1,
-      sorter: (a, b) => a.mime_types.length - b.mime_types.length,
+      sorter: true,
       render: (_, full) => {
         let mimeType = "N/A";
 
@@ -379,7 +349,6 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
         }
 
         const mappingEntry = getIconConfig("strelka", mimeType.toLowerCase());
-        const IconComponent = mappingEntry?.icon;
         const bgColor = mappingEntry?.color || "defaultBackgroundColor";
 
         return (
@@ -394,20 +363,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       dataIndex: "yara_hits",
       key: "yara_hits",
       width: 1,
-      sorter: (a, b) =>
-        (a.yara_hits ? a.yara_hits.length : 0) -
-        (b.yara_hits ? b.yara_hits.length : 0),
+      sorter: true,
       render: (yara_hits) => {
         const yarasCount = yara_hits ? yara_hits.length : 0;
         const textColor =
-          yarasCount > 25 ? "red" : yarasCount > 10 ? "orange" : "default";
-          const tagStyle = {
-            fontSize: "10px",
-            fontWeight: "bold",
-            width: "80%",
-            textAlignLast: "center",
-            maxWidth: "75px",
-          };
+          yarasCount > 25 ? "orange" : yarasCount > 10 ? "yellow" : "default";
+        const tagStyle = {
+          fontSize: "10px",
+          fontWeight: "bold",
+          width: "80%",
+          textAlignLast: "center",
+          maxWidth: "75px",
+        };
         return (
           <div style={{ textAlign: "center" }}>
             <Tag color={textColor} style={tagStyle}>
@@ -422,7 +389,7 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
       key: "scanners_run",
       dataIndex: "scanners_run",
       width: 1,
-      sorter: (a, b) => a.scanners_run.length - b.scanners_run.length,
+      sorter: true,
       render: (scanners_run) => (
         <p style={{ textAlign: "center" }}>{scanners_run.length}</p>
       ),
@@ -441,16 +408,18 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
         return (
           <Space size="middle">
             {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-              <a
-                target="_blank"
-                href={`${APP_CONFIG.SEARCH_URL}`.replace(
-                  "<REPLACE>",
-                  record.file_id
-                )}
-                rel="noreferrer"
-              >
-                {APP_CONFIG.SEARCH_NAME}
-              </a>
+              <Tooltip title={`Search ${APP_CONFIG.SEARCH_NAME}`}>
+                <a
+                  target="_blank"
+                  href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                    "<REPLACE>",
+                    record.file_id
+                  )}
+                  rel="noreferrer"
+                >
+                  <SearchOutlined style={{ cursor: "pointer" }} />
+                </a>
+              </Tooltip>
             )}
             <Space size="middle">
               <Tooltip title="Copy SHA256">
@@ -476,63 +445,39 @@ const SubmissionTable = ({ filesUploaded, page_size }) => {
     },
   ];
 
-  let tableProps = [...columns];
-  if (minimalView) {
-    tableProps = [
-      tableProps[0],
-      tableProps[1],
-      tableProps[2],
-      tableProps[3],
-      tableProps[7],
-    ];
-  }
-
   return (
-    <div ref={refElem}>
+    <div>
       <Row gutter={16} style={{ marginBottom: "16px" }}>
         <Col span={18}>
-          <div>
-            <Text
-              type="secondary"
-              style={{ fontSize: "12px", marginBottom: 8 }}
-            >
-              Search Filter
-            </Text>
-            <Input.Search
-              placeholder="Search by File Name or Submission Description..."
-              onChange={handleSearch}
-              style={{ fontSize: "12px" }}
-            />
-          </div>
+          <Text type="secondary" style={{ fontSize: "12px", marginBottom: 8 }}>
+            Search Filter
+          </Text>
+          <Input.Search
+            placeholder="Search by File Name or Submission Description..."
+            onChange={(e) => debouncedSearchChange(e)}
+            style={{ fontSize: "12px" }}
+          />
         </Col>
-
         <Col span={6}>
-          <div style={{ textAlign: "left" }}>
-            <Text
-              type="secondary"
-              style={{ fontSize: "12px", marginBottom: 8 }}
-            >
-              Exclude Submitters
-            </Text>
-            <Select
-              mode="tags"
-              style={{ width: "100%", fontSize: "12px" }}
-              placeholder="Submitters to exclude..."
-              defaultValue={excludedSubmitters}
-              onChange={(selected) => setExcludedSubmitters(selected)}
-            />
-          </div>
+          <Text type="secondary" style={{ fontSize: "12px", marginBottom: 8 }}>
+            Exclude Submitters
+          </Text>
+          <Select
+            mode="tags"
+            style={{ width: "100%", fontSize: "12px" }}
+            placeholder="Submitters to exclude..."
+            value={excludedSubmitters}
+            onChange={handleExcludedSubmitterChange}
+          />
         </Col>
       </Row>
-
       <Table
-        size={minimalView ? "small" : "middle"}
         loading={isLoading}
-        columns={tableProps}
+        columns={columns}
+        dataSource={data}
+        rowKey="id"
         pagination={pagination}
-        dataSource={filteredData.map((item) => ({ ...item, key: item.id }))}
         onChange={handleTableChange}
-        scroll={{ x: 600 }}
       />
     </div>
   );

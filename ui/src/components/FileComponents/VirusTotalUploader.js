@@ -38,6 +38,7 @@ const VirusTotalUploader = ({ onUploadSuccess }) => {
       message.success("Hash submitted successfully");
       onUploadSuccess(); // Trigger table refresh
       setVtHash(""); // Reset hash input
+      setLoading(false); // Stop loading
     })
     .catch((error) => {
       message.error(`Error submitting hash: ${error.message}`);
