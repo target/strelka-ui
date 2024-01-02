@@ -19,6 +19,7 @@ class FileSubmission(db.Model):
         strelka_response (dict): A dictionary containing the response from the Strelka scanner.
         mime_types (list): A list of MIME types associated with the file.
         yara_hits (list): A list of YARA rule IDs that matched the file.
+        files_seen (int): A count of files seen during analysis.
         scanners_run (list): A list of scanners that were run on the file.
         hashes (list): A list of hashes associated with the file.
         submitted_from_ip (str): The IP address of the client that submitted the file.
@@ -46,6 +47,7 @@ class FileSubmission(db.Model):
     strelka_response: dict = db.Column(db.JSON())
     mime_types: list = db.Column(db.ARRAY(db.String(), dimensions=1))
     yara_hits: list = db.Column(db.ARRAY(db.String(), dimensions=1))
+    files_seen: int = db.Column(db.Integer())
     scanners_run: list = db.Column(db.ARRAY(db.String(), dimensions=1))
     hashes: list = db.Column(db.ARRAY(db.String(), dimensions=2))
     insights: list = db.Column(db.ARRAY(db.String(), dimensions=1))
@@ -72,6 +74,7 @@ class FileSubmission(db.Model):
         strelka_response: dict,
         mime_types: list,
         yara_hits: list,
+        files_seen: int,
         scanners_run: list,
         hashes: list,
         insights: list,
@@ -89,6 +92,7 @@ class FileSubmission(db.Model):
         self.strelka_response = strelka_response
         self.mime_types = mime_types
         self.yara_hits = yara_hits
+        self.files_seen = files_seen
         self.scanners_run = scanners_run
         self.hashes = hashes
         self.insights = insights
