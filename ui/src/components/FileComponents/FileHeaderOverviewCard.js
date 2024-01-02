@@ -13,8 +13,9 @@ const StyledTag = styled(Tag)`
 `;
 
 const StyledText = styled(Text)`
-  font-size: 12px;
-  margin-right: 8px; // Adds space to the right of the text
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 8px;
 `;
 
 const LeftWrapper = styled.div`
@@ -40,6 +41,34 @@ const LeftWrapper = styled.div`
     text-overflow: ellipsis;
   }
 `;
+
+const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: small;
+  color: #888;
+`;
+
+const InfoLabel = styled.div`
+  min-width: 80px; // Set a minimum width for labels
+`;
+
+const InfoContent = styled.div`
+  flex: 1;
+`;
+
+// Function to format the file size
+const formatFileSize = (size) => {
+  if (size < 1024) {
+    return `${size} B`;
+  } else if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(2)} KB`;
+  } else if (size < 1024 * 1024 * 1024) {
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+  } else {
+    return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
+};
 
 const getDisposition = (data) => {
   let text = "Not Found on VirusTotal"; // Default text
@@ -106,33 +135,47 @@ const FileHeaderOverviewCard = ({ data }) => {
             <Row style={{ alignItems: "center" }}>
               <div style={{ flex: 1 }}>{data.file_name}</div>
               <div>
-                {data.iocs && (
+                {data?.iocs && data?.iocs?.length > 0 && (
                   <Tag
                     style={{
                       margin: "2px",
                       fontWeight: "500",
                       fontSize: "11px",
                     }}
-                    color="error"
+                    color="purple"
                   >
-                    IOCs: {data.iocs.length}
+                    Potential IOCs: {data.iocs.length}
                   </Tag>
                 )}
-                {data.insights && (
+                {data?.insights && data?.insights?.length > 0 && (
                   <Tag
                     style={{
                       margin: "2px",
                       fontWeight: "500",
                       fontSize: "11px",
                     }}
-                    color="warning"
+                    color="blue"
                   >
                     Insights: {data.insights.length}
                   </Tag>
                 )}
-                <span style={{ paddingLeft: "20px" }}>
+                <span style={{ padding: "5px" }}>
                   {getDisposition(data)}
                 </span>
+                {[
+                    APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+                      <a
+                        href={`${APP_CONFIG.SEARCH_URL.replace(
+                          "<REPLACE>",
+                          data.file_id
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <Button size="small" style={{fontSize: "12px"}}>View in {APP_CONFIG.SEARCH_NAME}</Button>
+                      </a>
+                    ),
+                  ]}
               </div>
             </Row>
             <Row>
@@ -204,20 +247,6 @@ const FileHeaderOverviewCard = ({ data }) => {
             </Row>
           </div>
         }
-        extra={[
-          APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-            <a
-              href={`${APP_CONFIG.SEARCH_URL.replace(
-                "<REPLACE>",
-                data.file_id
-              )}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button>{APP_CONFIG.SEARCH_NAME}</Button>
-            </a>
-          ),
-        ]}
       >
         <div
           style={{
@@ -228,18 +257,77 @@ const FileHeaderOverviewCard = ({ data }) => {
           <div style={{ display: "flex", alignItems: "center" }}>
             <div style={{ marginLeft: "8px" }}>
               {" "}
-              <StyledText>{data.submitted_description}</StyledText>
-              <div style={{ fontSize: "smaller", color: "#888" }}>
-                Submitted By: {data.user.first_name}.{data.user.last_name} (
-                {data.user.user_cn})
+              <div style={{ marginBottom: "8px" }}>
+                <StyledText style={{ paddingBottom: "4px" }}>
+                  {data.submitted_description}
+                </StyledText>
               </div>
-              <div style={{ fontSize: "smaller", color: "#888" }}>
-                Submitted At: {data.submitted_at}
-              </div>
-              <div style={{ fontSize: "smaller", color: "#888" }}>
-                Files Analyzed: {data.strelka_response.length}
-              </div>
-              <div>
+              <InfoRow>
+                <InfoLabel>MD5:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }} copyable>
+                    {data.strelka_response[0]?.scan?.hash?.md5}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>SHA1:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }} copyable>
+                    {data.strelka_response[0]?.scan?.hash?.sha1}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>SHA256:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }} copyable>
+                    {data.strelka_response[0]?.scan?.hash?.sha256}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>TLSH:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }} copyable>
+                    {data.strelka_response[0]?.scan?.hash?.tlsh}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Size:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }}>
+                    {formatFileSize(data.file_size)}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Submitter:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }}>
+                    {data.user.first_name}.{data.user.last_name} (
+                    {data.user.user_cn})
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Submitted:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }}>
+                    {data.submitted_at}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Files:</InfoLabel>
+                <InfoContent>
+                  <Text style={{ fontSize: "small", color: "#888" }}>
+                    {data.strelka_response.length}
+                  </Text>
+                </InfoContent>
+              </InfoRow>
+              <div style={{ marginTop: "8px" }}>
                 {sortedScannersRun.map((tag) => (
                   <StyledTag style={{ fontSize: "10px" }} key={tag}>
                     {tag.toUpperCase().startsWith("SCAN")
@@ -248,54 +336,6 @@ const FileHeaderOverviewCard = ({ data }) => {
                   </StyledTag>
                 ))}
               </div>
-              {/* <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                }}
-              >
-                {data?.strelka_response.map((response, index) => {
-                  const responseColor = getColorForIndex();
-                  const yaraMatches = response.scan?.yara?.matches || [];
-
-                  return (
-                    <React.Fragment key={index}>
-                      {" "}
-                      {yaraMatches.slice(0, 5).map((match, matchIndex) => (
-                        <Tooltip title={response.file.name} key={matchIndex}>
-                          <Tag
-                            style={{
-                              margin: "2px",
-                              fontWeight: "500",
-                              fontSize: "10px",
-                            }}
-                            color={responseColor}
-                          >
-                            {match}
-                          </Tag>
-                        </Tooltip>
-                      ))}
-                      {yaraMatches.length > 5 && (
-                        <Tooltip
-                          title={yaraMatches.slice(5).join(", ")}
-                          key={`more-${index}`}
-                        >
-                          {" "}
-                          <Tag
-                            style={{
-                              margin: "2px",
-                              fontWeight: "500",
-                              fontSize: "10px",
-                            }}
-                            color={responseColor}
-                          >{`... and ${yaraMatches.length - 5} more`}</Tag>
-                        </Tooltip>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </div> */}
             </div>
           </div>
           <div>

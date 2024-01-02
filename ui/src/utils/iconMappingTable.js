@@ -12,91 +12,159 @@ import {
   CalculatorOutlined,
   LockOutlined,
   FileOutlined,
-
+  FileWordOutlined,
+  FileImageOutlined,
+  FileGifOutlined,
+  FileMarkdownOutlined,
+  MailOutlined,
+  FileUnknownOutlined,
+  ExperimentOutlined,
+  CodeOutlined,
 } from "@ant-design/icons";
+
+import { antdColors } from "../utils/colors"
 
 export const flowIconMappingTable = {
   strelka: {
     "application/octet-stream": {
       icon: NumberOutlined,
-      color: "#8D6E63",
+      color: antdColors.brown,
     },
     "text/plain": {
       icon: FileTextOutlined,
-      color: "#1677ff",
+      color: antdColors.blue,
     },
     "text/html": {
       icon: Html5Outlined,
-      color: "#9c27b0",
+      color: antdColors.purple,
     },
     "text/csv": {
       icon: TableOutlined,
-      color: "#5b8c00",
+      color: antdColors.lime,
     },
     "image/png": {
       icon: PictureOutlined,
-      color: "#4096ff",
+      color: antdColors.blue,
     },
     "image/jpeg": {
       icon: PictureOutlined,
-      color: "#4096ff",
+      color: antdColors.blue,
     },
     "application/pdf": {
       icon: FilePdfOutlined,
-      color: "#ff4d4f",
+      color: antdColors.red,
     },
     "text/xml": {
       icon: FileTextOutlined,
-      color: "#ffa940",
+      color: antdColors.orange,
     },
     "application/x-executable": {
       icon: PlaySquareOutlined,
-      color: "#ff4d4f",
+      color: antdColors.red,
     },
     "application/zip": {
       icon: FileZipOutlined,
-      color: "#f759ab",
-    }
-    ,
+      color: antdColors.gold,
+    },
     "application/vnd.ms-excel": {
       icon: FileExcelOutlined,
-      color: "#4CAF50",
+      color: antdColors.green,
     },
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
       icon: FileExcelOutlined,
-      color: "#4CAF50",
+      color: antdColors.green,
+    },
+    "application/msword": {
+      icon: FileWordOutlined,
+      color: antdColors.geekblue,
     },
     "application/x-dosexec": {
       icon: PlaySquareOutlined,
-      color: "#ff4d4f",
+      color: antdColors.red,
     },
     "application/x-dbt": {
       icon: DatabaseOutlined,
-      color: "#531dab",
+      color: antdColors.purple,
     },
     "application/encrypted": {
       icon: LockOutlined,
-      color: "#13c2c2",
+      color: antdColors.cyan,
     },
     "application/x-matlab-data": {
       icon: CalculatorOutlined,
-      color: "#fadb14",
+      color: antdColors.yellow,
     },
     "application/x-pnf": {
       icon: FileOutlined,
-      color: "#faad14",
+      color: antdColors.gold,
     },
     "application/x-empty": {
-      icon: FileOutlined,
-      color: "#531dab",
+      icon: FileUnknownOutlined,
+      color: antdColors.gray,
     },
-  }
-}
+    "application/cdfv2": {
+      icon: FileTextOutlined,
+      color: antdColors.gray,
+    },
+    "application/gzip": {
+      icon: FileZipOutlined,
+      color: antdColors.gold,
+    },
+    "image/svg+xml": {
+      icon: FileImageOutlined,
+      color: antdColors.green,
+    },
+    "message/rfc822": {
+      icon: MailOutlined,
+      color: antdColors.blue,
+    },
+    "text/rtf": {
+      icon: FileWordOutlined,
+      color: antdColors.green,
+    },
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+      icon: FileWordOutlined,
+      color: antdColors.green,
+    },
+    "application/x-wine-extension-ini": {
+      icon: ExperimentOutlined,
+      color: antdColors.magenta,
+    },
+    "application/x-setupscript": {
+      icon: CodeOutlined,
+      color: antdColors.cyan,
+    },
+    "text/css": {
+      icon: CodeOutlined,
+      color: antdColors.teal,
+    },
+    "application/json": {
+      icon: FileOutlined,
+      color: antdColors.indigo,
+    },
+    "application/xml": {
+      icon: FileOutlined,
+      color: antdColors.deepPurple,
+    },
+    "application/javascript": {
+      icon: CodeOutlined,
+      color: antdColors.deepOrange,
+    },
+    "text/markdown": {
+      icon: FileMarkdownOutlined,
+      color: antdColors.limeGreen,
+    },
+    "image/gif": {
+      icon: FileGifOutlined,
+      color: antdColors.amber,
+    },
+  },
+};
 
 // Default icon and color
 const defaultIconConfig = {
   icon: FileTextOutlined,
-  color: "#d9d9d9" 
+  color: antdColors.darkGray,
 };
 
 // Function to get icon configuration

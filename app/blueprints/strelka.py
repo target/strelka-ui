@@ -173,7 +173,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
                             )
                             total_scanned += 1
                         else:
-                            pass
+                            scanned_file["enrichment"] = {"virustotal": -3}
                 except Exception as e:
                     logging.warning(
                         f"Could not process VirusTotal search with error: {e} "
@@ -215,6 +215,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
                 response,
                 get_mimetypes(response),
                 get_yara_hits(response),
+                len(response),
                 get_scanners_run(response),
                 get_hashes(submitted_file),
                 list(insights),
@@ -510,8 +511,8 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
         "file_count": case(
             [
                 (
-                    FileSubmission.strelka_response != None,
-                    func.json_array_length(FileSubmission.strelka_response.cast(JSON)),
+                    FileSubmission.files_seen != None,
+                    FileSubmission.files_seen,
                 )
             ],
             else_=0,
