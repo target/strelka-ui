@@ -13,7 +13,7 @@
 The Strelka Web UI is a browser and API-based file submission frontend for the [Strelka Enterprise File Scanner](https://github.com/target/strelka). It allows users to submit files to a Strelka cluster and review historical response results easily. The Strelka Web UI supports LDAP authentication and API access, providing a secure and flexible way to interact with the Strelka scanner. This document provides details on how to set up and use the Strelka Web UI, as well as its features and related projects.
 
 <div align="center">
-  <img src="./misc/assets/strelkaui_results.png" alt="Strelka UI Results Page" />
+  <img src="./misc/assets/strelkaui_results.gif" alt="Strelka UI Results Page" />
   <h5>Strelka UI Results Page</h5>
 </div>
 
@@ -32,7 +32,6 @@ The file submission UI provides the following features:
 - Docker
 - Docker-compose
 - Python 3.9+
-- Entitlement: `CN=APP-DHB-DetectHubUser`
 
 ## Quick Start
 
