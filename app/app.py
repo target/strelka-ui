@@ -65,4 +65,4 @@ if __name__ == "__main__":
     serve(TransLogger(main_app, setup_console_handler=False), host="0.0.0.0", port=8080)
 
     # uncomment below for local flask app development with hot reloading
-    # main_app.run(host="0.0.0.0", port=80, threaded=True)
+    main_app.run(host="0.0.0.0", port=80, threaded=True)
