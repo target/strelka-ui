@@ -8,7 +8,7 @@ const GenericLogo = () => {
       width="129px"
       height="129px"
       viewBox="0 0 129 129"
-      enable-background="new 0 0 129 129"
+      enableBackground="new 0 0 129 129"
     >
       {" "}
       <image

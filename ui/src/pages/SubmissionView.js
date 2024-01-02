@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Tag, Row, Col, Collapse, Typography, Spin } from "antd";
 
 import PageWrapper from "../components/PageWrapper";
-import FileTreeCard from "../components/FileComponents/FileTreeCard";
+import FileTreeCardWithProvider from "../components/FileComponents/FileTreeCardWithProvider";
 import FileHeaderOverviewCard from "../components/FileComponents/FileHeaderOverviewCard";
 import FileTypeOverviewCard from "../components/FileComponents/FileTypeOverviewCard";
 import YaraTypeOverviewCard from "../components/FileComponents/YaraTypeOverviewCard";
@@ -40,9 +40,44 @@ const SubmissionsPage = (props) => {
   const [showAll] = useState(true);
   const [selectedNodeData, setSelectedNodeData] = useState("");
 
+  const [fileTypeFilter, setFileTypeFilter] = useState(null);
+  const [fileYaraFilter, setFileYaraFilter] = useState(null);
+  const [fileNameFilter, setFileNameFilter] = useState(null);
+
+  // Callback to set file type filter
+  const handleFileTypeSelect = (fileType) => {
+    setFileTypeFilter(fileType);
+  };
+
+  // Callback to set file name filter
+  const handleFileNameSelect = (fileName) => {
+    setFileNameFilter(fileName);
+  };
+
+  // Callback to set file yara filter
+  const handleFileYaraSelect = (fileYara) => {
+    setFileYaraFilter(fileYara);
+  };
+
+  // Callback for selected a node in the flow view
   const handleNodeSelect = (nodeData) => {
     setSelectedNodeData(nodeData);
   };
+
+  // Callback for monitoring filter changes. Need to deselect node.
+  useEffect(() => {
+    if (fileNameFilter) {
+      // Find the node data based on the file name filter
+      const nodeData = data.strelka_response.find(
+        (response) => response.file.tree.node === fileNameFilter
+      );
+      setSelectedNodeData(nodeData || ""); // Set to found node data or reset if not found
+    } else {
+      // Reset selectedNodeData when other filters change
+      setSelectedNodeData("");
+    }
+  }, [fileNameFilter, fileTypeFilter, fileYaraFilter]);
+
 
   const getFileIcon = () => {
     const mappingEntry = getIconConfig(
@@ -70,7 +105,12 @@ const SubmissionsPage = (props) => {
         if (virustotalPositives === -1) {
           disposition = "Not Found on VirusTotal";
           color = "default";
-        } else if (virustotalPositives === -2) {
+        } 
+        else if (virustotalPositives === -3) {
+          disposition = "Exceeded VirusTotal Limit";
+          color = "warning";   
+        }
+        else if (virustotalPositives === -2) {
           disposition = "VirusTotal Not Enabled";
           color = "default";
         } else if (virustotalPositives > 5) {
@@ -209,44 +249,41 @@ const SubmissionsPage = (props) => {
         <Col className="gutter-row" xs={6} sm={6} md={6} lg={6}>
           <Collapse
             defaultActiveKey={[1]}
-            style={{ width: "100%", marginBottom: "10px", borderRadius: "20px" }}
+            style={{
+              width: "100%",
+              marginBottom: "10px",
+              borderRadius: "20px",
+            }}
           >
-            <Collapse.Panel header="Submission Highlights" key="1">
-              <FileHighlightsOverviewCard data={data} />
+            <Collapse.Panel header="File Highlights" key="1">
+              <FileHighlightsOverviewCard
+                data={data}
+                onFileNameSelect={handleFileNameSelect}
+              />
             </Collapse.Panel>
           </Collapse>
           <Collapse
-                defaultActiveKey={[1]}
-                style={{ width: "100%", marginBottom: "10px" }}
-              >
-                <Collapse.Panel
-                  header={
-                    <div style={{ marginLeft: "8px" }}>
-                      <Text>Submission File Types</Text>
-                      <div style={{ float: "right" }}></div>
-                    </div>
-                  }
-                  key="1"
-                >
-                  <FileTypeOverviewCard data={data} />
-                </Collapse.Panel>
-              </Collapse>
-              <Collapse
-                defaultActiveKey={[1]}
-                style={{ width: "100%", marginBottom: "10px" }}
-              >
-                <Collapse.Panel
-                  header={
-                    <div style={{ marginLeft: "8px" }}>
-                      <Text>Submission File YARA Matches</Text>
-                      <div style={{ float: "right" }}></div>
-                    </div>
-                  }
-                  key="1"
-                >
-                  <YaraTypeOverviewCard data={data} />
-                </Collapse.Panel>
-              </Collapse>
+            defaultActiveKey={[1]}
+            style={{ width: "100%", marginBottom: "10px" }}
+          >
+            <Collapse.Panel header={<Text>File Mimetypes</Text>} key="1">
+              <FileTypeOverviewCard
+                data={data}
+                onFileTypeSelect={handleFileTypeSelect}
+              />
+            </Collapse.Panel>
+          </Collapse>
+          <Collapse
+            defaultActiveKey={[1]}
+            style={{ width: "100%", marginBottom: "10px" }}
+          >
+            <Collapse.Panel header={<Text>File YARA Matches</Text>} key="1">
+              <YaraTypeOverviewCard
+                data={data}
+                onFileYaraSelect={handleFileYaraSelect}
+              />
+            </Collapse.Panel>
+          </Collapse>
         </Col>
 
         <Col className="gutter-row" xs={24} sm={24} md={18} lg={18}>
@@ -256,13 +293,17 @@ const SubmissionsPage = (props) => {
               style={{ width: "100%", marginBottom: "10px" }}
             >
               <Collapse.Panel header="Submission File Flow" key="1">
-                <FileTreeCard
+                <FileTreeCardWithProvider
                   data={data.strelka_response}
                   onNodeSelect={handleNodeSelect}
+                  fileTypeFilter={fileTypeFilter}
+                  fileYaraFilter={fileYaraFilter}
+                  fileNameFilter={fileNameFilter}
+                  selectedNodeData={selectedNodeData}
+                  setSelectedNodeData={setSelectedNodeData}
                 />
               </Collapse.Panel>
             </Collapse>
-
 
             {selectedNodeData && (
               <Collapse

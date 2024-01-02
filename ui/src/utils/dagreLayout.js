@@ -1,6 +1,3 @@
-
- 
-
 import dagre from "dagre";
 
 const dagreGraph = new dagre.graphlib.Graph()
@@ -21,23 +18,40 @@ const getDagreLayout = (nodes, edges) => {
 
   dagre.layout(graph);
 
-  const layoutedElements = [];
-  nodes.forEach((node) => {
-    const nodeWithPosition = graph.node(node.id);
-    layoutedElements.push({
-      ...node,
-      position: {
-        x: nodeWithPosition.x - 450 / 2,
-        y: nodeWithPosition.y - 150 / 2,
-      },
-    });
-  });
+// Get nodes with computed positions
+const positionedNodes = nodes.map(node => {
+  return {
+    ...node,
+    position: graph.node(node.id)
+  };
+});
 
-  edges.forEach((edge) => {
-    layoutedElements.push(edge);
-  });
+// Sort nodes by `nodeMain` after layout (this is the mimetype so we can group like files)
+positionedNodes.sort((a, b) => {
+  const aValue = a.data?.nodeMain || '';
+  const bValue = b.data?.nodeMain || '';
+  return aValue.localeCompare(bValue);
+});
 
-  return layoutedElements;
+// Adjust the y positions to reflect the sorting order
+const heightOffset = 150; // This changes the vertical spacing between the nodes
+positionedNodes.forEach((node, index) => {
+  node.position.y = index * heightOffset;
+});
+
+// Prepare the layouted elements with adjusted positions
+const layoutedElements = positionedNodes.map(node => ({
+  ...node,
+  position: {
+    x: node.position.x - 550 / 2,
+    y: node.position.y - heightOffset / 2,
+  },
+}));
+
+// Include the edges in the layout
+layoutedElements.push(...edges);
+
+return layoutedElements;
 };
 
 export { getDagreLayout };

@@ -108,6 +108,7 @@ export function transformElasticSearchDataToElements(results) {
           nodeLabel: nodeData.nodeLabel,
           nodeMetric: nodeData.nodeMetric,
           nodeMetricLabel: nodeData.nodeMetricLabel,
+          nodeYaraList: nodeData.nodeYaraList,
           nodeParentId: nodeData.nodeParentId,
           nodeRelationshipId: nodeData.nodeRelationshipId,
           nodeAlert: false,
