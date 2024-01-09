@@ -15,22 +15,61 @@ def check_mime_type(strelka_data: dict) -> str:
         str: Insight message or empty string.
     """
     try:
-        file_name = strelka_data["file"]["name"]
-        if "." not in file_name:
-            # No file extension present
-            return ""
+        file_info = strelka_data.get("file", {})
+        file_name = file_info.get("name", "")
+        file_extension = (
+            file_name.rpartition(".")[2].lower() if "." in file_name else None
+        )
 
-        file_extension = strelka_data["file"]["name"].split(".")[-1]
-        mime_type = strelka_data["file"]["flavors"]["mime"][0]
-        expected_extensions = {
-            "application/x-dosexec": ["exe", "dll"],
-            "image/bmp": ["bmp"],
-        }
-        if (
-            mime_type in expected_extensions
-            and file_extension.lower() not in expected_extensions[mime_type]
-        ):
-            return f"The file extension .{file_extension} does not match the expected extension for its MIME type ({mime_type})."
+        if file_extension:
+            mime_type = file_info.get("flavors", {}).get("mime", [None])[0]
+            expected_extensions = {
+                "application/x-dosexec": ["exe", "dll"],
+                "image/bmp": ["bmp"],
+                "image/jpeg": ["jpg", "jpeg"],
+                "image/png": ["png"],
+                "image/gif": ["gif"],
+                "text/html": ["html", "htm"],
+                "text/plain": ["txt"],
+                "application/pdf": ["pdf"],
+                "application/msword": ["doc"],
+                "application/vnd.ms-excel": ["xls"],
+                "application/vnd.ms-powerpoint": ["ppt"],
+                "application/zip": ["zip"],
+                "application/x-rar-compressed": ["rar"],
+                "application/x-tar": ["tar"],
+                "application/x-7z-compressed": ["7z"],
+                "application/x-bzip2": ["bz2"],
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+                    "docx"
+                ],
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+                    "xlsx"
+                ],
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation": [
+                    "pptx"
+                ],
+                "audio/mpeg": ["mp3"],
+                "audio/ogg": ["ogg"],
+                "video/mp4": ["mp4"],
+                "video/mpeg": ["mpeg", "mpg"],
+                "application/javascript": ["js"],
+                "application/json": ["json"],
+                "application/xml": ["xml"],
+                "application/x-shockwave-flash": ["swf"],
+                "application/x-msdownload": ["exe", "msi"],
+                "application/x-font-ttf": ["ttf"],
+                "font/otf": ["otf"],
+                "application/x-font-woff": ["woff"],
+                "application/x-font-woff2": ["woff2"],
+            }
+            if (
+                mime_type in expected_extensions
+                and file_extension not in expected_extensions[mime_type]
+            ):
+                return f"The file extension .{file_extension} does not match the expected extension for its MIME type ({mime_type})."
+
+        return ""
     except Exception as e:
         logging.warning(f"Error in MIME type check: {e}")
     return ""
