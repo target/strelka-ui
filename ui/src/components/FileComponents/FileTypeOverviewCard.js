@@ -9,6 +9,7 @@ const FileTypeOverviewCard = ({ data, onFileTypeSelect }) => {
   const [selectedFileType, setSelectedFileType] = useState(null);
   const [showMoreFileTypes, setShowMoreFileTypes] = useState(false);
   const MAX_ITEMS_VISIBLE = 10;
+  
 
   // Handler for selecting or deselecting a file type
   const selectFileType = (mimeType) => {
@@ -22,12 +23,12 @@ const FileTypeOverviewCard = ({ data, onFileTypeSelect }) => {
 
   // Iterate over the strelka_response to populate mimeTypeDetails
   data.strelka_response.forEach((response) => {
-    const mimeType = response.file.flavors.mime[0];
+    const mimeType = (response.file?.flavors?.yara && response.file.flavors?.yara[0]) || response.file.flavors.mime[0];
     if (mimeTypeDetails[mimeType]) {
       mimeTypeDetails[mimeType].count++;
-      mimeTypeDetails[mimeType].files.push(response.file.name); // Add filename to array
+      mimeTypeDetails[mimeType].files.push(response.file.name || response.file.scan?.hash.md5); // Add filename to array
     } else {
-      mimeTypeDetails[mimeType] = { count: 1, files: [response.file.name] }; // Initialize with first filename
+      mimeTypeDetails[mimeType] = { count: 1, files: [response.file.name || response.scan?.hash.md5] }; // Initialize with first filename
     }
   });
 
