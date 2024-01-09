@@ -340,11 +340,11 @@ const SubmissionTable = () => {
           ) {
             // Use the second record's MIME type if it exists
             if (full.strelka_response.length > 1) {
-              mimeType = full.strelka_response[1].file.flavors.mime[0];
+              mimeType = full.strelka_response[1].file.flavors.yara[0] || full.strelka_response[1].file.flavors.mime[0];
             }
           } else {
             // Use the first record's MIME type
-            mimeType = full.strelka_response[0].file.flavors.mime[0];
+            mimeType = full.strelka_response[0].file.flavors.yara[0] || full.strelka_response[0].file.flavors.mime[0];
           }
         }
 

@@ -25,6 +25,7 @@ import AuthCtx from "../contexts/auth";
 import { fetchWithTimeout } from "../util";
 
 import "../styles/IconContainer.css";
+import VbOverviewCard from "../components/FileComponents/VbOverviewCard";
 
 const { Text } = Typography;
 
@@ -78,12 +79,20 @@ const SubmissionsPage = (props) => {
     }
   }, [fileNameFilter, fileTypeFilter, fileYaraFilter]);
 
-
   const getFileIcon = () => {
-    const mappingEntry = getIconConfig(
-      "strelka",
-      selectedNodeData["file"]["flavors"]["mime"][0].toLowerCase()
-    );
+    let flavorKey;
+    if (
+      selectedNodeData["file"]["flavors"]["yara"] &&
+      selectedNodeData["file"]["flavors"]["yara"].length > 0
+    ) {
+      // Use YARA flavor if available
+      flavorKey = selectedNodeData["file"]["flavors"]["yara"][0].toLowerCase();
+    } else {
+      // Use MIME flavor if YARA is not available
+      flavorKey = selectedNodeData["file"]["flavors"]["mime"][0].toLowerCase();
+    }
+
+    const mappingEntry = getIconConfig("strelka", flavorKey);
     const IconComponent = mappingEntry?.icon;
     const bgColor = mappingEntry?.color || "defaultBackgroundColor";
 
@@ -105,12 +114,10 @@ const SubmissionsPage = (props) => {
         if (virustotalPositives === -1) {
           disposition = "Not Found on VirusTotal";
           color = "default";
-        } 
-        else if (virustotalPositives === -3) {
+        } else if (virustotalPositives === -3) {
           disposition = "Exceeded VirusTotal Limit";
-          color = "warning";   
-        }
-        else if (virustotalPositives === -2) {
+          color = "warning";
+        } else if (virustotalPositives === -2) {
           disposition = "VirusTotal Not Enabled";
           color = "default";
         } else if (virustotalPositives > 5) {
@@ -266,7 +273,7 @@ const SubmissionsPage = (props) => {
             defaultActiveKey={[1]}
             style={{ width: "100%", marginBottom: "10px" }}
           >
-            <Collapse.Panel header={<Text>File Mimetypes</Text>} key="1">
+            <Collapse.Panel header={<Text>File Types</Text>} key="1">
               <FileTypeOverviewCard
                 data={data}
                 onFileTypeSelect={handleFileTypeSelect}
@@ -323,9 +330,13 @@ const SubmissionsPage = (props) => {
                         {getFileIcon()}
                         <div style={{ marginLeft: "8px" }}>
                           {" "}
-                          <Text strong>{selectedNodeData.file.name}</Text>
+                          <Text strong>
+                            {selectedNodeData.file.name || "No Filename"}
+                          </Text>
                           <div style={{ fontSize: "smaller", color: "#888" }}>
-                            {selectedNodeData.file.flavors.mime[0]}
+                            {(selectedNodeData.file.flavors?.yara &&
+                              selectedNodeData.file.flavors.yara[0]) ||
+                              selectedNodeData.file.flavors.mime[0]}
                           </div>
                         </div>
                       </div>
@@ -475,6 +486,27 @@ const SubmissionsPage = (props) => {
                   key="1"
                 >
                   <OcrOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && selectedNodeData.scan.vb && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text strong>Visual Basic</Text>
+                      <div style={{ fontSize: "smaller", color: "#888" }}>
+                        Script Length:{" "}
+                        {selectedNodeData.scan.vb?.script_length_bytes} bytes
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <VbOverviewCard data={selectedNodeData} />
                 </Collapse.Panel>
               </Collapse>
             )}

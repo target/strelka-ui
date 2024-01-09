@@ -48,9 +48,9 @@ const YaraTypeOverviewCard = ({ data, onFileYaraSelect }) => {
     yaraMatches.forEach((match) => {
       if (yaraCounts[match]) {
         yaraCounts[match].count++;
-        yaraCounts[match].files.push(response.file.name);
+        yaraCounts[match].files.push(response.file.name || response.scan.hash.md5);
       } else {
-        yaraCounts[match] = { count: 1, files: [response.file.name] };
+        yaraCounts[match] = { count: 1, files: [response.file.name || response.scan.hash.md5] };
       }
     });
   });
