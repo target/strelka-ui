@@ -462,8 +462,10 @@ const SubmissionsPage = (props) => {
                         <Tag color="default">
                           <b>
                             Words Extracted:{" "}
-                            {selectedNodeData.scan.ocr?.text
-                              ? selectedNodeData.scan.ocr?.text.length
+                            {Array.isArray(selectedNodeData.scan.ocr?.text)
+                              ? selectedNodeData.scan.ocr?.text.length // if it's an array, return the length of the array
+                              : typeof selectedNodeData.scan.ocr?.text === "string"
+                              ? selectedNodeData.scan.ocr?.text.split(" ").length // if it's a string, split by spaces and return the number of words
                               : 0}
                           </b>
                         </Tag>
