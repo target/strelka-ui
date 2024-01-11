@@ -1,6 +1,13 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2024-01-11
+- Bug fix for files missing types (Dashboard)
+
+## 2024-01-09
+- Adding Visual Basic scanner
+- Formatting + Bug Fixes
+  
 ## 2023-12-18
 - Updated UI
 - Updated many / most files / packages
