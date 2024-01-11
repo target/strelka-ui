@@ -334,17 +334,18 @@ const SubmissionTable = () => {
         };
 
         if (full.strelka_response && full.strelka_response.length > 0) {
+          const firstResponse = full.strelka_response[0];
+          const secondResponse = full.strelka_response[1];
+        
           // Check if the first record is a zip
-          if (
-            full.strelka_response[0].file.flavors.mime[0] === "application/zip"
-          ) {
-            // Use the second record's MIME type if it exists
-            if (full.strelka_response.length > 1) {
-              mimeType = full.strelka_response[1].file.flavors.yara[0] || full.strelka_response[1].file.flavors.mime[0];
+          if (firstResponse.file.flavors?.mime?.[0] === "application/zip") {
+            // Use the second record's MIME type if it exists and is not a zip
+            if (secondResponse && secondResponse.file.flavors?.mime?.[0] !== "application/zip") {
+              mimeType = secondResponse.file.flavors?.yara?.[0] || secondResponse.file.flavors?.mime?.[0] || mimeType;
             }
           } else {
             // Use the first record's MIME type
-            mimeType = full.strelka_response[0].file.flavors.yara[0] || full.strelka_response[0].file.flavors.mime[0];
+            mimeType = firstResponse.file.flavors?.yara?.[0] || firstResponse.file.flavors?.mime?.[0] || mimeType;
           }
         }
 
