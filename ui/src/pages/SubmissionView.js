@@ -17,6 +17,8 @@ import IocOverviewCard from "../components/FileComponents/IocOverviewCard";
 import PeOverviewCard from "../components/FileComponents/PeOverviewCard";
 import InsightsCard from "../components/FileComponents/InsightsCard";
 import FileHighlightsOverviewCard from "../components/FileComponents/FileHighlightsOverviewCard";
+import VbOverviewCard from "../components/FileComponents/VbOverviewCard";
+import JavascriptOverviewCard from "../components/FileComponents/JavascriptOverviewCard";
 
 import { getIconConfig } from "../utils/iconMappingTable";
 
@@ -25,7 +27,6 @@ import AuthCtx from "../contexts/auth";
 import { fetchWithTimeout } from "../util";
 
 import "../styles/IconContainer.css";
-import VbOverviewCard from "../components/FileComponents/VbOverviewCard";
 
 const { Text } = Typography;
 
@@ -314,7 +315,7 @@ const SubmissionsPage = (props) => {
 
             {selectedNodeData && (
               <Collapse
-                defaultActiveKey={[1]}
+                defaultActiveKey={[]}
                 style={{ width: "100%", marginBottom: "10px" }}
               >
                 <Collapse.Panel
@@ -351,14 +352,23 @@ const SubmissionsPage = (props) => {
             )}
             {selectedNodeData && (
               <Collapse
-                defaultActiveKey={[1]}
+                defaultActiveKey={[]}
                 style={{ width: "100%", marginBottom: "10px" }}
               >
                 <Collapse.Panel
                   header={
                     <div style={{ marginLeft: "8px" }}>
                       <Text strong>Insights</Text>
-                      <div style={{ float: "right" }}></div>
+                      <div style={{ float: "right" }}>
+                        <Tag color="default">
+                          <b>
+                            Matches:{" "}
+                            {selectedNodeData?.insights
+                              ? selectedNodeData?.insights.length
+                              : 0}
+                          </b>
+                        </Tag>
+                      </div>
                     </div>
                   }
                   key="1"
@@ -369,7 +379,7 @@ const SubmissionsPage = (props) => {
             )}
             {selectedNodeData && (
               <Collapse
-                defaultActiveKey={[1]}
+                defaultActiveKey={[]}
                 style={{ width: "100%", marginBottom: "10px" }}
               >
                 <Collapse.Panel
@@ -464,8 +474,10 @@ const SubmissionsPage = (props) => {
                             Words Extracted:{" "}
                             {Array.isArray(selectedNodeData.scan.ocr?.text)
                               ? selectedNodeData.scan.ocr?.text.length // if it's an array, return the length of the array
-                              : typeof selectedNodeData.scan.ocr?.text === "string"
-                              ? selectedNodeData.scan.ocr?.text.split(" ").length // if it's a string, split by spaces and return the number of words
+                              : typeof selectedNodeData.scan.ocr?.text ===
+                                "string"
+                              ? selectedNodeData.scan.ocr?.text.split(" ")
+                                  .length // if it's a string, split by spaces and return the number of words
                               : 0}
                           </b>
                         </Tag>
@@ -509,6 +521,29 @@ const SubmissionsPage = (props) => {
                   key="1"
                 >
                   <VbOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && selectedNodeData.scan.javascript && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div style={{ marginLeft: "8px" }}>
+                      <Text strong>JavaScript</Text>
+                      <div style={{ fontSize: "smaller", color: "#888" }}>
+                        Script Length:{" "}
+                        {selectedNodeData.scan.javascript?.script_length_bytes
+                          ? `${selectedNodeData.scan.javascript?.script_length_bytes} bytes`
+                          : "(Length calculation not supported by this release of Strelka)"}
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <JavascriptOverviewCard data={selectedNodeData} />
                 </Collapse.Panel>
               </Collapse>
             )}
@@ -586,11 +621,31 @@ const SubmissionsPage = (props) => {
               >
                 <Collapse.Panel
                   header={
-                    <div style={{ marginLeft: "8px" }}>
-                      <Text strong>Indicators of Compromise (IOCs)</Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        <Text strong>Indicators of Compromise (IOCs)</Text>
+                        <div style={{ fontSize: "smaller", color: "#888" }}>
+                          {selectedNodeData.iocs[0].ioc} and{" "}
+                          {selectedNodeData.iocs.length - 1} more
+                        </div>
+                      </div>
                       <div style={{ fontSize: "smaller", color: "#888" }}>
-                        {selectedNodeData.iocs[0].ioc} and{" "}
-                        {selectedNodeData.iocs.length - 1} more
+                        <div>
+                          <Tag
+                            color={selectedNodeData.iocs ? "purple" : "default"}
+                          >
+                            <b>
+                              {selectedNodeData.iocs.length} Potential IOCs
+                              Extracted
+                            </b>
+                          </Tag>
+                        </div>
                       </div>
                     </div>
                   }
@@ -601,7 +656,18 @@ const SubmissionsPage = (props) => {
               </Collapse>
             )}
             <Collapse style={{ width: "100%" }}>
-              <Collapse.Panel header={<Text strong>JSON View</Text>} key="1">
+              <Collapse.Panel
+                header={
+                  <div>
+                    <Text strong>JSON View</Text>
+                    <div style={{ fontSize: "smaller", color: "#888" }}>
+                      Raw Strelka data, including scanners not yet available in
+                      Card view.
+                    </div>
+                  </div>
+                }
+                key="1"
+              >
                 <ReactJson
                   src={getFilteredData()}
                   collapsed={3}

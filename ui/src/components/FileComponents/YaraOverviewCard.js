@@ -125,6 +125,7 @@ const YaraOverviewCard = ({ data }) => {
                 padding: "8px",
                 alignItems: "center",
                 justifyContent: "space-between",
+                maxWidth: "-webkit-fill-available"
               }}
               color={item.color}
             >
@@ -133,7 +134,7 @@ const YaraOverviewCard = ({ data }) => {
               </Text>
               <Paragraph
                 ellipsis={{ rows: 1, expandable: true }}
-                style={{ margin: 0, textAlign: "right", fontSize: "12px" }}
+                style={{ margin: 0, textAlign: "right", fontSize: "12px", overflow: "auto" }}
               >
                 {item.description}
               </Paragraph>
