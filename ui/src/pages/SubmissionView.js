@@ -535,8 +535,9 @@ const SubmissionsPage = (props) => {
                       <Text strong>JavaScript</Text>
                       <div style={{ fontSize: "smaller", color: "#888" }}>
                         Script Length:{" "}
-                        {selectedNodeData.scan.javascript?.script_length_bytes}{" "}
-                        bytes
+                        {selectedNodeData.scan.javascript?.script_length_bytes
+                          ? `${selectedNodeData.scan.javascript?.script_length_bytes} bytes`
+                          : "(Length calculation not supported by this release of Strelka)"}
                       </div>
                     </div>
                   }

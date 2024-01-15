@@ -29,6 +29,10 @@ const JavascriptOverviewCard = ({ data }) => {
   };
 
   const renderJavascriptSection = (title, key) => {
+    if (!data.scan.javascript || !data.scan.javascript[key]) {
+      return null; // Return null or handle the case where key doesn't exist
+    }
+  
     const javascriptData = processJavascriptData(key);
     return (
       <div
