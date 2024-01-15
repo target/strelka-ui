@@ -1,6 +1,12 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2024-01-15
+- On new releases, user session may be expired required the user to manually log out and log in. This fix aims to resolve that issue by forcing the user to the login page.
+- Add a ScanJavascript card to display Javascript scanner details
+- Adds some more context to Card headers (IOC count)
+- Fixes issue where long YARA descriptions extend outside the bounds of the YARA box.
+
 ## 2024-01-11
 - Bug fix for files missing types (Dashboard)
 
