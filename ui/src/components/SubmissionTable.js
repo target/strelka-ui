@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
   Table,
   Space,
@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import { getIconConfig } from "../utils/iconMappingTable";
 
 import { debounce } from "lodash";
+import AuthCtx from "../contexts/auth";
 import { fetchWithTimeout } from "../util.js";
 import { APP_CONFIG } from "../config";
 
@@ -30,6 +31,7 @@ const { Text } = Typography;
  * A table component for displaying submission data.
  */
 const SubmissionTable = () => {
+  const { handle401 } = useContext(AuthCtx);
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,6 +73,8 @@ const SubmissionTable = () => {
     } catch (error) {
       console.error("Fetch table data failed:", error);
       message.error("Failed to fetch table data.");
+      handle401();
+      
     } finally {
       setIsLoading(false);
     }
