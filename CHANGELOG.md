@@ -1,6 +1,9 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2024-01-17
+- Bug fix for Visual Basic card where page fails to load if data does not exist for a section.
+  
 ## 2024-01-15
 - On new releases, user session may be expired required the user to manually log out and log in. This fix aims to resolve that issue by forcing the user to the login page.
 - Add a ScanJavascript card to display Javascript scanner details
