@@ -59,12 +59,13 @@ const LoginPage = () => {
                       timeout: APP_CONFIG.LOGIN_TIMEOUT,
                     }
                   );
-                  if (res.status === 200) {
+                  if (!res.ok) { 
+                    const errorResponse = await res.json(); 
+                    message.error(`Login Failed: ${errorResponse.error}`); 
+                  }
+                  else {
                     login();
                     message.success(`Login succeeded`);
-                  } else {
-                    console.error(res);
-                    message.error("Login failed");
                   }
                 } catch (e) {
                   console.error(e);

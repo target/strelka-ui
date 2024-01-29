@@ -19,7 +19,7 @@ const FileOverviewCard = ({ data }) => {
       </Col>
       <Col span={18}>
         <Text code={isCode} copyable={copyable} style={{ fontSize: "12px" }}>
-          {content || "Not Available"}
+          {content || "No Filename"}
         </Text>
       </Col>
     </Row>

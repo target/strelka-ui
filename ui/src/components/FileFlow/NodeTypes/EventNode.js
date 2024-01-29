@@ -1,6 +1,7 @@
 import { memo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { Tag } from "antd";
+import { CameraOutlined } from "@ant-design/icons";
+import { Tag, Tooltip } from "antd";
 import { Handle, Position } from "reactflow";
 import { getIconConfig } from "../../../utils/iconMappingTable";
 
@@ -29,11 +30,9 @@ function getVirusTotalColor(virusTotalResponse) {
       return "error";
     } else if (virusTotalResponse === -1) {
       return "default";
-    } 
-    else if (virusTotalResponse === -3) {
+    } else if (virusTotalResponse === -3) {
       return "warning";
-    } 
-    else {
+    } else {
       return "success";
     }
   }
@@ -44,11 +43,9 @@ function getVirusTotalStatus(virusTotalResponse) {
   if (typeof virusTotalResponse === "number") {
     if (virusTotalResponse === -1) {
       return "Not Found on VirusTotal";
-    } 
-    else if (virusTotalResponse === -3) {
+    } else if (virusTotalResponse === -3) {
       return "Exceeded VirusTotal Limit";
-    }
-    else if (virusTotalResponse > 5) {
+    } else if (virusTotalResponse > 5) {
       return virusTotalResponse + " Positives";
     } else {
       return "Benign";
@@ -72,9 +69,43 @@ const PulsatingAnimation = createGlobalStyle`
   }
 `;
 
+const ImagePreviewWrapper = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 20%;
+  background-color: #1890ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+`;
+
+const ImageTooltip = styled(Tooltip)`
+  .ant-tooltip-inner {
+    max-width: 100%;
+    max-height: 100%
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    overflow: hidden; 
+  }
+`;
+
+const PreviewImage = styled.img`
+  max-width: 100%; 
+  max-height: 100%; 
+  width: auto; 
+  height: auto; 
+`;
+
 const TagWrapper = styled.div`
-  display: inline-block; // Allows side-by-side positioning
-  margin-right: 10px; // Adds some spacing between the tags
+  display: inline-block; 
+  margin-right: 10px; 
   position: absolute;
   top: -15px;
   z-index: 10;
@@ -164,7 +195,7 @@ const RightWrapper = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 250px;
+    max-width: 450px;
   }
   .node-label {
     color: #3d3a3b;
@@ -213,12 +244,16 @@ const EventNode = memo(({ data, selected }) => {
       {<PulsatingAnimation />}
       {data.nodeIocs && (
         <TagWrapper style={{ left: "-5px" }}>
-          <Tag color="purple"><strong>Potential IOCs: {data.nodeIocs}</strong></Tag>
+          <Tag color="purple">
+            <strong>Potential IOCs: {data.nodeIocs}</strong>
+          </Tag>
         </TagWrapper>
       )}
       {data.nodeInsights && (
-        <TagWrapper style={{ left: data.nodeIocs ? "125px" : "-5px" }}> 
-                  <Tag color="blue"><strong>Insights: {data.nodeInsights}</strong></Tag>
+        <TagWrapper style={{ left: data.nodeIocs ? "135px" : "-5px" }}>
+          <Tag color="blue">
+            <strong>Insights: {data.nodeInsights}</strong>
+          </Tag>
         </TagWrapper>
       )}
       {data.nodeDepth !== 0 && (
@@ -267,6 +302,22 @@ const EventNode = memo(({ data, selected }) => {
           <b>{getVirusTotalStatus(data.nodeVirustotal)}</b>
         </Tag>
       </VirustotalWrapper>
+      {data.nodeImage && (
+        <ImageTooltip
+          color="white"
+          placement="left"
+          title={
+            <PreviewImage
+              src={`data:image/jpeg;base64,${data.nodeImage}`}
+              alt="Image Preview"
+            />
+          }
+        >
+          <ImagePreviewWrapper>
+            <CameraOutlined style={{ color: "white" }} />
+          </ImagePreviewWrapper>
+        </ImageTooltip>
+      )}
     </NodeWrapper>
   );
 });

@@ -142,7 +142,7 @@ const DashboardPage = (props) => {
                 Upload Via VirusTotal
               </Title>
               <Text type="secondary">
-                Input a SHA256 hash to analyze a file from VirusTotal.
+                Input a MD5, SHA1, or SHA256 hash to analyze a file from VirusTotal.
               </Text>
             </Typography>
             <br />
@@ -178,7 +178,7 @@ const DashboardPage = (props) => {
                 Submission Statistics
               </Title>
             </Typography>
-            <MimeTypeBarChart height={529} />
+            <MimeTypeBarChart height={582} />
           </Card>
         </Col>
 

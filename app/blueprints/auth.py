@@ -105,17 +105,7 @@ def login():
 
     except Exception as err:
         # current_app.logger.error("Failed connection to database: %s", err)
-        try:
-            return (
-                jsonify(
-                    {
-                        "error": "Failed to connect to database. Make sure you are set up to connect to a Strelka UI Database."
-                    }
-                ),
-                400,
-            )
-        except Exception as e:
-            print(e)
+        return jsonify({"error": "Failed to connect to database"}), 400
 
     return (
         jsonify(
