@@ -19,6 +19,7 @@ import InsightsCard from "../components/FileComponents/InsightsCard";
 import FileHighlightsOverviewCard from "../components/FileComponents/FileHighlightsOverviewCard";
 import VbOverviewCard from "../components/FileComponents/VbOverviewCard";
 import JavascriptOverviewCard from "../components/FileComponents/JavascriptOverviewCard";
+import EmailOverviewCard from "../components/FileComponents/EmailOverviewCard";
 
 import { getIconConfig } from "../utils/iconMappingTable";
 
@@ -36,12 +37,13 @@ const { Text } = Typography;
  */
 const SubmissionsPage = (props) => {
   const { handle401 } = useContext(AuthCtx);
+  const [data, setData] = useState({});
   const [FilenameView, setFileNameView] = useState("");
   const [FiledepthView, setFileDepthView] = useState("");
   const [hideMetadata] = useState(true);
   const [showAll] = useState(true);
   const [selectedNodeData, setSelectedNodeData] = useState("");
-
+  const [isLoading, setIsLoading] = useState(true);
   const [fileTypeFilter, setFileTypeFilter] = useState(null);
   const [fileYaraFilter, setFileYaraFilter] = useState(null);
   const [fileNameFilter, setFileNameFilter] = useState(null);
@@ -185,14 +187,13 @@ const SubmissionsPage = (props) => {
     return { strelka_response, ...filteredData };
   };
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState({});
+
 
   const { id } = useParams();
 
   useEffect(() => {
     let mounted = true;
-
+  
     fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/scans/${id}`, {
       method: "GET",
       mode: "cors",
@@ -209,17 +210,26 @@ const SubmissionsPage = (props) => {
       })
       .then((res) => {
         if (mounted) {
+          // Check if the submission_type is virustotal and modify data accordingly
+          if (res.submitted_type && res.submitted_type === "virustotal") {
+            // Make sure that strelka_response is an array and has at least one element
+            if (Array.isArray(res.strelka_response) && res.strelka_response.length > 0) {
+              // Remove the first element of strelka_response
+              res.strelka_response.shift();
+            }
+          }
           setData(res);
           setIsLoading(false);
-          setFileNameView(res.strelka_response[0].file.name);
-          setFileDepthView(res.strelka_response[0].file.depth);
+          setFileNameView(res.strelka_response[0]?.file?.name || "");
+          setFileDepthView(res.strelka_response[0]?.file?.depth || "");
         }
       });
-
+  
     return function cleanup() {
       mounted = false;
     };
   }, [handle401, id]);
+  
 
   return isLoading ? (
     <div
@@ -490,8 +500,8 @@ const SubmissionsPage = (props) => {
                         >
                           <b>
                             {selectedNodeData.scan.ocr?.base64_thumbnail
-                              ? "Thumbnail Available"
-                              : "No Thumbnail"}
+                              ? "Preview Available"
+                              : "No Preview"}
                           </b>
                         </Tag>
                       </div>
@@ -500,6 +510,63 @@ const SubmissionsPage = (props) => {
                   key="1"
                 >
                   <OcrOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
+            {selectedNodeData && selectedNodeData.scan.email && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginLeft: "8px" }}>
+                          {" "}
+                          <Text strong>Email</Text>
+                          <div style={{ fontSize: "smaller", color: "#888" }}>
+                            {selectedNodeData.scan.email.subject.length > 0
+                              ? selectedNodeData.scan.email.subject.substring(
+                                  0,
+                                  47
+                                ) + "..."
+                              : "No Subject"}
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <Tag color="default">
+                          <b>
+                            Attachments:{" "}
+                            {selectedNodeData.scan.email.total.attachments}
+                          </b>
+                        </Tag>
+                        <Tag
+                          color={
+                            selectedNodeData.scan.email?.base64_thumbnail
+                              ? "success"
+                              : "error"
+                          }
+                        >
+                          <b>
+                            {selectedNodeData.scan.email?.base64_thumbnail
+                              ? "Preview Available"
+                              : "No Preview"}
+                          </b>
+                        </Tag>
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <EmailOverviewCard data={selectedNodeData} />
                 </Collapse.Panel>
               </Collapse>
             )}

@@ -34,6 +34,7 @@ const COLORS = {
       nodeVirustotal: "Not Found",
       nodeInsights: 0,
       nodeIocs: 0,
+      nodeImage: "",
       nodeDisposition: "",
       nodeMain: "",
       nodeSub: "",
@@ -45,11 +46,23 @@ const COLORS = {
     };
     switch (index) {
       case "strelka":
+
+        // Extracting the base64_thumbnail from _any_ scanner, if present
+        let base64Thumbnail = '';
+        if (data["scan"]) {
+          for (let key in data["scan"]) {
+            if (data["scan"][key]["base64_thumbnail"]) {
+              base64Thumbnail = data["scan"][key]["base64_thumbnail"];
+              break;
+            }
+          }
+        }
+
         Object.assign(nodeData, {
           nodeDepth: data["file"]["depth"],
-          nodeMain: data["file"]["flavors"]["mime"][0],
+          nodeMain: data["file"]["flavors"]["yara"]?.[0] || data["file"]["flavors"]["mime"]?.[0],
           nodeSub: `${data["file"]["size"]} Bytes`,
-          nodeLabel: data["file"]["name"],
+          nodeLabel: data["file"]["name"] || "No Filename",
           nodeYaraList: data["scan"]?.["yara"]?.["matches"] || "",
           nodeMetric: data["scan"]?.["yara"]?.["matches"]?.length || 0,
           nodeMetricLabel: "Yara Matches",
@@ -57,7 +70,8 @@ const COLORS = {
           nodeRelationshipId: data["file"]["tree"]["node"],
           nodeVirustotal: data["enrichment"]?.["virustotal"] !== undefined ? data["enrichment"]["virustotal"] : "Not Found",
           nodeInsights: data?.insights?.length,
-          nodeIocs: data?.iocs?.length
+          nodeIocs: data?.iocs?.length,
+          nodeImage: base64Thumbnail,
         }
         );
         break;

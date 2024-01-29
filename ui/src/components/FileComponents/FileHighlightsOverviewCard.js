@@ -39,7 +39,7 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
   const sortedNodeIds = Object.keys(filenameByNode)
     .map((nodeId) => ({
       nodeId,
-      filename: filenameByNode[nodeId],
+      filename: filenameByNode[nodeId] || 'No Filename',
       iocCount: iocsByNode[nodeId]?.length || 0,
       insightCount: insightsByNode[nodeId]?.length || 0,
     }))
@@ -93,7 +93,7 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
 
   const nodeList = sortedNodeIds.map((nodeId) => {
     const isExpanded = expandedNodes.has(nodeId);
-    const filename = filenameByNode[nodeId];
+    const filename = filenameByNode[nodeId] || "No Filename";
     const insights = insightsByNode[nodeId] || [];
     const iocs = iocsByNode[nodeId] || [];
     const mimeType = mimeTypeByNode[nodeId];

@@ -15,6 +15,7 @@ import {
   InfoCircleOutlined,
   CopyOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -74,7 +75,6 @@ const SubmissionTable = () => {
       console.error("Fetch table data failed:", error);
       message.error("Failed to fetch table data.");
       handle401();
-      
     } finally {
       setIsLoading(false);
     }
@@ -131,15 +131,70 @@ const SubmissionTable = () => {
 
   const columns = [
     {
-      title: "Submitted",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <UploadOutlined style={{ fontSize: 14 }} />
+        </div>
+      ),
+      dataIndex: "submitted_type",
+      key: "submitted_type",
+      width: 1,
+      render: (submitted_type, full) => {
+        const typeToDisplay = submitted_type || "api";
+        const imageSrc =
+          typeToDisplay === "api" ? "/strelka.png" : "/virustotal.png";
+        const tooltipText =
+          typeToDisplay === "api"
+            ? "Uploaded via File Upload"
+            : "Uploaded via VirusTotal";
+
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Tooltip title={tooltipText}>
+              <img src={imageSrc} alt={typeToDisplay} width={24} height={24} />
+            </Tooltip>
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Submitted
+        </div>
+      ),
       dataIndex: "submitted_at",
       key: "submitted_at",
       width: 1,
       sorter: true,
       defaultSortOrder: sorter.order,
-      render: (submitted_at, full) => {
+      render: (submitted_at, submitted_type, full) => {
         return submitted_at ? (
-          <p>
+          <p
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             {new Date(submitted_at).toLocaleDateString(undefined, {
               year: "numeric",
               month: "2-digit",
@@ -151,6 +206,7 @@ const SubmissionTable = () => {
         );
       },
     },
+
     {
       title: "VT +",
       dataIndex: "strelka_response",
@@ -193,10 +249,10 @@ const SubmissionTable = () => {
       title: "Filename",
       dataIndex: "file_id",
       key: "file_id",
-      width: 1,
+      width: "25%",
       render: (file_id, full) => (
         <div
-          style={{ maxWidth: "200px", display: "flex", alignItems: "center" }}
+          style={{ maxWidth: "300px", display: "flex", alignItems: "center" }}
         >
           <Link
             to={`/submissions/${file_id}`}
@@ -218,14 +274,44 @@ const SubmissionTable = () => {
     },
 
     {
-      title: "Uploader",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Uploader
+        </div>
+      ),
       dataIndex: "user.user_cn",
       key: "user.user_cn",
       width: 1,
-      render: (_, full) => <p>{full.user?.user_cn}</p>,
+      render: (_, full) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <p>{full.user?.user_cn}</p>
+        </div>
+      ),
     },
     {
-      title: "Size",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Size
+        </div>
+      ),
       dataIndex: "file_size",
       key: "file_size",
       width: 1,
@@ -245,20 +331,60 @@ const SubmissionTable = () => {
           size = fileSize;
         }
 
-        return <p>{`${size}${unit}`}</p>;
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <p>{`${size}${unit}`}</p>
+          </div>
+        );
       },
     },
     {
-      title: "Files",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Files
+        </div>
+      ),
       dataIndex: "file_count",
       key: "file_count",
       width: 1,
       sorter: true,
-      render: (_, full) => <p>{full.files_seen}</p>,
+      render: (_, full) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <p>{full.files_seen}</p>
+        </div>
+      ),
     },
 
     {
-      title: "IOCs",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          IOCs
+        </div>
+      ),
       dataIndex: "iocs",
       key: "iocs",
       width: 1,
@@ -286,7 +412,17 @@ const SubmissionTable = () => {
       },
     },
     {
-      title: "Insights",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Insights
+        </div>
+      ),
       dataIndex: "insights",
       key: "insights",
       width: 1,
@@ -312,15 +448,48 @@ const SubmissionTable = () => {
         );
       },
     },
-
     {
-      title: "Type",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Type
+        </div>
+      ),
       dataIndex: "mime_types",
       key: "mime_types",
       width: 1,
       sorter: true,
       render: (_, full) => {
         let mimeType = "N/A";
+
+        // Clone the strelka_response to avoid directly mutating the state
+        let strelkaResponse = [...full.strelka_response];
+
+        // If the type is virustotal, remove the first item in strelka_response
+        if (
+          full.submitted_type === "virustotal" &&
+          strelkaResponse.length > 0
+        ) {
+          strelkaResponse.shift();
+        }
+
+        // Proceed with the remaining logic for determining mimeType
+        if (strelkaResponse.length > 0) {
+          const response = strelkaResponse[0];
+          mimeType =
+            response.file.flavors?.yara?.[0] ||
+            response.file.flavors?.mime?.[0] ||
+            mimeType;
+        }
+
+        // Lookup Icon and Color entry based on mimeType
+        const mappingEntry = getIconConfig("strelka", mimeType.toLowerCase());
+        const bgColor = mappingEntry?.color || "defaultBackgroundColor";
 
         const tagStyle = {
           fontSize: "10px",
@@ -337,34 +506,34 @@ const SubmissionTable = () => {
           whiteSpace: "nowrap",
         };
 
-        if (full.strelka_response && full.strelka_response.length > 0) {
-          const firstResponse = full.strelka_response[0];
-          const secondResponse = full.strelka_response[1];
-        
-          // Check if the first record is a zip
-          if (firstResponse.file.flavors?.mime?.[0] === "application/zip") {
-            // Use the second record's MIME type if it exists and is not a zip
-            if (secondResponse && secondResponse.file.flavors?.mime?.[0] !== "application/zip") {
-              mimeType = secondResponse.file.flavors?.yara?.[0] || secondResponse.file.flavors?.mime?.[0] || mimeType;
-            }
-          } else {
-            // Use the first record's MIME type
-            mimeType = firstResponse.file.flavors?.yara?.[0] || firstResponse.file.flavors?.mime?.[0] || mimeType;
-          }
-        }
-
-        const mappingEntry = getIconConfig("strelka", mimeType.toLowerCase());
-        const bgColor = mappingEntry?.color || "defaultBackgroundColor";
-
         return (
-          <Tag style={tagStyle} color={bgColor}>
-            {mimeType}
-          </Tag>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Tag style={tagStyle} color={bgColor}>
+              {mimeType}
+            </Tag>
+          </div>
         );
       },
     },
+
     {
-      title: "YARAs",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          YARAs
+        </div>
+      ),
       dataIndex: "yara_hits",
       key: "yara_hits",
       width: 1,
@@ -390,7 +559,17 @@ const SubmissionTable = () => {
       },
     },
     {
-      title: "Scanners",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Scanners
+        </div>
+      ),
       key: "scanners_run",
       dataIndex: "scanners_run",
       width: 1,
@@ -400,7 +579,17 @@ const SubmissionTable = () => {
       ),
     },
     {
-      title: "Actions",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Actions
+        </div>
+      ),
       key: "action",
       width: 1,
       render: (text, record) => {
@@ -411,40 +600,48 @@ const SubmissionTable = () => {
         const sha256Value = sha256Array ? sha256Array[1] : "N/A";
 
         return (
-          <Space size="middle">
-            {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-              <Tooltip title={`Search ${APP_CONFIG.SEARCH_NAME}`}>
-                <a
-                  target="_blank"
-                  href={`${APP_CONFIG.SEARCH_URL}`.replace(
-                    "<REPLACE>",
-                    record.file_id
-                  )}
-                  rel="noreferrer"
-                >
-                  <SearchOutlined style={{ cursor: "pointer" }} />
-                </a>
-              </Tooltip>
-            )}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Space size="middle">
-              <Tooltip title="Copy SHA256">
-                <a
-                  href="/"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (sha256Value !== "N/A") {
-                      navigator.clipboard.writeText(sha256Value);
-                      message.success("SHA256 copied to clipboard!");
-                    } else {
-                      message.error("SHA256 is undefined!");
-                    }
-                  }}
-                >
-                  <CopyOutlined style={{ cursor: "pointer" }} />
-                </a>
-              </Tooltip>
+              {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+                <Tooltip title={`Search ${APP_CONFIG.SEARCH_NAME}`}>
+                  <a
+                    target="_blank"
+                    href={`${APP_CONFIG.SEARCH_URL}`.replace(
+                      "<REPLACE>",
+                      record.file_id
+                    )}
+                    rel="noreferrer"
+                  >
+                    <SearchOutlined style={{ cursor: "pointer" }} />
+                  </a>
+                </Tooltip>
+              )}
+              <Space size="middle">
+                <Tooltip title="Copy SHA256">
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (sha256Value !== "N/A") {
+                        navigator.clipboard.writeText(sha256Value);
+                        message.success("SHA256 copied to clipboard!");
+                      } else {
+                        message.error("SHA256 is undefined!");
+                      }
+                    }}
+                  >
+                    <CopyOutlined style={{ cursor: "pointer" }} />
+                  </a>
+                </Tooltip>
+              </Space>
             </Space>
-          </Space>
+          </div>
         );
       },
     },

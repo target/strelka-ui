@@ -35,9 +35,9 @@ const VirusTotalUploader = ({ onUploadSuccess }) => {
       return response.json();
     })
     .then((data) => {
-      message.success("Hash submitted successfully");
       onUploadSuccess(); // Trigger table refresh
       setVtHash(""); // Reset hash input
+      message.success(`${vtHash} analyzed successfully via VirusTotal!`);
       setLoading(false); // Stop loading
     })
     .catch((error) => {
@@ -48,29 +48,30 @@ const VirusTotalUploader = ({ onUploadSuccess }) => {
 
   return (
     <div>
+      <div style={{paddingBottom: 12}}>
       <Input
         onChange={handleDescriptionChange}
         placeholder="Description to be saved with submission..."
         prefix={<MessageOutlined />}
       />
-      <br />
-      <br />
-      <div style={{ display: "flex" }}>
+      </div>
+      <div style={{paddingBottom: 12}}>
         <Input
           onChange={handleVtHashChange}
-          placeholder="SHA256 Hash..."
+          placeholder="MD5, SHA1, SHA256 Hash..."
           value={vtHash}
-          style={{ marginRight: "15px" }}
           disabled={loading} // Disable input during loading
         />
-        <Button
+      </div>
+      <div style={{float: "right"}}>
+      <Button
           type="primary"
           onClick={handleSubmitVtHash}
           loading={loading} // Use loading prop for loading indicator
         >
           <Text strong style={{ fontSize: "12px", color: "white" }}>Submit Hash</Text>
         </Button>
-      </div>
+    </div>
     </div>
   );
 };
