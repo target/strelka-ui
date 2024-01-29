@@ -92,6 +92,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
     if "file" in request.files:
         file = request.files["file"]
         submitted_description = request.form["description"]
+        submitted_type = "api"
 
         # Check if the submitted filename is empty.
         if file.filename == "":
@@ -110,6 +111,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
         submission = json.loads(request.data)
         submitted_description = submission["description"]
         submitted_hash = submission["hash"]
+        submitted_type = "virustotal"
 
         if os.environ.get("VIRUSTOTAL_API_KEY"):
             file = create_vt_zip_and_download(
@@ -220,6 +222,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
                 get_hashes(submitted_file),
                 list(insights),
                 list(iocs),
+                submitted_type,
                 request.remote_addr,
                 request.headers.get("User-Agent"),
                 user.id,

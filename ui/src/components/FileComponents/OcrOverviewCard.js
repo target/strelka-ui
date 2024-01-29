@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-import { Checkbox, Input, Row, Col } from "antd";
+import { Checkbox, Input, Row, Col, Modal } from "antd";
 import "../../styles/OcrOverviewCard.css";
 
 const OcrOverviewCard = ({ data }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [wrapText, setWrapText] = useState(false);
   const [trimText, setTrimText] = useState(true);
   const [filter, setFilter] = useState("");
+
+  const showModal = () => setIsModalVisible(true);
+  const handleCancel = () => setIsModalVisible(false);
+
   let texts = Array.isArray(data.scan.ocr?.text)
     ? data.scan.ocr.text
     : [data.scan.ocr?.text || ""];
@@ -78,12 +83,31 @@ const OcrOverviewCard = ({ data }) => {
           </table>
         </Col>
         <Col span={5} className="thumbnail-container">
-          {base64Thumbnail ? (
-            <img
-              src={`data:image/jpeg;base64,${base64Thumbnail}`}
-              alt="OCR Thumbnail"
-              style={{ width: "auto", maxHeight: "200px" }}
-            />
+        {base64Thumbnail ? (
+            <>
+              <img
+                src={`data:image/jpeg;base64,${base64Thumbnail}`}
+                alt="Email Preview"
+                style={{
+                  width: "auto",
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  cursor: "pointer",
+                }}
+                onClick={showModal}
+              />
+              <Modal
+                open={isModalVisible}
+                footer={null}
+                onCancel={handleCancel}
+              >
+                <img
+                  src={`data:image/jpeg;base64,${base64Thumbnail}`}
+                  alt="Email Preview (Expanded)"
+                  style={{ width: "100%" }}
+                />
+              </Modal>
+            </>
           ) : (
             <ThumbnailPlaceholder />
           )}

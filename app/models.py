@@ -22,6 +22,7 @@ class FileSubmission(db.Model):
         files_seen (int): A count of files seen during analysis.
         scanners_run (list): A list of scanners that were run on the file.
         hashes (list): A list of hashes associated with the file.
+        submitted_type (str): The type of submission that occurred (e.g., UI, VirusTotal)
         submitted_from_ip (str): The IP address of the client that submitted the file.
         submitted_from_client (str): The name of the client that submitted the file.
         submitted_description (str): A description of the file provided by the user.
@@ -54,6 +55,7 @@ class FileSubmission(db.Model):
     iocs: list = db.Column(db.ARRAY(db.String(), dimensions=1))
 
     # Submission Metadata
+    submitted_type: str = db.Column(db.String())
     submitted_from_ip: str = db.Column(db.String())
     submitted_from_client: str = db.Column(db.String())
     submitted_description: str = db.Column(db.String())
@@ -79,6 +81,7 @@ class FileSubmission(db.Model):
         hashes: list,
         insights: list,
         iocs: list,
+        submitted_type: str,
         submitted_from_ip: str,
         submitted_from_client: str,
         submitted_by_user_id: int,
@@ -97,6 +100,7 @@ class FileSubmission(db.Model):
         self.hashes = hashes
         self.insights = insights
         self.iocs = iocs
+        self.submitted_type = submitted_type
         self.submitted_from_ip = submitted_from_ip
         self.submitted_from_client = submitted_from_client
         self.submitted_by_user_id = submitted_by_user_id

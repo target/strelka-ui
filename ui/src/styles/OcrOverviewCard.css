@@ -16,7 +16,6 @@
 /* Container for thumbnails */
 .thumbnail-container {
   text-align: center; /* Centers the thumbnail if it's smaller than the container */
-  overflow: auto; /* Make the image scrollable if the window is small */
 }
 
 /* Line number styles */

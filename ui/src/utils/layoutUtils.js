@@ -103,6 +103,7 @@ export function transformElasticSearchDataToElements(results) {
           nodeVirustotal: nodeData.nodeVirustotal,
           nodeInsights: nodeData.nodeInsights,
           nodeIocs: nodeData.nodeIocs,
+          nodeImage: nodeData.nodeImage,
           nodeMain: nodeData.nodeMain,
           nodeSub: nodeData.nodeSub,
           nodeLabel: nodeData.nodeLabel,
