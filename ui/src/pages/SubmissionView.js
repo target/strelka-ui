@@ -20,6 +20,7 @@ import FileHighlightsOverviewCard from "../components/FileComponents/FileHighlig
 import VbOverviewCard from "../components/FileComponents/VbOverviewCard";
 import JavascriptOverviewCard from "../components/FileComponents/JavascriptOverviewCard";
 import EmailOverviewCard from "../components/FileComponents/EmailOverviewCard";
+import QrOverviewCard from "../components/FileComponents/QrOverviewCard";
 
 import { getIconConfig } from "../utils/iconMappingTable";
 
@@ -513,6 +514,39 @@ const SubmissionsPage = (props) => {
                 </Collapse.Panel>
               </Collapse>
             )}
+            {selectedNodeData && selectedNodeData.scan?.qr?.data && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginLeft: "8px" }}>
+                          {" "}
+                          <Text strong>QR Code Data</Text>
+                          <div style={{ fontSize: "smaller", color: "#888" }}>
+                            {selectedNodeData.scan.qr.data.length > 0
+                              ? "QR Data Count: " + selectedNodeData.scan.qr.data.length
+                              : "No QR Data"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  key="1"
+                >
+                  <QrOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
             {selectedNodeData && selectedNodeData.scan.email && (
               <Collapse
                 defaultActiveKey={[]}
@@ -698,8 +732,8 @@ const SubmissionsPage = (props) => {
                       <div>
                         <Text strong>Indicators of Compromise (IOCs)</Text>
                         <div style={{ fontSize: "smaller", color: "#888" }}>
-                          {selectedNodeData.iocs[0].ioc} and{" "}
-                          {selectedNodeData.iocs.length - 1} more
+                          {selectedNodeData.iocs[0].ioc} {" "}
+                          {selectedNodeData.iocs.length > 1 && ` and ${selectedNodeData.iocs.length - 1} more`}
                         </div>
                       </div>
                       <div style={{ fontSize: "smaller", color: "#888" }}>
