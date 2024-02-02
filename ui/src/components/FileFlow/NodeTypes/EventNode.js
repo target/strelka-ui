@@ -1,7 +1,7 @@
-import { memo } from "react";
+import { useState, memo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Tag, Tooltip } from "antd";
+import { Button, Tag, Tooltip } from "antd";
 import { Handle, Position } from "reactflow";
 import { getIconConfig } from "../../../utils/iconMappingTable";
 
@@ -109,6 +109,17 @@ const ImageTooltip = styled(Tooltip)`
     padding: 0 !important;
     overflow: hidden; 
   }
+  .ant-tooltip-inner img {
+    pointer-events: auto;
+  }
+`;
+
+const UnblurButton = styled(Button)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  z-index: 20; // Ensure it's above the image/QR code preview
 `;
 
 const PreviewImage = styled.img`
@@ -240,6 +251,13 @@ const RightWrapper = styled.div`
 // -------------------------
 
 const EventNode = memo(({ data, selected }) => {
+  // Initialize isBlurred based on the presence of data.nodeQrData
+  const [isBlurred, setIsBlurred] = useState(!!data.nodeQrData);
+
+
+  // Example of conditional styling for blur effect
+  const previewStyle = isBlurred ? { filter: 'blur(4px)' } : {};
+
   const handleStyle = {
     backgroundColor: "#aaa",
     width: 12,
@@ -247,6 +265,7 @@ const EventNode = memo(({ data, selected }) => {
     borderRadius: 12,
     border: `1px solid bbb`,
   };
+
   const mappingEntry = getIconConfig("strelka", data.nodeMain.toLowerCase());
   const IconComponent = mappingEntry?.icon;
   const color = mappingEntry?.color || data.color;
@@ -333,6 +352,7 @@ const EventNode = memo(({ data, selected }) => {
             <PreviewImage
               src={`data:image/jpeg;base64,${data.nodeImage}`}
               alt="Image Preview"
+              style={previewStyle}
             />
           }
         >
