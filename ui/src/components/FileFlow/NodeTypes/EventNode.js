@@ -1,6 +1,6 @@
 import { memo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { CameraOutlined } from "@ant-design/icons";
+import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
 import { Tag, Tooltip } from "antd";
 import { Handle, Position } from "reactflow";
 import { getIconConfig } from "../../../utils/iconMappingTable";
@@ -55,6 +55,21 @@ function getVirusTotalStatus(virusTotalResponse) {
 }
 
 // Styled Components
+const QrCodePreviewWrapper = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: ${({ hasImage }) => (hasImage ? "40px" : "10px")};
+  width: 24px;
+  height: 24px;
+  border-radius: 20%;
+  background-color: #ff7a45;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+`;
+
 const PulsatingAnimation = createGlobalStyle`
   @keyframes pulsate {
     0% {
@@ -97,15 +112,15 @@ const ImageTooltip = styled(Tooltip)`
 `;
 
 const PreviewImage = styled.img`
-  max-width: 100%; 
-  max-height: 100%; 
-  width: auto; 
-  height: auto; 
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 `;
 
 const TagWrapper = styled.div`
-  display: inline-block; 
-  margin-right: 10px; 
+  display: inline-block;
+  margin-right: 10px;
   position: absolute;
   top: -15px;
   z-index: 10;
@@ -235,6 +250,7 @@ const EventNode = memo(({ data, selected }) => {
   const mappingEntry = getIconConfig("strelka", data.nodeMain.toLowerCase());
   const IconComponent = mappingEntry?.icon;
   const color = mappingEntry?.color || data.color;
+  const hasImage = Boolean(data.nodeImage);
   const virusTotalResponse = data.nodeVirustotal;
   data.nodeAlert =
     typeof virusTotalResponse === "number" && virusTotalResponse > 5;
@@ -302,6 +318,13 @@ const EventNode = memo(({ data, selected }) => {
           <b>{getVirusTotalStatus(data.nodeVirustotal)}</b>
         </Tag>
       </VirustotalWrapper>
+      {data.nodeQrData && (
+        <Tooltip title="QR Code found">
+          <QrCodePreviewWrapper hasImage={hasImage}>
+            <QrcodeOutlined style={{ color: "white" }} />
+          </QrCodePreviewWrapper>
+        </Tooltip>
+      )}
       {data.nodeImage && (
         <ImageTooltip
           color="white"

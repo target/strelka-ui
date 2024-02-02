@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Checkbox, Input, Row, Col, Modal } from "antd";
+import { Checkbox, Input, Row, Col, Modal, Button, Tooltip } from "antd";
 import "../../styles/OcrOverviewCard.css";
 
 const OcrOverviewCard = ({ data }) => {
@@ -7,9 +7,16 @@ const OcrOverviewCard = ({ data }) => {
   const [wrapText, setWrapText] = useState(false);
   const [trimText, setTrimText] = useState(true);
   const [filter, setFilter] = useState("");
+  const [isBlurred, setIsBlurred] = useState(data.scan.qr ? true : false); // State to manage blur for QR codes
 
-  const showModal = () => setIsModalVisible(true);
+  const showModal = () => {
+    // Only show modal if the image is not blurred
+    if (!isBlurred) {
+      setIsModalVisible(true);
+    }
+  };
   const handleCancel = () => setIsModalVisible(false);
+  const toggleBlur = () => setIsBlurred(!isBlurred);
 
   let texts = Array.isArray(data.scan.ocr?.text)
     ? data.scan.ocr.text
@@ -26,6 +33,16 @@ const OcrOverviewCard = ({ data }) => {
   const ThumbnailPlaceholder = () => {
     return <div className="thumbnail-placeholder" />;
   };
+
+  // Conditional styling for blurred image (QR codes)
+  const imageStyle = isBlurred
+    ? {
+        filter: "blur(4px)",
+        cursor: "pointer",
+      }
+    : {
+        cursor: "pointer",
+      };
 
   // Function to create line numbers and corresponding text
   const renderTextLines = (texts) => {
@@ -83,19 +100,27 @@ const OcrOverviewCard = ({ data }) => {
           </table>
         </Col>
         <Col span={5} className="thumbnail-container">
-        {base64Thumbnail ? (
-            <>
+          {base64Thumbnail ? (
+            <div className="thumbnail-wrapper">
               <img
                 src={`data:image/jpeg;base64,${base64Thumbnail}`}
                 alt="Email Preview"
-                style={{
-                  width: "auto",
-                  maxHeight: "200px",
-                  overflowY: "auto",
-                  cursor: "pointer",
-                }}
+                style={imageStyle}
                 onClick={showModal}
               />
+              {isBlurred && (
+                <div>
+                  <Tooltip title="QR codes can pose a security risk, use with caution">
+                    <Button
+                      onClick={toggleBlur}
+                      danger
+                      className="centered-button"
+                    >
+                      Remove Blur
+                    </Button>
+                  </Tooltip>
+                </div>
+              )}
               <Modal
                 open={isModalVisible}
                 footer={null}
@@ -107,7 +132,7 @@ const OcrOverviewCard = ({ data }) => {
                   style={{ width: "100%" }}
                 />
               </Modal>
-            </>
+            </div>
           ) : (
             <ThumbnailPlaceholder />
           )}
