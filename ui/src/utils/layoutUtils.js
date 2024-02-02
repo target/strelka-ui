@@ -104,6 +104,7 @@ export function transformElasticSearchDataToElements(results) {
           nodeInsights: nodeData.nodeInsights,
           nodeIocs: nodeData.nodeIocs,
           nodeImage: nodeData.nodeImage,
+          nodeQrData: nodeData.nodeQrData,
           nodeMain: nodeData.nodeMain,
           nodeSub: nodeData.nodeSub,
           nodeLabel: nodeData.nodeLabel,
