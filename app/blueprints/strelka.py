@@ -5,10 +5,10 @@ import os
 from collections import defaultdict
 
 from io import BytesIO
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 
 from flask import Blueprint, current_app, jsonify, request, session, Response
-from sqlalchemy import or_, desc, asc, func, case
+from sqlalchemy import or_, desc, asc, func, case, cast, String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import joinedload
 
@@ -60,7 +60,9 @@ def get_database_status() -> Tuple[Response, int]:
 
 @strelka.route("/upload", methods=["POST"])
 @auth_required
-def submit_file(user: User) -> Tuple[Response, int]:
+def submit_file(
+    user: User,
+) -> Union[tuple[Response, int], tuple[dict[str, Union[Response, str]], int]]:
     """
     Submit a file (or hash) to the Strelka file analysis engine and save the analysis results to the database.
 
@@ -112,6 +114,7 @@ def submit_file(user: User) -> Tuple[Response, int]:
         submitted_description = submission["description"]
         submitted_hash = submission["hash"]
         submitted_type = "virustotal"
+        total_scanned_with_hits = []
 
         if os.environ.get("VIRUSTOTAL_API_KEY"):
             file = create_vt_zip_and_download(
@@ -173,7 +176,18 @@ def submit_file(user: User) -> Tuple[Response, int]:
                                 api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
                                 file_hash=scanned_file["scan"]["hash"]["sha256"],
                             )
-                            total_scanned += 1
+                            total_scanned += 1.0
+                            if scanned_file["enrichment"]["virustotal"] > 0:
+                                total_scanned_with_hits.append(
+                                    {
+                                        "file_sha256": scanned_file["scan"]["hash"][
+                                            "sha256"
+                                        ],
+                                        "positives": scanned_file["enrichment"][
+                                            "virustotal"
+                                        ],
+                                    }
+                                )
                         else:
                             scanned_file["enrichment"] = {"virustotal": -3}
                 except Exception as e:
@@ -240,7 +254,20 @@ def submit_file(user: User) -> Tuple[Response, int]:
             db.session.commit()
 
             # Return the analysis results and a 200 status code.
-            return jsonify(response), 200
+            return (
+                jsonify(
+                    {
+                        "file_id": str(new_submission.file_id),
+                        "response": response,
+                        "meta": {
+                            "file_size": int(file_size),
+                            "iocs": list(iocs),
+                            "vt_positives": list(total_scanned_with_hits),
+                        },
+                    }
+                ),
+                200,
+            )
 
         # If an exception occurs, log the error and return an error message.
         except Exception as e:
@@ -498,8 +525,10 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
     # Apply the search filter if there is a search query
     if search_query:
         search_filter = or_(
-            FileSubmission.file_name.like(f"%{search_query}%"),
-            FileSubmission.submitted_description.like(f"%{search_query}%"),
+            FileSubmission.file_name.ilike(f"%{search_query}%"),
+            FileSubmission.submitted_description.ilike(f"%{search_query}%"),
+            cast(FileSubmission.yara_hits, String).ilike(f"%{search_query}%"),
+            User.user_cn.ilike(f"%{search_query}%"),
         )
         base_query = base_query.filter(search_filter)
 
