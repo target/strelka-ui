@@ -38,6 +38,7 @@ export const indexDataType = (index, data) => {
     nodeDisposition: "",
     nodeMain: "",
     nodeSub: "",
+    nodeTlsh: "",
     nodeLabel: "",
     nodeYaraList: "",
     nodeMetric: "",
@@ -51,6 +52,12 @@ export const indexDataType = (index, data) => {
       let qrData = "";
       if (data.scan?.qr?.data) {
         qrData = data.scan.qr.data;
+      }
+
+      // Check if TLSH data exists and add to nodeData
+      let tlshData = "";
+      if (data.scan?.tlsh?.match) {
+        tlshData = data.scan.tlsh.match;
       }
 
       // Extracting the base64_thumbnail from _any_ scanner, if present
@@ -80,6 +87,7 @@ export const indexDataType = (index, data) => {
           data["enrichment"]?.["virustotal"] !== undefined
             ? data["enrichment"]["virustotal"]
             : "Not Found",
+        nodeTlshData: tlshData,
         nodeInsights: data?.insights?.length,
         nodeIocs: data?.iocs?.length,
         nodeImage: base64Thumbnail,

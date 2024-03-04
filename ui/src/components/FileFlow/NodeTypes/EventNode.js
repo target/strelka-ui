@@ -1,7 +1,7 @@
 import { useState, memo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Button, Tag, Tooltip } from "antd";
+import { Tag, Tooltip } from "antd";
 import { Handle, Position } from "reactflow";
 import { getIconConfig } from "../../../utils/iconMappingTable";
 
@@ -107,19 +107,11 @@ const ImageTooltip = styled(Tooltip)`
     align-items: center;
     justify-content: center;
     padding: 0 !important;
-    overflow: hidden; 
+    overflow: hidden;
   }
   .ant-tooltip-inner img {
     pointer-events: auto;
   }
-`;
-
-const UnblurButton = styled(Button)`
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(50%, -50%);
-  z-index: 20; // Ensure it's above the image/QR code preview
 `;
 
 const PreviewImage = styled.img`
@@ -254,9 +246,8 @@ const EventNode = memo(({ data, selected }) => {
   // Initialize isBlurred based on the presence of data.nodeQrData
   const [isBlurred, setIsBlurred] = useState(!!data.nodeQrData);
 
-
   // Example of conditional styling for blur effect
-  const previewStyle = isBlurred ? { filter: 'blur(4px)' } : {};
+  const previewStyle = isBlurred ? { filter: "blur(4px)" } : {};
 
   const handleStyle = {
     backgroundColor: "#aaa",
@@ -271,6 +262,8 @@ const EventNode = memo(({ data, selected }) => {
   const color = mappingEntry?.color || data.color;
   const hasImage = Boolean(data.nodeImage);
   const virusTotalResponse = data.nodeVirustotal;
+  const tlshResponse = data.nodeTlshData.family;
+
   data.nodeAlert =
     typeof virusTotalResponse === "number" && virusTotalResponse > 5;
 
@@ -321,6 +314,13 @@ const EventNode = memo(({ data, selected }) => {
           <Tag color="default">
             {data.nodeMetric} {data.nodeMetricLabel}
           </Tag>
+          {tlshResponse && (
+            <Tag                         style={{
+              margin: "2px",
+              fontWeight: "500",
+              fontSize: "11px",
+            }} color="red">TLSH Related Match: {tlshResponse}</Tag>
+          )}
         </div>
       </RightWrapper>
       <Handle
