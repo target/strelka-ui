@@ -84,7 +84,13 @@ export function transformElasticSearchDataToElements(results) {
   const edges = [];
   let rootNodes = new Set();
   let nodeIdsToIndices = new Map();
-  
+  let qrDataPresent = false;
+
+  results.forEach((result) => {
+    if (result.scan?.qr?.data){
+      qrDataPresent = true
+    }
+  })
 
     results.forEach((result) => {
       result.index = "strelka"
@@ -104,11 +110,12 @@ export function transformElasticSearchDataToElements(results) {
           nodeInsights: nodeData.nodeInsights,
           nodeIocs: nodeData.nodeIocs,
           nodeImage: nodeData.nodeImage,
-          nodeQrData: nodeData.nodeQrData,
+          nodeQrData: qrDataPresent || nodeData.nodeQrData,
           nodeMain: nodeData.nodeMain,
           nodeSub: nodeData.nodeSub,
           nodeLabel: nodeData.nodeLabel,
           nodeMetric: nodeData.nodeMetric,
+          nodeTlshData: nodeData.nodeTlshData,
           nodeMetricLabel: nodeData.nodeMetricLabel,
           nodeYaraList: nodeData.nodeYaraList,
           nodeParentId: nodeData.nodeParentId,
