@@ -77,6 +77,7 @@ def submit_file(
         None.
     """
     submitted_hash = ""
+    total_scanned_with_hits = []
 
     if "file" not in request.files and b"hash" not in request.data:
         return (
@@ -114,7 +115,6 @@ def submit_file(
         submitted_description = submission["description"]
         submitted_hash = submission["hash"]
         submitted_type = "virustotal"
-        total_scanned_with_hits = []
 
         if os.environ.get("VIRUSTOTAL_API_KEY"):
             file = create_vt_zip_and_download(
