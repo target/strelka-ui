@@ -21,6 +21,8 @@ import VbOverviewCard from "../components/FileComponents/VbOverviewCard";
 import JavascriptOverviewCard from "../components/FileComponents/JavascriptOverviewCard";
 import EmailOverviewCard from "../components/FileComponents/EmailOverviewCard";
 import QrOverviewCard from "../components/FileComponents/QrOverviewCard";
+import TlshOverviewCard from "../components/FileComponents/TlshOverviewCard";
+
 
 import { getIconConfig } from "../utils/iconMappingTable";
 
@@ -146,6 +148,20 @@ const SubmissionsPage = (props) => {
     };
   };
 
+  const getTlshRating = (score) => {
+    const scoreRanges = [
+      { max: 30, label: "Very Similar", color: "error" },
+      { max: 60, label: "Somewhat Similar", color: "orange" },
+      { max: 120, label: "Moderately Different", color: "gold" },
+      { max: 180, label: "Quite Different", color: "lime" },
+      { max: 300, label: "Very Different", color: "green" },
+    ];
+
+    // Find the first range where the score is less than the max
+    const range = scoreRanges.find((r) => score <= r.max);
+    return range || scoreRanges[scoreRanges.length - 1]; // default to the last range if not found
+  };
+
   const getFilteredData = () => {
     let filteredData = "";
     if (selectedNodeData) {
@@ -194,7 +210,7 @@ const SubmissionsPage = (props) => {
 
   useEffect(() => {
     let mounted = true;
-  
+
     fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/scans/${id}`, {
       method: "GET",
       mode: "cors",
@@ -225,12 +241,12 @@ const SubmissionsPage = (props) => {
           setFileDepthView(res.strelka_response[0]?.file?.depth || "");
         }
       });
-  
+
     return function cleanup() {
       mounted = false;
     };
   }, [handle401, id]);
-  
+
 
   return isLoading ? (
     <div
@@ -419,7 +435,45 @@ const SubmissionsPage = (props) => {
                 </Collapse.Panel>
               </Collapse>
             )}
-
+            {selectedNodeData && selectedNodeData.scan?.tlsh?.match && (
+              <Collapse
+                defaultActiveKey={[]}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                <Collapse.Panel
+                  header={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        <Text strong>TLSH Related Match</Text>
+                        <div style={{ fontSize: "smaller", color: "#888" }}>
+                          Match Family:{" "}
+                          {selectedNodeData.scan.tlsh.match?.family}
+                        </div>
+                      </div>
+                      {(() => {
+                        const { label, color } = getTlshRating(
+                          selectedNodeData.scan.tlsh.match.score
+                        );
+                        return (
+                          <Tag color={color}>
+                            <b>{label}</b>
+                          </Tag>
+                        );
+                      })()}
+                    </div>
+                  }
+                  key="1"
+                >
+                  <TlshOverviewCard data={selectedNodeData} />
+                </Collapse.Panel>
+              </Collapse>
+            )}
             {selectedNodeData &&
               selectedNodeData.scan.header &&
               selectedNodeData.scan.footer && (
