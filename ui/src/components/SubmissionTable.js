@@ -655,7 +655,7 @@ const SubmissionTable = () => {
             Search Filter
           </Text>
           <Input.Search
-            placeholder="Search by File Name or Submission Description..."
+            placeholder="Search by File Name, Submission Description, Uploader, or YARA Matches..."
             onChange={(e) => debouncedSearchChange(e)}
             style={{ fontSize: "12px" }}
           />
