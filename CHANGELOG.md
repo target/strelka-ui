@@ -1,6 +1,19 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2024-03-29
+- Adding unencrypted VirusTotal submission support
+- Update dependency (Black)
+
+## 2024-03-20
+- Dependency updates
+  
+## 2024-03-04
+- Adding TLSH Card support
+
+## 2024-02-02
+- Adding QR Card support
+  
 ## 2024-01-17
 - Bug fix for Visual Basic card where page fails to load if data does not exist for a section.
   
