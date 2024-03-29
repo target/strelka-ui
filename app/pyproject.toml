@@ -56,7 +56,6 @@ Typing-Extensions = "4.0.1"
 Urllib3 = "1.26.18"
 Waitress = "2.1.2"
 Wrapt = "1.13.3"
-vt-py = "0.18.0"
 
 
 [tool.poetry.dev-dependencies]

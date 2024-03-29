@@ -4,22 +4,70 @@ import json
 import os
 from collections import defaultdict
 
-from io import BytesIO
 from typing import Dict, Tuple, Union
 
 from flask import Blueprint, current_app, jsonify, request, session, Response
 from sqlalchemy import or_, desc, asc, func, case, cast, String
-from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import joinedload
 
 from database import db
 from models import FileSubmission, User
 from services.auth import auth_required
 from services.strelka import get_db_status, get_frontend_status, submit_data
-from services.virustotal import get_virustotal_positives, create_vt_zip_and_download
+from services.virustotal import (
+    get_virustotal_positives,
+    create_vt_zip_and_download,
+    download_vt_bytes,
+)
 from services.insights import get_insights
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
+
+# Define the priority of each mimetype (For VirusTotal Scanning Priorization)
+MIMETYPE_PRIORITY = {
+    "application/x-dosexec": 1,  # Executables
+    "application/x-executable": 1,
+    "application/vnd.microsoft.portable-executable": 1,
+    "application/x-elf": 1,
+    "application/zip": 2,  # Archives
+    "application/x-rar-compressed": 2,
+    "application/x-msi": 2,
+    "application/x-7z-compressed": 2,
+    "application/vnd.ms-cab-compressed": 2,
+    "application/x-tar": 2,
+    "application/gzip": 2,
+    "application/octet-stream": 2,  # Unknown streams
+    "text/plain": 3,  # Scripts and source code
+    "text/x-script": 3,
+    "text/javascript": 3,
+    "application/x-bat": 3,
+    "application/x-sh": 3,
+    "application/x-python": 3,
+    "text/x-python": 3,
+    "text/html": 4,  # Web files
+    "application/xhtml+xml": 4,
+    "application/xml": 4,
+    "text/xml": 4,
+    "text/css": 4,
+    "application/pdf": 5,  # Documents
+    "application/msword": 5,
+    "application/vnd.ms-excel": 5,
+    "application/vnd.ms-powerpoint": 5,
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": 5,
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": 5,
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": 5,
+    # Images
+    "image/jpeg": 10,
+    "image/png": 10,
+    "image/gif": 10,
+    "image/webp": 10,
+    "image/tiff": 10,
+    "image/bmp": 10,
+    "image/svg+xml": 10,
+    # Other file types
+    "application/json": 20,  # Data formats
+    "application/xml": 20,
+}
 
 
 @strelka.route("/status/strelka", methods=["GET"])
@@ -114,25 +162,36 @@ def submit_file(
         submission = json.loads(request.data)
         submitted_description = submission["description"]
         submitted_hash = submission["hash"]
+        submitted_encrypted = submission.get("encrypted", True)
         submitted_type = "virustotal"
 
         if os.environ.get("VIRUSTOTAL_API_KEY"):
-            file = create_vt_zip_and_download(
-                api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
-                file_hashes=[submitted_hash],
-                password="infected",
-            )
-            if "Error" in str(file):
+            try:
+                if submitted_encrypted:
+                    file = create_vt_zip_and_download(
+                        api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
+                        file_hash=[submitted_hash],
+                        password="infected",
+                    )
+                else:
+                    file = download_vt_bytes(
+                        api_key=os.environ.get("VIRUSTOTAL_API_KEY"),
+                        file_hash=submitted_hash,
+                    )
+
+            except Exception as e:
                 return (
                     jsonify(
                         {
                             "error": "VirusTotal request was not successful.",
-                            "details": str(file.args[0]),
+                            "details": str(e),
                         }
                     ),
                     400,
                 )
-            file.filename = submitted_hash
+
+        # Assume file is a BytesIO object and set a filename attribute
+        file.filename = submitted_hash
 
     # Submit the file to the Strelka analysis engine.
     if file:
@@ -160,6 +219,10 @@ def submit_file(
             # Get the submitted file object from the analysis results.
             submitted_file = response[0]
 
+            def get_mimetype_priority(mime_list):
+                # Return the highest priority of the mimetypes in the list
+                return min(MIMETYPE_PRIORITY.get(mime, 9999) for mime in mime_list)
+
             # If VirusTotal API key provided, get positives (VIRUSTOTAL_API_LIMIT determined Max Scans per Request)
             # -1    = VirusTotal Lookup Error
             # -2    = VirusTotal API Key Not Provided
@@ -167,7 +230,14 @@ def submit_file(
             if os.environ.get("VIRUSTOTAL_API_KEY"):
                 total_scanned = 0
                 try:
-                    for scanned_file in response:
+                    # Sort files by the priority of their mimetypes
+                    sorted_files = sorted(
+                        response,
+                        key=lambda x: get_mimetype_priority(
+                            x["file"]["flavors"]["mime"]
+                        ),
+                    )
+                    for scanned_file in sorted_files:
                         if total_scanned <= int(os.environ.get("VIRUSTOTAL_API_LIMIT")):
                             scanned_file["enrichment"] = {"virustotal": -2}
                             scanned_file["enrichment"][
