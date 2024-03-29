@@ -473,6 +473,7 @@ const SubmissionTable = () => {
         // If the type is virustotal, remove the first item in strelka_response
         if (
           full.submitted_type === "virustotal" &&
+          strelkaResponse[0].file.flavors.mime[0] === "application/zip" &&
           strelkaResponse.length > 0
         ) {
           strelkaResponse.shift();
@@ -482,8 +483,8 @@ const SubmissionTable = () => {
         if (strelkaResponse.length > 0) {
           const response = strelkaResponse[0];
           mimeType =
-            response.file.flavors?.yara?.[0] ||
             response.file.flavors?.mime?.[0] ||
+            response.file.flavors?.yara?.[0] ||
             mimeType;
         }
 
