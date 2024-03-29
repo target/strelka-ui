@@ -179,6 +179,9 @@ def submit_file(
                         file_hash=submitted_hash,
                     )
 
+                # Assume file is a BytesIO object and set a filename attribute
+                file.filename = submitted_hash
+
             except Exception as e:
                 return (
                     jsonify(
@@ -189,9 +192,16 @@ def submit_file(
                     ),
                     400,
                 )
-
-            # Assume file is a BytesIO object and set a filename attribute
-            file.filename = submitted_hash
+        else:
+            return (
+                jsonify(
+                    {
+                        "error": "VirusTotal request was not successful.",
+                        "details": "No VirusTotal API key has been loaded. Check the README for details.",
+                    }
+                ),
+                400,
+            )
 
     # Submit the file to the Strelka analysis engine.
     if file:

@@ -43,7 +43,7 @@ def create_vt_zip_and_download(api_key, file_hash, password, max_attempts=3):
 
     Args:
         api_key (str): The API key for VirusTotal.
-        file_hash (str): The hash of the file to download.
+        file_hash (list): The hash of the file to download.
         password (str): The password to set for the ZIP file.
         max_attempts (int): The maximum number of attempts to check for ZIP readiness.
 
