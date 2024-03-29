@@ -315,11 +315,19 @@ const EventNode = memo(({ data, selected }) => {
             {data.nodeMetric} {data.nodeMetricLabel}
           </Tag>
           {tlshResponse && (
-            <Tag                         style={{
-              margin: "2px",
-              fontWeight: "500",
-              fontSize: "11px",
-            }} color="red">TLSH Related Match: {tlshResponse}</Tag>
+            <Tag
+              style={{
+                margin: "2px",
+                fontWeight: "500",
+                fontSize: "11px",
+              }}
+              color="red"
+            >
+              TLSH Related Match:{" "}
+              {`${tlshResponse.slice(0, 10)}${
+                tlshResponse.length > 10 ? "..." : ""
+              }`}
+            </Tag>
           )}
         </div>
       </RightWrapper>

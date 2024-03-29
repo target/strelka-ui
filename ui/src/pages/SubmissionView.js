@@ -121,7 +121,7 @@ const SubmissionsPage = (props) => {
           disposition = "Not Found on VirusTotal";
           color = "default";
         } else if (virustotalPositives === -3) {
-          disposition = "Exceeded VirusTotal Limit";
+          disposition = "Exceeded VirusTotal Limit for Submission";
           color = "warning";
         } else if (virustotalPositives === -2) {
           disposition = "VirusTotal Not Enabled";
@@ -228,7 +228,7 @@ const SubmissionsPage = (props) => {
       .then((res) => {
         if (mounted) {
           // Check if the submission_type is virustotal and modify data accordingly
-          if (res.submitted_type && res.submitted_type === "virustotal") {
+          if (res.submitted_type && res.submitted_type === "virustotal" && res.strelka_response[0].file.flavors.mime[0] === "application/zip") {
             // Make sure that strelka_response is an array and has at least one element
             if (Array.isArray(res.strelka_response) && res.strelka_response.length > 0) {
               // Remove the first element of strelka_response
