@@ -190,8 +190,8 @@ def submit_file(
                     400,
                 )
 
-        # Assume file is a BytesIO object and set a filename attribute
-        file.filename = submitted_hash
+            # Assume file is a BytesIO object and set a filename attribute
+            file.filename = submitted_hash
 
     # Submit the file to the Strelka analysis engine.
     if file:
