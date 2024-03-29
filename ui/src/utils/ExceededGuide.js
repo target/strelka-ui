@@ -20,7 +20,7 @@ const ExceededGuide = () => {
       zIndex: 1000,
       animation: 'glow 3s ease-in-out infinite'
     }}>
-      <Text strong>VirusTotal Limit Reached</Text>
+      <Text strong>VirusTotal Submission Limit Reached</Text>
       <Paragraph style={{ margin: 0, fontSize: '12px' }}>Some file hashes were not checked against VirusTotal.</Paragraph>
       <style>
         {`
