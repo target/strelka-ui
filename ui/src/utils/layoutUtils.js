@@ -139,7 +139,6 @@ export function transformElasticSearchDataToElements(results) {
         });
       }
     });
- 
 
   // Add Possible Relationship Edges
   nodes.forEach((node) => {
