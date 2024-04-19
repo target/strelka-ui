@@ -18,6 +18,20 @@
   text-align: center; /* Centers the thumbnail if it's smaller than the container */
 }
 
+/* Wrapper for Thumbnails */
+.thumbnail-wrapper {
+  position: relative;
+  text-align: center; 
+}
+
+/* Button CSS for Thumbnail Blur */
+.centered-button {
+  position: absolute;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* Line number styles */
 .line-number {
   text-align: right;

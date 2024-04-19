@@ -20,6 +20,9 @@ import {
 import { Link } from "react-router-dom";
 
 import { getIconConfig } from "../utils/iconMappingTable";
+import useVirusTotalApiKey from '../utils/useVirusTotalApiKey';
+import VirusTotalAugmentDrawer from "./VirusTotal/VirusTotalAugmentDrawer.js";
+
 
 import { debounce } from "lodash";
 import AuthCtx from "../contexts/auth";
@@ -27,7 +30,6 @@ import { fetchWithTimeout } from "../util.js";
 import { APP_CONFIG } from "../config";
 
 const { Text } = Typography;
-
 /**
  * A table component for displaying submission data.
  */
@@ -42,6 +44,18 @@ const SubmissionTable = () => {
   const defaultSorter = { field: "submitted_at", order: "descend" };
   const [sorter, setSorter] = useState(defaultSorter);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [vtDrawerVisible, setVtDrawerVisible] = useState(false);
+  const [selectedResource, setSelectedResource] = useState(null);
+  const { isApiKeyAvailable } = useVirusTotalApiKey();
+
+
+  // Function to handle opening the VT Augment
+  const handleVtOpen = (sha256Hash) => {
+    if (isApiKeyAvailable) {
+      setSelectedResource(sha256Hash);
+      setVtDrawerVisible(true);
+    }
+  };
 
   // Fetches Data from the Strelka UP API
   const fetchData = useCallback(async () => {
@@ -208,18 +222,20 @@ const SubmissionTable = () => {
     },
 
     {
-      title: "VT +",
+      title: (
+        <Tooltip title="Highest VT positives from all files shown">
+          <span>
+            VT +
+            <InfoCircleOutlined style={{ marginLeft: 4 }} />
+          </span>
+        </Tooltip>
+      ),
       dataIndex: "strelka_response",
       key: "vt",
       width: 1,
       render: (strelkaResponse) => {
-        // Find the highest VirusTotal enrichment number in the responses
-        const highestVtEnrichment = strelkaResponse.reduce((max, response) => {
-          const enrichmentNumber = response?.enrichment?.virustotal;
-          return enrichmentNumber > max ? enrichmentNumber : max;
-        }, -1); // Start with -1 to handle cases where there are no positive numbers
 
-        const tagStyle = {
+        const defaultTagStyle = {
           fontSize: "10px",
           fontWeight: "bold",
           width: "80%",
@@ -227,24 +243,55 @@ const SubmissionTable = () => {
           maxWidth: "75px",
         };
 
-        let tagColor = "default";
-        let vtText =
-          highestVtEnrichment >= 0 ? highestVtEnrichment.toString() : "N/A";
+        const VtTagStyle = {
+          fontSize: "10px",
+          fontWeight: "bold",
+          width: "80%",
+          textAlignLast: "center",
+          maxWidth: "75px",
+          cursor: "pointer"
+        };
 
-        if (highestVtEnrichment >= 5) {
-          tagColor = "error"; // red
-        } else if (highestVtEnrichment >= 0) {
-          tagColor = "success"; // green
+        // Initialize the object to store the highest VT enrichment and SHA256
+        const highestVt = {
+          enrichment: -1,
+          sha256: null,
+        };
+    
+        // Iterate over strelkaResponse to find the highest VT enrichment and its SHA256
+        strelkaResponse.forEach((response) => {
+          const enrichmentNumber = response?.enrichment?.virustotal;
+          if (enrichmentNumber > highestVt.enrichment) {
+            highestVt.enrichment = enrichmentNumber;
+            highestVt.sha256 = response.scan.hash.sha256;
+          }
+        });
+    
+        // Determine color based on enrichment value
+        let vtColor = "default";
+        if (highestVt.enrichment > 5) {
+          vtColor = "volcano"; // Ant Design's volcano color for high enrichment
+        } else if (highestVt.enrichment >= 0) {
+          vtColor = "green"; // Ant Design's green color for low enrichment
         }
-
-        return (
-          <Tag color={tagColor} style={tagStyle}>
-            {vtText}
+    
+        // Check if enrichment value is "N/A", then return a non-clickable tag without an icon
+        if (highestVt.enrichment === -1) {
+          return <Tag color="default" style={defaultTagStyle}>N/A</Tag>;
+        } else {
+          // Enrichment value exists, so return a clickable tag with the VirusTotal icon
+          return (
+            <Tag
+            color={vtColor}
+            style={!isApiKeyAvailable ? defaultTagStyle : VtTagStyle}
+            onClick={() => !isApiKeyAvailable ? null : handleVtOpen(highestVt.sha256)}
+          >
+            {highestVt.enrichment}
           </Tag>
-        );
+          );
+        }
       },
     },
-
     {
       title: "Filename",
       dataIndex: "file_id",
@@ -650,6 +697,11 @@ const SubmissionTable = () => {
 
   return (
     <div>
+      <VirusTotalAugmentDrawer
+        resource={selectedResource}
+        onClose={() => setVtDrawerVisible(false)}
+        open={vtDrawerVisible}
+      />
       <Row gutter={16} style={{ marginBottom: "16px" }}>
         <Col span={18}>
           <Text type="secondary" style={{ fontSize: "12px", marginBottom: 8 }}>

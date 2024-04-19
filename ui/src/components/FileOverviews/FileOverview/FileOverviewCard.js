@@ -1,20 +1,59 @@
 import React from "react";
-import { Row, Col, Typography, Tooltip } from "antd";
+import { Row, Col, Typography, Tooltip, Tag } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import styled from "styled-components";
+import useVirusTotalApiKey from '../../../utils/useVirusTotalApiKey';
+
 const { Text } = Typography;
+
+const VirusTotalInfoContent = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  cursor: ${({ isClickable }) => (isClickable ? "pointer" : "default")};
+`;
+
+const VirusTotalTag = styled(Tag)`
+  fontSize: "10px",
+  fontWeight: "bold",
+  width: "80%",
+  textAlignLast: "center",
+  maxWidth: "75px",
+`;
+
+const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: small;
+  color: #888;
+`;
+
+const getVirusTotalTagProps = (positives) => {
+  if (positives > 5) {
+    return "red"; // Color "volcano" from Ant Design for a red tone
+  } else if (positives === 0) {
+    return "success"; // Green color for benign
+  }
+  return "default"; // Default for not available or not applicable cases
+};
 
 /**
  * Component that displays an overview of a file's properties.
  *
  * @param {Object} props - Component properties.
+ * @param {Object} onOpenVt - Resource for VT Augment
  * @param {Object} props.data - The data object containing file and scan information.
  * @returns {JSX.Element} A JSX element representing the card.
  */
-const FileOverviewCard = ({ data }) => {
+const FileOverviewCard = ({ data, onOpenVT }) => {
+  const virustotalData = data?.enrichment?.virustotal;
+  const vtColor = getVirusTotalTagProps(virustotalData);
+  const { isApiKeyAvailable } = useVirusTotalApiKey();
+
   // Helper function to format the text row for display.
   const renderTextRow = (label, content, isCode = false, copyable = false) => (
     <Row>
-      <Col span={2}>
+      <Col span={3}>
         <Text style={{ fontSize: "12px" }}>{label}</Text>
       </Col>
       <Col span={18}>
@@ -24,6 +63,13 @@ const FileOverviewCard = ({ data }) => {
       </Col>
     </Row>
   );
+
+  // Helper function to open VT Augment if exists
+  const handleVirusTotalClick = () => {
+    if (isApiKeyAvailable) {
+      onOpenVT(data.scan.hash.sha256);
+    }
+  };
 
   // Function to handle entropy styling
   const getEntropyStyle = (entropy) => {
@@ -48,7 +94,7 @@ const FileOverviewCard = ({ data }) => {
 
     return (
       <Row>
-        <Col span={2}>
+        <Col span={3}>
           <Text style={{ fontSize: "12px" }}>Entropy:</Text>
         </Col>
         <Col span={18}>
@@ -67,7 +113,7 @@ const FileOverviewCard = ({ data }) => {
     <div style={{ padding: "10px" }}>
       {renderTextRow("File Name:", data.file.name)}
       {renderTextRow("MIME Type:", data.file.flavors.mime?.join(", "), true)}
-      {renderTextRow("YARA Flavors:", data.file.flavors.yara?.join(", "), true)}
+      {renderTextRow("YARA Flavors:", data.file.flavors.yara?.join(", ") || "N/A", true)}
       {renderTextRow("MD5:", data.scan.hash.md5, true, true)}
       {renderTextRow("SHA1:", data.scan.hash.sha1, true, true)}
       {renderTextRow("SHA256:", data.scan.hash.sha256, true, true)}
@@ -79,28 +125,46 @@ const FileOverviewCard = ({ data }) => {
       )}
       {data.scan?.entropy && renderEntropy(data.scan.entropy.entropy)}
       <Row>
-        <Col span={2}>
+        <Col span={3}>
           <Text style={{ fontSize: "12px" }}>VirusTotal:</Text>
         </Col>
         <Col span={18}>
           <Text style={{ fontSize: "12px" }}>
-            {data["enrichment"]?.["virustotal"] !== undefined &&
-            data["enrichment"]["virustotal"] !== -1 ? (
-              <a
-                href={`https://www.virustotal.com/gui/file/${data.scan.hash.sha256}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {data["enrichment"]?.["virustotal"]} Positives
-              </a>
-            ) : (
-              <a
-                href={`https://www.virustotal.com/gui/file/${data.scan.hash.sha256}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Not Found
-              </a>
+            {typeof virustotalData !== "undefined" && virustotalData > -1 && (
+              <InfoRow onClick={handleVirusTotalClick}>
+                <VirusTotalInfoContent isClickable={isApiKeyAvailable}>
+                  <img
+                    src="/virustotal.png"
+                    alt="VirusTotal"
+                    width={12}
+                    height={12}
+                  />
+                  <VirusTotalTag
+                    style={{ fontSize: "10px", marginLeft: 6 }}
+                    color={vtColor}
+                  >
+                    {virustotalData} Positives
+                  </VirusTotalTag>
+                </VirusTotalInfoContent>
+              </InfoRow>
+            )}
+            {(typeof virustotalData == "undefined" || virustotalData < 0) && (
+              <InfoRow onClick={handleVirusTotalClick}>
+                <VirusTotalInfoContent isClickable={isApiKeyAvailable}>
+                  <img
+                    src="/virustotal.png"
+                    alt="VirusTotal"
+                    width={12}
+                    height={12}
+                  />
+                  <VirusTotalTag
+                    style={{ fontSize: "10px", marginLeft: 6 }}
+                    color="default"
+                  >
+                    N/A
+                  </VirusTotalTag>
+                </VirusTotalInfoContent>
+              </InfoRow>
             )}
           </Text>
         </Col>

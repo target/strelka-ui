@@ -8,7 +8,7 @@ import {
 } from "antd";
 import { WarningOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
-import "../../styles/PeOverviewCard.css";
+import "../../../styles/PeOverviewCard.css";
 
 const { Text } = Typography;
 
@@ -217,7 +217,7 @@ const PeOverviewCard = ({ data }) => {
 
       <List
         size="small"
-        dataSource={data.scan.pe.symbols.imported}
+        dataSource={data.scan.pe?.symbols?.imported}
         renderItem={item => (
           <List.Item>
             <Text style={{ fontSize: "12px" }} code>{item}</Text>
@@ -232,7 +232,7 @@ const PeOverviewCard = ({ data }) => {
 
       <List
         size="small"
-        dataSource={data.scan.pe.symbols.exported}
+        dataSource={data.scan.pe?.symbols?.exported}
         renderItem={item => (
           <List.Item>
             <Text style={{ fontSize: "12px" }} code>{item}</Text>

@@ -1,9 +1,10 @@
 import React from "react";
 import { Card, Row, Tooltip, Button, Tag, Typography } from "antd";
-import { getIconConfig } from "../../utils/iconMappingTable";
+import { getIconConfig } from "../../../utils/iconMappingTable";
 
-import { APP_CONFIG } from "../../config";
+import { APP_CONFIG } from "../../../config";
 import styled from "styled-components";
+import useVirusTotalApiKey from "../../../utils/useVirusTotalApiKey";
 
 const { Text } = Typography;
 
@@ -16,6 +17,23 @@ const StyledText = styled(Text)`
   font-size: 16px;
   font-weight: 500;
   margin-right: 8px;
+`;
+
+const VirusTotalInfoContent = styled.div`
+  cursor: ${({ isApiKeyAvailable }) =>
+    !isApiKeyAvailable ? "default" : "pointer"};
+  display: flex;
+  align-items: center;
+  pointer-events: ${({ isApiKeyAvailable }) =>
+    !isApiKeyAvailable ? "none" : "auto"};
+`;
+
+const VirusTotalTag = styled(Tag)`
+  fontSize: "10px",
+  fontWeight: "bold",
+  width: "80%",
+  textAlignLast: "center",
+  maxWidth: "75px",
 `;
 
 const LeftWrapper = styled.div`
@@ -70,6 +88,15 @@ const formatFileSize = (size) => {
   }
 };
 
+const getVirusTotalTagProps = (positives) => {
+  if (positives > 5) {
+    return "red"; // Color "volcano" from Ant Design for a red tone
+  } else if (positives === 0) {
+    return "success"; // Green color for benign
+  }
+  return "default"; // Default for not available or not applicable cases
+};
+
 const getDisposition = (data) => {
   let text = "Not Found on VirusTotal"; // Default text
   let color = "default"; // Default color
@@ -117,8 +144,12 @@ const getRandomColor = () => {
 
 const getColorForMimetypes = () => getRandomColor();
 
-const FileHeaderOverviewCard = ({ data }) => {
+const FileHeaderOverviewCard = ({ data, onOpenVT }) => {
   const sortedScannersRun = [...(data?.scanners_run || [])].sort();
+  const virustotalData = data.strelka_response[0]?.enrichment?.virustotal;
+  const vtColor = getVirusTotalTagProps(virustotalData);
+  const { isApiKeyAvailable } = useVirusTotalApiKey();
+
   const mappingEntry = getIconConfig(
     "strelka",
     data.strelka_response[0].file.flavors.mime[0].toLowerCase()
@@ -126,8 +157,15 @@ const FileHeaderOverviewCard = ({ data }) => {
   const IconComponent = mappingEntry?.icon;
   const color = mappingEntry?.color || data.color;
 
+  const handleVirusTotalClick = () => {
+    if (isApiKeyAvailable) {
+      const sha256Hash = data.strelka_response[0]?.scan?.hash?.sha256;
+      onOpenVT(sha256Hash);
+    }
+  };
+
   return (
-    <div>
+    <div style={{ marginBottom: "10px", paddingBottom: "5px" }}>
       <Card
         type="inner"
         title={
@@ -159,23 +197,23 @@ const FileHeaderOverviewCard = ({ data }) => {
                     Insights: {data.insights.length}
                   </Tag>
                 )}
-                <span style={{ padding: "5px" }}>
-                  {getDisposition(data)}
-                </span>
+                <span style={{ padding: "5px" }}>{getDisposition(data)}</span>
                 {[
-                    APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-                      <a
-                        href={`${APP_CONFIG.SEARCH_URL.replace(
-                          "<REPLACE>",
-                          data.file_id
-                        )}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <Button size="small" style={{fontSize: "12px"}}>View in {APP_CONFIG.SEARCH_NAME}</Button>
-                      </a>
-                    ),
-                  ]}
+                  APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+                    <a
+                      href={`${APP_CONFIG.SEARCH_URL.replace(
+                        "<REPLACE>",
+                        data.file_id
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Button size="small" style={{ fontSize: "12px" }}>
+                        View in {APP_CONFIG.SEARCH_NAME}
+                      </Button>
+                    </a>
+                  ),
+                ]}
               </div>
             </Row>
             <Row>
@@ -227,9 +265,9 @@ const FileHeaderOverviewCard = ({ data }) => {
                   >
                     <Tag
                       style={{
-                        margin: "2px",
                         fontWeight: "500",
-                        fontSize: "11px",
+                        marginLeft: "30px",
+                        fontSize: "12px",
                       }}
                       color={getColorForMimetypes()}
                     >{`... and ${
@@ -327,6 +365,29 @@ const FileHeaderOverviewCard = ({ data }) => {
                   </Text>
                 </InfoContent>
               </InfoRow>
+              {typeof virustotalData !== "undefined" && virustotalData > -1 && (
+                <InfoRow
+                  onClick={
+                    !isApiKeyAvailable ? undefined : handleVirusTotalClick
+                  }
+                >
+                  <InfoLabel>VirusTotal:</InfoLabel>
+                  <VirusTotalInfoContent isApiKeyAvailable={isApiKeyAvailable}>
+                    <img
+                      src="/virustotal.png"
+                      alt="VirusTotal"
+                      width={12}
+                      height={12}
+                    />
+                    <VirusTotalTag
+                      style={{ fontSize: "10px", marginLeft: 6 }}
+                      color={vtColor}
+                    >
+                      {virustotalData} Positives
+                    </VirusTotalTag>
+                  </VirusTotalInfoContent>
+                </InfoRow>
+              )}
               <div style={{ marginTop: "8px" }}>
                 {sortedScannersRun.map((tag) => (
                   <StyledTag style={{ fontSize: "10px" }} key={tag}>

@@ -79,9 +79,9 @@ body {
 .ant-card,
 .submission-card-height,
 .ant-collapse-item {
-  border-radius: 20px;
-  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 0px;
+  box-shadow: -1px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    -1px -2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Collapse Styles */
@@ -92,10 +92,10 @@ body {
 .ant-collapse > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box,
 .ant-collapse-content,
 .ant-collapse-content-box {
-  border-radius: 20px !important;
+  border-radius: 0px !important;
   background-color: #ffffff;
   border: 0;
-  padding-top: 5px;
+
   padding-bottom: 5px;
 }
 
