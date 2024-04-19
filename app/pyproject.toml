@@ -37,7 +37,7 @@ Pathspec = "0.9.0"
 Paste = "3.5.2"
 Platformdirs = "2.4.1"
 Protobuf = "3.18.3"
-Psycopg2-Binary = "2.9.4"
+Psycopg2-Binary = "2.9.9"
 Pyasn1 = "0.4.8"
 PyJWT = "2.4.0"
 PyOpenSSL = "20.0.1"
@@ -56,6 +56,7 @@ Typing-Extensions = "4.0.1"
 Urllib3 = "1.26.18"
 Waitress = "2.1.2"
 Wrapt = "1.13.3"
+vt-py = "0.18.0"
 
 
 [tool.poetry.dev-dependencies]
