@@ -41,6 +41,7 @@ export const indexDataType = (index, data) => {
     nodeTlsh: "",
     nodeLabel: "",
     nodeYaraList: "",
+    nodeIocList: "",
     nodeMetric: "",
     nodeParentId: "",
     nodeRelationshipId: "",
@@ -59,7 +60,7 @@ export const indexDataType = (index, data) => {
       if (data.scan?.tlsh?.match) {
         tlshData = data.scan.tlsh.match;
       }
-
+      
       // Extracting the base64_thumbnail from _any_ scanner, if present
       let base64Thumbnail = "";
       if (data["scan"]) {
@@ -71,6 +72,9 @@ export const indexDataType = (index, data) => {
         }
       }
 
+      // Get File IOC Matches
+      const iocList = data?.iocs?.map(ioc => ioc.ioc) || [];
+
       Object.assign(nodeData, {
         nodeDepth: data["file"]["depth"],
         nodeMain:
@@ -80,6 +84,7 @@ export const indexDataType = (index, data) => {
         nodeLabel: data["file"]["name"] || "No Filename",
         nodeYaraList: data["scan"]?.["yara"]?.["matches"] || "",
         nodeMetric: data["scan"]?.["yara"]?.["matches"]?.length || 0,
+        nodeIocList: iocList,
         nodeMetricLabel: "Yara Matches",
         nodeParentId: data["file"]["tree"]["parent"],
         nodeRelationshipId: data["file"]["tree"]["node"],

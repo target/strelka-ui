@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Checkbox, Input, Row, Col, Modal, Button, Tooltip } from "antd";
-import "../../styles/OcrOverviewCard.css";
+import "../../../styles/OcrOverviewCard.css";
 
 const OcrOverviewCard = ({ data }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -67,7 +67,7 @@ const OcrOverviewCard = ({ data }) => {
   return (
     <div className="ocr-overview">
       <Row gutter={[16, 16]}>
-        <Col span={18}>
+        <Col span={17}>
           <Input
             placeholder="Filter"
             onChange={(e) => setFilter(e.target.value)}
@@ -91,7 +91,7 @@ const OcrOverviewCard = ({ data }) => {
       </Row>
       <Row>
         <Col
-          span={18}
+          span={17}
           className="text-container"
           style={{ overflowX: wrapText ? "hidden" : "scroll" }}
         >

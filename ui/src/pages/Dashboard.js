@@ -4,20 +4,21 @@ import { Row, Col, Card, Input, Statistic, Typography, message } from "antd";
 import { CalendarOutlined, MessageOutlined } from "@ant-design/icons";
 import PageWrapper from "../components/PageWrapper";
 import SubmissionTable from "../components/SubmissionTable";
-import VirusTotalUploader from "../components/FileComponents/VirusTotalUploader";
-import MimeTypeBarChart from "../components/FileComponents/MimeTypeBarChart";
+import VirusTotalUploader from "../components/VirusTotal/VirusTotalUploader";
+import MimeTypeBarChart from "../components/Visualizations/MimeTypeBarChart";
 import Dropzone from "../components/Dropzone";
 import { APP_CONFIG } from "../config";
 import { fetchWithTimeout } from "../util";
+import useVirusTotalApiKey from '../utils/useVirusTotalApiKey';
+
 
 const { Title, Text } = Typography;
 
 const statisticCardStyle = {
-  borderRadius: '20px',
-  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-  height: '100%',
+  borderRadius: "20px",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+  height: "100%",
 };
-
 
 const DashboardPage = (props) => {
   const [fileDescription, setFileDescription] = useState(
@@ -36,6 +37,8 @@ const DashboardPage = (props) => {
   const setDescription = (event) => {
     setFileDescription(event.target.value);
   };
+
+  const { isApiKeyAvailable } = useVirusTotalApiKey();
 
   useEffect(() => {
     let mounted = true;
@@ -95,7 +98,7 @@ const DashboardPage = (props) => {
               value={stats.all_time}
               loading={loadingStats}
               prefix={<CalendarOutlined />}
-              valueStyle={{ color: '#3f8600' }}
+              valueStyle={{ color: "#3f8600" }}
             />
           </Card>
         </Col>
@@ -106,7 +109,7 @@ const DashboardPage = (props) => {
               value={stats.thirty_days}
               loading={loadingStats}
               prefix={<CalendarOutlined />}
-              valueStyle={{ color: '#cf1322' }}
+              valueStyle={{ color: "#cf1322" }}
             />
           </Card>
         </Col>
@@ -117,7 +120,7 @@ const DashboardPage = (props) => {
               value={stats.seven_days}
               loading={loadingStats}
               prefix={<CalendarOutlined />}
-              valueStyle={{ color: '#125ecf' }}
+              valueStyle={{ color: "#125ecf" }}
             />
           </Card>
         </Col>
@@ -128,7 +131,7 @@ const DashboardPage = (props) => {
               value={stats.twentyfour_hours}
               loading={loadingStats}
               prefix={<CalendarOutlined />}
-              valueStyle={{ color: '#cf8512' }}
+              valueStyle={{ color: "#cf8512" }}
             />
           </Card>
         </Col>
@@ -137,19 +140,50 @@ const DashboardPage = (props) => {
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
         <Col className="gutter-row" xs={8} sm={8} md={8} lg={8}>
           <Card>
+            {!isApiKeyAvailable && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                  zIndex: 10,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "4px",
+                  textAlign: "center",
+                  color: "grey",
+                  fontSize: "18px",
+                  padding: "20px",
+                }}
+              >
+                <h3 style={{ margin: 0 }}>
+                  Premium VirusTotal Key Not Provided
+                </h3>
+                <div>Please Review the README for Details</div>
+              </div>
+            )}
             <Typography>
               <Title style={{ marginTop: "0", paddingTop: "0" }} level={3}>
                 Upload Via VirusTotal
               </Title>
               <Text type="secondary">
-                Input a MD5, SHA1, or SHA256 hash to analyze a file from VirusTotal.
+                Input a MD5, SHA1, or SHA256 hash to analyze a file from
+                VirusTotal.
               </Text>
             </Typography>
+
             <br />
+
             <VirusTotalUploader
               onUploadSuccess={() => setFilesUploaded(filesUploaded + 1)}
             />
           </Card>
+
           <br />
           <Card>
             <Typography>

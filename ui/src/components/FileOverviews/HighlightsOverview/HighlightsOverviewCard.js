@@ -6,19 +6,40 @@ import {
   RightOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
-import { getIconConfig } from "../../utils/iconMappingTable";
-import { antdColors } from "../../utils/colors";
+import { getIconConfig } from "../../../utils/iconMappingTable";
+import { antdColors } from "../../../utils/colors";
 
 const { Text } = Typography;
 
 const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
   const [expandedNodes, setExpandedNodes] = useState(new Set());
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [visibleNodeCount, setVisibleNodeCount] = useState(20); // start with 20 nodes visible
+  const LOAD_MORE_COUNT = 10; // number of nodes to load on each click
 
   const insightsByNode = {};
   const iocsByNode = {};
   const mimeTypeByNode = {};
   const filenameByNode = {};
+
+  // Function to load more nodes
+  const loadMoreNodes = () => {
+    setVisibleNodeCount((prevCount) => prevCount + LOAD_MORE_COUNT);
+  };
+
+  const getVTPositivesInfo = (response) => {
+    const vtCount = response?.enrichment?.virustotal;
+    if (typeof vtCount === "number") {
+      if (vtCount < 0) {
+        return null; // No box if VT data is not available
+      }
+      return {
+        count: vtCount,
+        color: vtCount > 3 ? "volcano" : "green", // Red if > 3, green if 0-3
+      };
+    }
+    return null; // No box if VT data is not available
+  };
 
   // Populate insights, iocs, mime types, and filenames by node
   data.strelka_response.forEach((response) => {
@@ -39,11 +60,25 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
   const sortedNodeIds = Object.keys(filenameByNode)
     .map((nodeId) => ({
       nodeId,
-      filename: filenameByNode[nodeId] || 'No Filename',
+      filename: filenameByNode[nodeId] || "No Filename",
       iocCount: iocsByNode[nodeId]?.length || 0,
       insightCount: insightsByNode[nodeId]?.length || 0,
     }))
     .sort((a, b) => {
+      // Get VT positives or assign a default for comparison
+      const vtPositivesA =
+        getVTPositivesInfo(
+          data.strelka_response.find((res) => res.file.tree.node === a.nodeId)
+        )?.count || 0;
+      const vtPositivesB =
+        getVTPositivesInfo(
+          data.strelka_response.find((res) => res.file.tree.node === b.nodeId)
+        )?.count || 0;
+
+      // Descending sort for VT positives
+      if (vtPositivesA !== vtPositivesB) {
+        return vtPositivesB - vtPositivesA;
+      }
       if (a.iocCount !== b.iocCount) {
         return b.iocCount - a.iocCount;
       } else if (a.insightCount !== b.insightCount) {
@@ -53,19 +88,8 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
     })
     .map((sortedItem) => sortedItem.nodeId);
 
-  const getVTPositivesInfo = (response) => {
-    const vtCount = response?.enrichment?.virustotal;
-    if (typeof vtCount === "number") {
-      if (vtCount < 0) {
-        return null; // No box if VT data is not available
-      }
-      return {
-        count: vtCount,
-        color: vtCount > 3 ? "volcano" : "green", // Red if > 3, green if 0-3
-      };
-    }
-    return null; // No box if VT data is not available
-  };
+  // Only show the nodes that are within the visibleNodeCount
+  const visibleNodeIds = sortedNodeIds.slice(0, visibleNodeCount);
 
   // Check if there are any highlights
   const hasHighlights = sortedNodeIds.length > 0;
@@ -91,7 +115,7 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
     setExpandedNodes(newExpandedNodes);
   };
 
-  const nodeList = sortedNodeIds.map((nodeId) => {
+  const nodeList = visibleNodeIds.map((nodeId) => {
     const isExpanded = expandedNodes.has(nodeId);
     const filename = filenameByNode[nodeId] || "No Filename";
     const insights = insightsByNode[nodeId] || [];
@@ -114,10 +138,14 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
           marginBottom: "8px",
           overflow: "hidden",
           cursor: "pointer",
+          background:
+          selectedNodeId === nodeId
+            ? `${antdColors.blue}10` 
+            : "none",
           borderRadius: "5px",
           border:
             selectedNodeId === nodeId
-              ? `1px solid ${antdColors.lightGray}`
+              ? `1px solid ${antdColors.blue}`
               : "none",
         }}
       >
@@ -252,21 +280,35 @@ const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
   return (
     <div>
       {hasHighlights ? (
-        nodeList
+        <>
+          {nodeList}
+          {visibleNodeCount < sortedNodeIds.length && (
+            <Text
+              onClick={loadMoreNodes}
+              style={{
+                cursor: "pointer",
+                fontWeight: "500",
+                color: "#1890ff",
+                marginLeft: "30px",
+                fontSize: "12px",
+              }}
+            >
+              ...and {sortedNodeIds.length - visibleNodeCount} more (show next{" "}
+              {Math.min(
+                LOAD_MORE_COUNT,
+                sortedNodeIds.length - visibleNodeCount
+              )}
+              )
+            </Text>
+          )}
+        </>
       ) : (
-        <div>
-          <Typography.Title
-            level={5}
-            style={{
-              color: antdColors.gray,
-              textAlign: "left",
-              margin: "0px",
-            }}
-          >
-            {" "}
-            No Highlights for this Submission
-          </Typography.Title>
-        </div>
+        <Typography.Title
+          level={5}
+          style={{ color: antdColors.gray, textAlign: "left", margin: "0px" }}
+        >
+          No Highlights for this Submission
+        </Typography.Title>
       )}
     </div>
   );

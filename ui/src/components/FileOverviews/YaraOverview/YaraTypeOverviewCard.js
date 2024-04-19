@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Tag, Tooltip, Typography, Row } from "antd";
 import { WarningOutlined, BookOutlined } from "@ant-design/icons";
-import { antdColors } from "../../utils/colors";
+import { antdColors } from "../../../utils/colors";
 
 const { Text } = Typography;
 
@@ -48,9 +48,14 @@ const YaraTypeOverviewCard = ({ data, onFileYaraSelect }) => {
     yaraMatches.forEach((match) => {
       if (yaraCounts[match]) {
         yaraCounts[match].count++;
-        yaraCounts[match].files.push(response.file.name || response.scan.hash.md5);
+        yaraCounts[match].files.push(
+          response.file.name || response.scan.hash.md5
+        );
       } else {
-        yaraCounts[match] = { count: 1, files: [response.file.name || response.scan.hash.md5] };
+        yaraCounts[match] = {
+          count: 1,
+          files: [response.file.name || response.scan.hash.md5],
+        };
       }
     });
   });
@@ -79,12 +84,17 @@ const YaraTypeOverviewCard = ({ data, onFileYaraSelect }) => {
             width: "95%",
             justifyContent: "space-between",
             alignItems: "center",
-            background: "none",
+            background:
+              selectedYara === item.yara
+                ? isSuspicious
+                  ? `${antdColors.deepOrange}20`
+                  : `${antdColors.blue}20`
+                : "none",
             cursor: "pointer",
             border:
               selectedYara === item.yara
                 ? `1px solid ${
-                    isSuspicious ? antdColors.deepOrange : antdColors.darkGray
+                    isSuspicious ? antdColors.deepOrange : antdColors.blue
                   }`
                 : "none",
           }}

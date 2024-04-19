@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Row, Col, Modal, Typography, List, Tag } from "antd";
-import "../../styles/OcrOverviewCard.css";
+import "../../../styles/OcrOverviewCard.css";
 
 const EmailOverviewCard = ({ data }) => {
-
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const { Text } = Typography;
@@ -49,7 +48,7 @@ const EmailOverviewCard = ({ data }) => {
     { title: "Sender", description: from || "No Sender", tag: "Informational" },
     {
       title: "Recipients",
-      description: to.map((name) => ({ name })) || [],
+      description: to?.map((name) => ({ name })) || "No Recipients",
       tag: "Informational",
     },
     {
@@ -62,8 +61,8 @@ const EmailOverviewCard = ({ data }) => {
       description: message_id || "No Message ID",
       tag: "Informational",
     },
-    // Conditionally add "Attachment Names" row only if filenames is not empty
-    ...(filenames.length > 0
+    // Check if filenames exist and is an array before trying to map over it
+    ...(Array.isArray(filenames) && filenames.length > 0
       ? [
           {
             title: "Attachment Names",
@@ -74,7 +73,8 @@ const EmailOverviewCard = ({ data }) => {
       : []),
     {
       title: "Domains in Header",
-      description: received_domain.map((domain) => ({ domain })) || [],
+      description:
+        received_domain.map((domain) => ({ domain })) || "No Domains",
       tag: "Informational",
     },
     { title: "Body", description: body || "No Body", tag: "Informational" },
