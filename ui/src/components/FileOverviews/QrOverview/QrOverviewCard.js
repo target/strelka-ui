@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Table, Typography } from "antd";
-import "../../styles/IocOverviewCard.css";
+import "../../../styles/IocOverviewCard.css";
 
 const { Text } = Typography;
 
