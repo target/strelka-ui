@@ -20,6 +20,9 @@ import {
   FileUnknownOutlined,
   ExperimentOutlined,
   CodeOutlined,
+  GlobalOutlined,
+  LinkOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
 import { antdColors } from "../utils/colors"
@@ -571,6 +574,30 @@ export const flowIconMappingTable = {
     "image/gif": {
       icon: FileGifOutlined,
       color: antdColors.amber,
+    },
+    "domain": {
+      icon: GlobalOutlined,
+      color: antdColors.blue,
+    },
+    "url": {
+      icon: LinkOutlined,
+      color: antdColors.geekblue,
+    },
+    "md5": {
+      icon: SafetyCertificateOutlined,
+      color: antdColors.violet,
+    },
+    "sha1": {
+      icon: SafetyCertificateOutlined,
+      color: antdColors.purple,
+    },
+    "sha256": {
+      icon: SafetyCertificateOutlined,
+      color: antdColors.indigo,
+    },
+    "ip": {
+      icon: NumberOutlined,
+      color: antdColors.orange,
     },
   },
 };

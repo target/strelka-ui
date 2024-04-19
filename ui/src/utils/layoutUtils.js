@@ -85,7 +85,7 @@ export function transformElasticSearchDataToElements(results) {
   let rootNodes = new Set();
   let nodeIdsToIndices = new Map();
   let qrDataPresent = false;
-
+  
   results.forEach((result) => {
     if (result.scan?.qr?.data){
       qrDataPresent = true
@@ -118,6 +118,7 @@ export function transformElasticSearchDataToElements(results) {
           nodeTlshData: nodeData.nodeTlshData,
           nodeMetricLabel: nodeData.nodeMetricLabel,
           nodeYaraList: nodeData.nodeYaraList,
+          nodeIocList: nodeData.nodeIocList,
           nodeParentId: nodeData.nodeParentId,
           nodeRelationshipId: nodeData.nodeRelationshipId,
           nodeAlert: false,
@@ -139,6 +140,7 @@ export function transformElasticSearchDataToElements(results) {
         });
       }
     });
+ 
 
   // Add Possible Relationship Edges
   nodes.forEach((node) => {

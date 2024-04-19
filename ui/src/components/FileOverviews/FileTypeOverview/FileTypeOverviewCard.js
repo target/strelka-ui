@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Tag, Tooltip, Typography, Space } from "antd";
-import { getIconConfig } from "../../utils/iconMappingTable";
-import { antdColors } from "../../utils/colors";
+import { getIconConfig } from "../../../utils/iconMappingTable";
+import { antdColors } from "../../../utils/colors";
 
 const { Text } = Typography;
 
@@ -60,11 +60,13 @@ const FileTypeOverviewCard = ({ data, onFileTypeSelect }) => {
               width: "100%",
               justifyContent: "space-between",
               alignItems: "center",
-              background: "none",
+              background: selectedFileType === item.mimeType
+              ? `${antdColors.blue}20`
+              : "none",
               cursor: "pointer",
               border:
                 selectedFileType === item.mimeType
-                  ? `1px solid ${bgColor}`
+                  ? `1px solid ${antdColors.blue}`
                   : "none",
             }}
           >

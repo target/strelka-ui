@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, Tag } from "antd";
-import { antdColors } from "../../utils/colors";
-import "../../styles/TlshOverviewCard.css";
+import { antdColors } from "../../../utils/colors";
+import "../../../styles/TlshOverviewCard.css";
 
 const { Text } = Typography;
 

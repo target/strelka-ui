@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Input, Table, Typography } from "antd";
-import "../../styles/IocOverviewCard.css";
+import "../../../styles/IocOverviewCard.css";
 
 const { Text } = Typography;
 
 const IocOverviewCard = ({ data }) => {
   const [filter, setFilter] = useState("");
+  const [pageSize, setPageSize] = useState(10); 
 
   const columns = [
     {
@@ -54,11 +55,16 @@ const IocOverviewCard = ({ data }) => {
       }));
   };
 
+  const handleTableChange = (pagination) => {
+    // Update pageSize when table pagination changes
+    setPageSize(pagination.pageSize);
+  };
+
+
   const filteredIocs = processIocData();
 
   return (
     <div>
-      {" "}
       <Input
         placeholder="Filter IOCs"
         onChange={(e) => setFilter(e.target.value)}
@@ -67,9 +73,10 @@ const IocOverviewCard = ({ data }) => {
       <Table
         columns={columns}
         dataSource={filteredIocs}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize, showSizeChanger: true }}
         scroll={{ y: 200 }}
         className="ioc-table"
+        onChange={handleTableChange}  // Handle pagination changes
       />
     </div>
   );
