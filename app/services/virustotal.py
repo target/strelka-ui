@@ -126,3 +126,36 @@ def download_vt_bytes(api_key: str, file_hash: str) -> BytesIO:
         error_msg = f"Error downloading file from VirusTotal: {response.text}"
         logging.error(error_msg)
         raise Exception(error_msg)
+
+
+def get_virustotal_widget_url(
+    api_key: str, resource: str, fg1: str, bg1: str, bg2: str, bd1: str
+) -> str:
+    """
+    Retrieves a URL for embedding the VirusTotal widget with customized theme colors.
+
+    Args:
+        api_key (str): The API key for accessing VirusTotal.
+        resource (str): The resource identifier (file hash, URL, IP, or domain).
+        fg1 (str): Theme primary foreground color in hex notation.
+        bg1 (str): Theme primary background color in hex notation.
+        bg2 (str): Theme secondary background color in hex notation.
+        bd1 (str): Theme border color.
+
+    Returns:
+        str: A URL for embedding the VirusTotal widget with the specified theme.
+    """
+    url = f"https://www.virustotal.com/api/v3/widget/url?query={resource}&fg1={fg1}&bg1={bg1}&bg2={bg2}&bd1={bd1}"
+    headers = {"x-apikey": api_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        widget_data = response.json()
+        return widget_data.get("data", {}).get("url", "")
+    except requests.HTTPError as http_err:
+        logging.error(f"HTTP error occurred: {http_err}")
+        raise
+    except Exception as err:
+        logging.error(f"An error occurred: {err}")
+        raise

@@ -1,6 +1,21 @@
-import { useState } from "react";
-import { Layout, Menu, message, Modal, Tag, Typography } from "antd";
-import { BarChartOutlined, KeyOutlined, CopyOutlined } from "@ant-design/icons";
+import { useState, useEffect } from 'react';
+import {
+  Layout,
+  Menu,
+  message,
+  Modal,
+  Tag,
+  Typography,
+  Tooltip,
+  Switch,
+} from "antd";
+import {
+  BarChartOutlined,
+  KeyOutlined,
+  CopyOutlined,
+  BulbOutlined,
+  BulbFilled,
+} from "@ant-design/icons";
 
 import { Link } from "react-router-dom";
 import { InternalRouter } from "../routes/InternalRouter";
@@ -16,6 +31,10 @@ const AppLayout = () => {
   const { logout } = useContext(AuthCtx);
   const [apiKey, setApiKey] = useState("");
   const [isKeyModalVisible, setIsKeyModalVisible] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode === 'true' ? true : false;
+  });
 
   const showKeyModal = () => {
     setIsKeyModalVisible(true);
@@ -34,6 +53,17 @@ const AppLayout = () => {
       message.error("Failed to copy API key to clipboard.");
     }
   };
+
+  useEffect(() => {
+    document.body.style.filter = darkMode ? 'invert(100%)' : 'none';
+  }, [darkMode]);
+
+  const toggleDarkMode = (checked) => {
+    setDarkMode(checked);
+    localStorage.setItem('darkMode', checked ? 'true' : 'false');
+    document.body.style.filter = checked ? "invert(100%)" : "none";
+  };
+
 
   const doLogout = () => {
     fetch(`${APP_CONFIG.BACKEND_URL}/auth/logout`, {
@@ -65,63 +95,79 @@ const AppLayout = () => {
 
   const menuItems = [
     {
-      key: 'home',
+      key: "home",
       label: (
-
-          <img
-            style={{ marginTop: '7px', paddingRight: '25px' }}
-            src="/logo192.png"
-            alt="Logo"
-            height="30px"
-          />
-
+        <img
+          style={{ marginTop: "7px", paddingRight: "25px" }}
+          src="/logo192.png"
+          alt="Logo"
+          height="30px"
+        />
       ),
     },
     {
-      key: 'dashboard',
+      key: "dashboard",
       icon: <BarChartOutlined />,
       label: <Link to="/">Dashboard</Link>,
     },
     {
-      key: 'key',
+      key: "key",
       icon: <KeyOutlined />,
-      label: <Link to="/" onClick={getApiKey}>Get API Key</Link>,
+      label: (
+        <Link to="/" onClick={getApiKey}>
+          Get API Key
+        </Link>
+      ),
     },
     {
-      key: 'logout',
+      key: "logout",
       label: <span onClick={doLogout}>Logout</span>,
     },
     {
-      key: 'system-status',
-      label: <SystemStatus />,
-      disabled: true,
-      style: { marginLeft: 'auto', background: 'none', cursor: 'pointer' },
+      key: "dark-mode-toggle",
+      label: (
+        <div>
+          <Tooltip title="Dark Mode (Beta)" placement="left">
+            <Switch
+              checkedChildren={<BulbOutlined />}
+              unCheckedChildren={<BulbFilled />}
+              onChange={toggleDarkMode}
+              checked={darkMode}
+            />
+          </Tooltip>
+        </div>
+      ),
+      style: { marginLeft: "auto", background: "none", cursor: "pointer" },
     },
     {
-      key: 'database-status',
+      key: "system-status",
+      label: <SystemStatus />,
+      disabled: true,
+      style: { background: "none", cursor: "pointer" },
+    },
+    {
+      key: "database-status",
       label: <DatabaseStatus />,
       disabled: true,
-      style: { background: 'none', cursor: 'pointer' },
+      style: { background: "none", cursor: "pointer" },
     },
+
   ];
 
   return (
     <Layout>
       <Menu
         theme="light"
+        mode="horizontal"
+        defaultSelectedKeys={["home"]}
+        items={menuItems}
         style={{
           boxShadow:
             "0px 4px 6px -1px rgba(0, 0, 0, 0.1),0px 2px 4px -1px rgba(0, 0, 0, 0.06)",
           paddingLeft: "50px",
           paddingRight: "50px",
         }}
-        mode="horizontal"
-        defaultSelectedKeys={["2"]}
-        items={menuItems}
-
-      >
-
-      </Menu>
+      />
 
       <Modal
         title="API Key"
