@@ -18,6 +18,7 @@ from services.virustotal import (
     get_virustotal_positives,
     create_vt_zip_and_download,
     download_vt_bytes,
+    get_virustotal_widget_url,
 )
 from services.insights import get_insights
 
@@ -729,6 +730,51 @@ def get_mime_type_stats(user: User) -> Tuple[Response, int]:
             stats[month.strftime("%Y-%m")][mime_type] += count
 
     return jsonify(stats), 200
+
+
+@strelka.route("/virustotal/widget-url", methods=["POST"])
+@auth_required
+def get_vt_widget_url(resource: str) -> Tuple[Response, int]:
+    """
+    Route to get a VirusTotal widget url with customized theme colors.
+
+    Returns:
+        A JSON response containing the VirusTotal widget url or an error message.
+    """
+    data = request.get_json()
+    if not data or "resource" not in data:
+        return jsonify({"error": "Resource identifier is required"}), 400
+
+    # Strelka UI Defaults
+    fg1 = data.get("fg1", "333333")  # Dark text color
+    bg1 = data.get("bg1", "FFFFFF")  # Light background color
+    bg2 = data.get("bg2", "F5F5F5")  # Slightly grey background for differentiation
+    bd1 = data.get("bd1", "E8E8E8")  # Light grey border color
+
+    api_key = os.getenv("VIRUSTOTAL_API_KEY")
+    if not api_key:
+        return jsonify({"error": "VirusTotal API key is not available."}), 500
+
+    try:
+        # Pass the theme colors to the function
+        widget_url = get_virustotal_widget_url(
+            api_key, data["resource"], fg1, bg1, bg2, bd1
+        )
+        return jsonify({"widget_url": widget_url}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@strelka.route("/check_vt_api_key", methods=["GET"])
+def check_vt_api_key():
+    """
+    Endpoint to check if the VirusTotal API key is available.
+
+    Returns:
+        A boolean response containing the VirusTotal widget url or an error message.
+    """
+    api_key_exists = bool(os.environ.get("VIRUSTOTAL_API_KEY"))
+    return jsonify({"apiKeyAvailable": api_key_exists}), 200
 
 
 def submissions_to_json(submission: FileSubmission) -> Dict[str, any]:
