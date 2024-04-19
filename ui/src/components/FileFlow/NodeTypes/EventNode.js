@@ -107,7 +107,7 @@ const ImageTooltip = styled(Tooltip)`
     align-items: center;
     justify-content: center;
     padding: 0 !important;
-    overflow: hidden;
+    overflow: hidden; 
   }
   .ant-tooltip-inner img {
     pointer-events: auto;

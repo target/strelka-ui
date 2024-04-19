@@ -85,8 +85,8 @@
 
 .tick-text {
   position: absolute;
-  bottom: -40px;
-  width: 120px;
+  bottom: -40px; 
+  width: 120px; 
   text-align: center;
   font-weight:600;
   font-size: 11px;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Checkbox, Typography, Row, Col } from "antd";
-import "../../styles/ExiftoolOverviewCard.css";
+import "../../../styles/ExiftoolOverviewCard.css";
 
 const { Text } = Typography;
 

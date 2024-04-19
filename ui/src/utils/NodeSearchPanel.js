@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Input } from 'antd';
-import { Panel, useStoreActions } from 'reactflow';
+import { Panel} from 'reactflow';
 
 const NodeSearchPanel = ({ onSearchChange }) => {
   return (

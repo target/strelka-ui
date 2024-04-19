@@ -13,15 +13,15 @@ import ReactFlow, {
   MiniMap,
   useReactFlow,
 } from "reactflow";
-import EventNode from "../FileFlow/NodeTypes/EventNode.js";
-import IndexConnectEdge from "../FileFlow/EdgeTypes/IndexConnectEdge.js";
+import EventNode from "./NodeTypes/EventNode.js";
+import IndexConnectEdge from "./EdgeTypes/IndexConnectEdge.js";
 import { initialNodes, initialEdges } from "../../data/initialData.js";
 import "reactflow/dist/style.css";
 import { getDagreLayout } from "../../utils/dagreLayout.js";
-import DownloadImage from "../../utils/downloadImage";
-import ShowFileListing from "../../utils/ShowFileListing";
-import NodeSearchPanel from "../../utils/NodeSearchPanel";
-import ClickGuide from "../../utils/ClickGuide";
+import DownloadImage from "../../utils/downloadImage.js";
+import ShowFileListing from "../../utils/ShowFileListing.js";
+import NodeSearchPanel from "../../utils/NodeSearchPanel.js";
+import ClickGuide from "../../utils/ClickGuide.js";
 import ExceededGuide from "../../utils/ExceededGuide.js";
 
 import {
@@ -50,6 +50,7 @@ const FileTreeCard = ({
   onNodeSelect,
   fileTypeFilter,
   fileYaraFilter,
+  fileIocFilter,
   fileNameFilter,
   selectedNodeData,
   setSelectedNodeData,
@@ -125,6 +126,13 @@ const FileTreeCard = ({
       );
     }
 
+    // Apply the ioc filter if it's set
+    if (fileIocFilter) {
+      nodesToFilter = nodesToFilter.filter((node) =>
+        node.data.nodeIocList?.includes(fileIocFilter)
+      );
+    }
+
     // If the search term is not empty, further filter the nodes
     if (searchTerm.trim()) {
       nodesToFilter = nodesToFilter.filter(
@@ -134,7 +142,7 @@ const FileTreeCard = ({
       );
     }
     return nodesToFilter;
-  }, [nodes, searchTerm, fileTypeFilter, fileYaraFilter, fileNameFilter]);
+  }, [nodes, searchTerm, fileTypeFilter, fileIocFilter, fileYaraFilter, fileNameFilter]);
 
   // Reset View when filters are applied
   useEffect(() => {
@@ -226,7 +234,7 @@ const FileTreeCard = ({
     <div
       style={{
         width: "100%",
-        height: "50vh",
+        height: "80vh",
         border: "5px solid rgba(0, 0, 0, 0.02)",
         borderRadius: "10px",
       }}
