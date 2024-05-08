@@ -61,8 +61,6 @@ class Config(object):
 
     # Formatted for ease of use with flask-sqlalchemy
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_DBNAME}"
-    logging.info(f"connecting to database with {SQLALCHEMY_DATABASE_URI}")
-
 
 class ProductionConfig(Config):
     UPLOAD_FOLDER = "/opt"
