@@ -11,7 +11,7 @@ Changes to the project will be tracked in this file via the date of change.
 - **Tooltips for Checkboxes**: Descriptive tooltips added for checkboxes.
 - **Human Readable Text Option**: Toggle view for `string_text` between human-readable form and array form.
 - **Background for Image**: Added a visual background stage for images.
-- 
+  
 ## 2024-03-29
 - Adding unencrypted VirusTotal submission support
 - Update dependency (Black)
