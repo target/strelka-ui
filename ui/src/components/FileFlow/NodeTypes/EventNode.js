@@ -1,9 +1,15 @@
 import { useState, memo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
+import {
+  CameraOutlined,
+  QrcodeOutlined,
+  LockOutlined,
+  UnlockOutlined,
+} from "@ant-design/icons";
 import { Tag, Tooltip } from "antd";
 import { Handle, Position } from "reactflow";
 import { getIconConfig } from "../../../utils/iconMappingTable";
+import { antdColors } from "../../../utils/colors";
 
 // Helper Functions
 function lightenHexColor(hexColor, factor) {
@@ -55,6 +61,40 @@ function getVirusTotalStatus(virusTotalResponse) {
 }
 
 // Styled Components
+const LockIndicatorWrapper = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid ${antdColors.red};
+  background: ${antdColors.lightRed};
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const UnlockIndicatorWrapper = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid ${antdColors.darkGreen};
+  background: ${antdColors.lightGreen};
+  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+`;
+
 const QrCodePreviewWrapper = styled.div`
   position: absolute;
   bottom: 10px;
@@ -160,18 +200,6 @@ const NodeWrapper = styled.div`
   align-items: center;
 `;
 
-const Arrow = styled.div`
-  width: 0;
-  height: 0;
-  border-top: 6px solid transparent;
-  border-bottom: 6px solid transparent;
-  border-left: 10px solid #aaa; /* Arrow color */
-  position: absolute;
-  left: -10px; /* Adjust as needed */
-  top: 50%;
-  transform: translateY(-50%);
-`;
-
 const LeftWrapper = styled.div`
   width: 44px;
   height: 44px;
@@ -213,7 +241,7 @@ const RightWrapper = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 450px;
+    max-width: 350px;
   }
   .node-label {
     color: #3d3a3b;
@@ -223,7 +251,7 @@ const RightWrapper = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 375px;
+    max-width: 350px;
   }
   .node-sub {
     color: ${({ $acColor }) => $acColor};
@@ -244,7 +272,7 @@ const RightWrapper = styled.div`
 
 const EventNode = memo(({ data, selected }) => {
   // Initialize isBlurred based on the presence of data.nodeQrData
-  const [isBlurred, setIsBlurred] = useState(!!data.nodeQrData);
+  const [isBlurred] = useState(!!data.nodeQrData);
 
   // Example of conditional styling for blur effect
   const previewStyle = isBlurred ? { filter: "blur(4px)" } : {};
@@ -253,16 +281,19 @@ const EventNode = memo(({ data, selected }) => {
     backgroundColor: "#aaa",
     width: 12,
     height: 12,
-    borderRadius: 12,
-    border: `1px solid bbb`,
+    borderRadius: "50%",
+    border: `1px solid #bbb`,
   };
 
-  const mappingEntry = getIconConfig("strelka", data.nodeMain.toLowerCase());
+  const mappingEntry = getIconConfig(
+    "strelka",
+    data.nodeMain[0]?.toLowerCase() || ""
+  );
   const IconComponent = mappingEntry?.icon;
   const color = mappingEntry?.color || data.color;
   const hasImage = Boolean(data.nodeImage);
   const virusTotalResponse = data.nodeVirustotal;
-  const tlshResponse = data.nodeTlshData.family;
+  const tlshResponse = data.nodeTlshData?.family;
 
   data.nodeAlert =
     typeof virusTotalResponse === "number" && virusTotalResponse > 5;
@@ -286,7 +317,6 @@ const EventNode = memo(({ data, selected }) => {
       )}
       {data.nodeDepth !== 0 && (
         <>
-          <Arrow />
           <Handle
             type="target"
             position={Position.Left}
@@ -303,12 +333,17 @@ const EventNode = memo(({ data, selected }) => {
         {IconComponent ? (
           <IconComponent style={{ color: "#ffffff", fontSize: "36px" }} />
         ) : (
-          <p>{data.nodeMain}</p>
+          <p>{data.nodeMain[0]}</p>
         )}
       </LeftWrapper>
       <RightWrapper $acColor={"#999094"}>
-        <p className="node-header">{data.nodeMain}</p>
-        <p className="node-label">{data.nodeLabel}</p>
+        <Tooltip title={data.nodeMain.join(", ")} placement="topLeft">
+          <p className="node-header">{data.nodeMain.join(", ")}</p>
+        </Tooltip>
+        <Tooltip title={data.nodeLabel} placement="topLeft">
+          <p className="node-label">{data.nodeLabel}</p>
+        </Tooltip>
+
         <p className="node-sub">{data.nodeSub}</p>
         <div className="node-groups">
           <Tag color="default">
@@ -345,6 +380,22 @@ const EventNode = memo(({ data, selected }) => {
           <b>{getVirusTotalStatus(data.nodeVirustotal)}</b>
         </Tag>
       </VirustotalWrapper>
+      {data.nodeDecryptionSuccess === false && (
+        <Tooltip title="Failed to decrypt files. Password not provided or could not be cracked.">
+          <LockIndicatorWrapper>
+            <LockOutlined style={{ color: antdColors.red, fontSize: "16px" }} />
+          </LockIndicatorWrapper>
+        </Tooltip>
+      )}
+      {data.nodeDecryptionSuccess === true && (
+        <Tooltip title="Successfully decrypted files.">
+          <UnlockIndicatorWrapper>
+            <UnlockOutlined
+              style={{ color: antdColors.darkGreen, fontSize: "16px" }}
+            />
+          </UnlockIndicatorWrapper>
+        </Tooltip>
+      )}
       {data.nodeQrData && (
         <Tooltip title="QR Code found">
           <QrCodePreviewWrapper hasImage={hasImage}>

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Checkbox, Input, Row, Col, Modal, Button, Tooltip } from "antd";
+import { Checkbox, Input, Row, Col, Modal, Button, Tooltip, Typography } from "antd";
 import "../../../styles/OcrOverviewCard.css";
+
+const { Text } = Typography;
 
 const OcrOverviewCard = ({ data }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -8,6 +10,7 @@ const OcrOverviewCard = ({ data }) => {
   const [trimText, setTrimText] = useState(true);
   const [filter, setFilter] = useState("");
   const [isBlurred, setIsBlurred] = useState(data.scan.qr ? true : false); // State to manage blur for QR codes
+  const [useHumanReadable, setUseHumanReadable] = useState(true); // State to toggle between text array and string_text
 
   const showModal = () => {
     // Only show modal if the image is not blurred
@@ -18,9 +21,11 @@ const OcrOverviewCard = ({ data }) => {
   const handleCancel = () => setIsModalVisible(false);
   const toggleBlur = () => setIsBlurred(!isBlurred);
 
-  let texts = Array.isArray(data.scan.ocr?.text)
-    ? data.scan.ocr.text
-    : [data.scan.ocr?.text || ""];
+  let texts = !useHumanReadable
+    ? Array.isArray(data.scan.ocr?.text)
+      ? data.scan.ocr.text
+      : [data.scan.ocr?.text || ""]
+    : [data.scan.ocr?.string_text || ""];
   const base64Thumbnail = data.scan.ocr?.base64_thumbnail;
 
   // Function to trim trailing whitespace or empty lines from a single line of text
@@ -47,11 +52,12 @@ const OcrOverviewCard = ({ data }) => {
   // Function to create line numbers and corresponding text
   const renderTextLines = (texts) => {
     let lineNumber = 1; // Initialize line number
+    const lowerCaseFilter = filter.toLowerCase(); // Convert filter to lower case
     return texts.flatMap((textContent) => {
       // Split each text block by new lines and filter based on the user's input
       const lines = textContent
         .split(/\r?\n/)
-        .filter((line) => !filter || line.includes(filter));
+        .filter((line) => !filter || line.toLowerCase().includes(lowerCaseFilter)); // Convert line to lower case
       // Map over each line and return a table row while incrementing the line number
       return lines.map((line) => (
         <tr key={lineNumber}>
@@ -63,35 +69,51 @@ const OcrOverviewCard = ({ data }) => {
       ));
     });
   };
+  
 
   return (
     <div className="ocr-overview">
       <Row gutter={[16, 16]}>
-        <Col span={17}>
+        <Col span={16}>
           <Input
             placeholder="Filter"
             onChange={(e) => setFilter(e.target.value)}
             style={{ width: "100%" }}
           />
         </Col>
-        <Col span={6}>
-          <Checkbox
-            checked={wrapText}
-            onChange={(e) => setWrapText(e.target.checked)}
-          >
-            Wrap
-          </Checkbox>
-          <Checkbox
-            checked={trimText}
-            onChange={(e) => setTrimText(e.target.checked)}
-          >
-            Trim
-          </Checkbox>
+        <Col span={8}>
+          {data.scan.ocr?.string_text && (
+            <Tooltip title="Toggle between human readable (original) text and text in an array">
+              <Checkbox
+                checked={useHumanReadable}
+                onChange={(e) => setUseHumanReadable(e.target.checked)}
+                style={{ marginLeft: "10px" }}
+              >
+                Original
+              </Checkbox>
+            </Tooltip>
+          )}
+          <Tooltip title="Toggle text wrapping">
+            <Checkbox
+              checked={wrapText}
+              onChange={(e) => setWrapText(e.target.checked)}
+            >
+              Wrap
+            </Checkbox>
+          </Tooltip>
+          <Tooltip title="Toggle trimming of trailing spaces">
+            <Checkbox
+              checked={trimText}
+              onChange={(e) => setTrimText(e.target.checked)}
+            >
+              Trim
+            </Checkbox>
+          </Tooltip>
         </Col>
       </Row>
       <Row>
         <Col
-          span={17}
+          span={16}
           className="text-container"
           style={{ overflowX: wrapText ? "hidden" : "scroll" }}
         >
@@ -99,7 +121,7 @@ const OcrOverviewCard = ({ data }) => {
             <tbody>{renderTextLines(texts)}</tbody>
           </table>
         </Col>
-        <Col span={5} className="thumbnail-container">
+        <Col span={7} className="thumbnail-container">
           {base64Thumbnail ? (
             <div className="thumbnail-wrapper">
               <img

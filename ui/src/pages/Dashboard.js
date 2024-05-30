@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import { Row, Col, Card, Input, Statistic, Typography, message } from "antd";
-import { CalendarOutlined, MessageOutlined } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  MessageOutlined,
+  LockOutlined,
+} from "@ant-design/icons";
 import PageWrapper from "../components/PageWrapper";
 import SubmissionTable from "../components/SubmissionTable";
 import VirusTotalUploader from "../components/VirusTotal/VirusTotalUploader";
@@ -9,8 +13,7 @@ import MimeTypeBarChart from "../components/Visualizations/MimeTypeBarChart";
 import Dropzone from "../components/Dropzone";
 import { APP_CONFIG } from "../config";
 import { fetchWithTimeout } from "../util";
-import useVirusTotalApiKey from '../utils/useVirusTotalApiKey';
-
+import useVirusTotalApiKey from "../utils/useVirusTotalApiKey";
 
 const { Title, Text } = Typography;
 
@@ -25,6 +28,8 @@ const DashboardPage = (props) => {
     "No Description Provided"
   );
 
+  const [filePassword, setFilePassword] = useState("");
+
   const [filesUploaded, setFilesUploaded] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
   const [stats, setStats] = useState({
@@ -36,6 +41,10 @@ const DashboardPage = (props) => {
 
   const setDescription = (event) => {
     setFileDescription(event.target.value);
+  };
+
+  const setPassword = (event) => {
+    setFilePassword(event.target.value);
   };
 
   const { isApiKeyAvailable } = useVirusTotalApiKey();
@@ -72,7 +81,7 @@ const DashboardPage = (props) => {
   const uploadProps = {
     name: "file",
     multiple: true,
-    data: { description: fileDescription },
+    data: { description: fileDescription, password: filePassword },
     withCredentials: true,
     action: `${APP_CONFIG.BACKEND_URL}/strelka/upload`,
     onChange(info) {
@@ -190,18 +199,26 @@ const DashboardPage = (props) => {
               <Title style={{ marginTop: "0", paddingTop: "0" }} level={3}>
                 Upload File
               </Title>
-              <Text type="secondary">
-                Drop a file below to upload to Strelka.
-              </Text>
+              <div style={{ paddingBottom: 12 }}>
+                <Text type="secondary">
+                  Drop a file below to upload to Strelka.
+                </Text>
+              </div>
             </Typography>
-            <br />
-            <Input
-              onChange={setDescription}
-              placeholder="Description to be saved with submission..."
-              prefix={<MessageOutlined />}
-            />
-            <br />
-            <br />
+            <div style={{ paddingBottom: 12 }}>
+              <Input
+                onChange={setDescription}
+                placeholder="(Optional) Description to be saved with submission..."
+                prefix={<MessageOutlined />}
+              />
+            </div>
+            <div style={{ paddingBottom: 12 }}>
+              <Input
+                onChange={setPassword}
+                placeholder="(Optional) Password to extract encrypted sample..."
+                prefix={<LockOutlined />}
+              />
+            </div>
             <Dropzone {...uploadProps} />
           </Card>
         </Col>

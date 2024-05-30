@@ -1,6 +1,3 @@
-// -------------------------
-// Imports
-// -------------------------
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -23,15 +20,12 @@ import ShowFileListing from "../../utils/ShowFileListing.js";
 import NodeSearchPanel from "../../utils/NodeSearchPanel.js";
 import ClickGuide from "../../utils/ClickGuide.js";
 import ExceededGuide from "../../utils/ExceededGuide.js";
-
 import {
   toggleChildrenVisibility,
   transformElasticSearchDataToElements,
 } from "../../utils/layoutUtils.js";
+import { antdColors } from "../../utils/colors";
 
-// -------------------------
-// Node & Edge Definitions
-// -------------------------
 const nodeTypes = {
   event: EventNode,
 };
@@ -39,11 +33,9 @@ const nodeTypes = {
 const edgeTypes = {
   indexedge: IndexConnectEdge,
 };
+
 const snapGrid = [16, 16];
 
-// -------------------------
-// Main Component
-// -------------------------
 const FileTreeCard = ({
   data,
   alertId,
@@ -55,9 +47,6 @@ const FileTreeCard = ({
   selectedNodeData,
   setSelectedNodeData,
 }) => {
-  // -------------------------
-  // State Definitions
-  // -------------------------
   const [searchTerm, setSearchTerm] = useState("");
   const { fitView } = useReactFlow();
 
@@ -73,11 +62,9 @@ const FileTreeCard = ({
   const [showExceededGuide, setShowExceededGuide] = useState(false);
   const ref = useRef(null);
 
-  // -------------------------
-  // Callbacks
-  // -------------------------
+  const [highlightedEdge, setHighlightedEdge] = useState(null);
+  const [highlightedNode, setHighlightedNode] = useState(null);
 
-  // Handler for updating showVtExceededGuide based on data
   useEffect(() => {
     const vtExceeded = data.some((item) => {
       return item?.enrichment?.virustotal === -3;
@@ -85,12 +72,10 @@ const FileTreeCard = ({
     setShowExceededGuide(vtExceeded);
   }, [data]);
 
-  // Handler to use the setSearchTerm / search filter
   const onSearchChange = (search) => {
     setSearchTerm(search);
   };
 
-  // Handler to update nodes when they change.
   const onNodesChange = useCallback(
     (changes) => {
       setNodes((currentNodes) => applyNodeChanges(changes, currentNodes));
@@ -98,7 +83,6 @@ const FileTreeCard = ({
     [setNodes]
   );
 
-  // Handler to update edges when they change.
   const onEdgesChange = useCallback(
     (changes) => {
       setEdges((currentEdges) => applyEdgeChanges(changes, currentEdges));
@@ -107,33 +91,27 @@ const FileTreeCard = ({
   );
 
   const filteredNodes = useMemo(() => {
-    // Start with all nodes or nodes that match the file type filter
     let nodesToFilter = fileTypeFilter
       ? nodes.filter((node) => node.data.nodeMain.includes(fileTypeFilter))
       : nodes;
 
-    // Apply the file name filter if it's set
     if (fileNameFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
         node.data.nodeRelationshipId?.includes(fileNameFilter)
       );
     }
-
-    // Apply the yara filter if it's set
     if (fileYaraFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
         node.data.nodeYaraList?.includes(fileYaraFilter)
       );
     }
 
-    // Apply the ioc filter if it's set
     if (fileIocFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
         node.data.nodeIocList?.includes(fileIocFilter)
       );
     }
 
-    // If the search term is not empty, further filter the nodes
     if (searchTerm.trim()) {
       nodesToFilter = nodesToFilter.filter(
         (node) =>
@@ -142,28 +120,29 @@ const FileTreeCard = ({
       );
     }
     return nodesToFilter;
-  }, [nodes, searchTerm, fileTypeFilter, fileIocFilter, fileYaraFilter, fileNameFilter]);
+  }, [
+    nodes,
+    searchTerm,
+    fileTypeFilter,
+    fileIocFilter,
+    fileYaraFilter,
+    fileNameFilter,
+  ]);
 
-  // Reset View when filters are applied
   useEffect(() => {
     fitView({ padding: 0.2 });
   }, [fileTypeFilter, fileYaraFilter, fileNameFilter, fitView]);
 
-  // Handler for when a node is clicked.
   const handleNodeClick = (event, node) => {
     if (node.type === "index") {
-      // Gather all nodes of type 'index'. This type I'm using as a "root" node for now.
       const rootNodeIds = nodes
         .filter((n) => n.type === "index")
         .map((n) => n.id);
 
-      // Gather all edges related to the clicked node.
       const relatedEdges = edges.filter((edge) => edge.source === node.id);
 
-      // Identify the nodes connected to the clicked node through the edges.
       const relatedNodes = relatedEdges.map((edge) => edge.target);
 
-      // Determine if the first related node is hidden.
       const firstRelatedNode = nodes.find((n) => n.id === relatedNodes[0]);
       const shouldBeHidden = firstRelatedNode && !firstRelatedNode.hidden;
 
@@ -171,7 +150,6 @@ const FileTreeCard = ({
       let updatedEdges = [...edges];
       const rootNodeIdsSet = new Set(rootNodeIds);
 
-      // Update visibility of the edges connected to the clicked node.
       updatedEdges = updatedEdges.map((edge) => {
         if (edge.source === node.id && !rootNodeIdsSet.has(edge.target)) {
           return { ...edge, hidden: shouldBeHidden };
@@ -179,7 +157,6 @@ const FileTreeCard = ({
         return edge;
       });
 
-      // Update visibility for nodes related to the clicked node.
       relatedNodes.forEach((relatedNodeId) => {
         const result = toggleChildrenVisibility(
           relatedNodeId,
@@ -195,41 +172,66 @@ const FileTreeCard = ({
       setNodes(updatedNodes);
       setEdges(updatedEdges);
     } else {
-      // If node type is not 'index', display node data in a modal.
       setSelectedNodeData(node.data);
       onNodeSelect(node.data.record);
     }
   };
 
-  // Effect to layout nodes and edges based on the API data.
+  const handleNodeMouseEnter = useCallback(
+    (event, node) => {
+      const relatedEdge = edges.find((edge) => edge.target === node.id);
+      if (relatedEdge) {
+        setHighlightedEdge(relatedEdge.id);
+        setHighlightedNode(node.id);
+      }
+    },
+    [edges]
+  );
+
+  const handleNodeMouseLeave = useCallback(() => {
+    setHighlightedEdge(null);
+    setHighlightedNode(null);
+  }, []);
+
+  const highlightedEdges = edges.map((edge) => {
+    const isHighlighted = edge.id === highlightedEdge;
+    return {
+      ...edge,
+      style: {
+        ...edge.style,
+        stroke: isHighlighted ? antdColors.darkGray : antdColors.lightGray,
+        strokeWidth: isHighlighted ? 2 : 2,
+      },
+      data: { ...edge.data, isHighlighted },
+    };
+  });
+
+  const highlightedNodes = filteredNodes.map((node) => {
+    if (node.id === highlightedNode) {
+      return {
+        ...node,
+        style: {
+          ...node.style,
+          boxShadow: "0 0 10px 3px rgba(1,1,0,0.5)",
+        },
+      };
+    }
+    return node;
+  });
+
   useEffect(() => {
-    // Transform the raw API data to nodes and edges.
     const { nodes: transformedNodes, edges: transformedEdges } =
       transformElasticSearchDataToElements(data, alertId);
 
-    // Separate nodes and edges for layout.
     const nodesToLayout = transformedNodes.filter(isNode);
     const edgesToLayout = transformedEdges.filter((el) => !isNode(el));
 
-    // Apply a layout algorithm (e.g., Dagre) to position nodes and edges.
     const layoutedData = getDagreLayout(nodesToLayout, edgesToLayout);
 
-    // Find the first node and store its index
-    // const firstNode = layoutedData.find(isNode);
-
-    // Update state with the positioned nodes and edges and select the first node
     setNodes(layoutedData.filter(isNode));
     setEdges(layoutedData.filter((el) => !isNode(el)));
-
-    // // Select the first node by calling handleNodeClick
-    // if (firstNode) {
-    //   handleNodeClick(null, firstNode);
-    // }
   }, [alertId, data, setEdges, setNodes]);
 
-  // -------------------------
-  // Render
-  // -------------------------
   return (
     <div
       style={{
@@ -241,11 +243,13 @@ const FileTreeCard = ({
     >
       <ReactFlow
         ref={ref}
-        nodes={filteredNodes}
-        edges={edges}
+        nodes={highlightedNodes}
+        edges={highlightedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
+        onNodeMouseEnter={handleNodeMouseEnter}
+        onNodeMouseLeave={handleNodeMouseLeave}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         snapToGrid={true}

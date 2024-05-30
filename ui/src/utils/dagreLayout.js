@@ -9,7 +9,7 @@ const getDagreLayout = (nodes, edges) => {
   graph.setDefaultEdgeLabel(() => ({}));
 
   nodes.forEach((node) => {
-    graph.setNode(node.id, { width: 550, height: 100 });
+    graph.setNode(node.id, { width: 650, height: 100 });
   });
 
   edges.forEach((edge) => {
@@ -28,8 +28,8 @@ const positionedNodes = nodes.map(node => {
 
 // Sort nodes by `nodeMain` after layout (this is the mimetype so we can group like files)
 positionedNodes.sort((a, b) => {
-  const aValue = a.data?.nodeMain || '';
-  const bValue = b.data?.nodeMain || '';
+  const aValue = a.data?.nodeMain[0] || '';
+  const bValue = b.data?.nodeMain[0] || '';
   return aValue.localeCompare(bValue);
 });
 

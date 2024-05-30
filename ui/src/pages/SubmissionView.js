@@ -32,6 +32,11 @@ import JavascriptOverviewLanding from "../components/FileOverviews/JavascriptOve
 import ExiftoolOverviewLanding from "../components/FileOverviews/ExiftoolOverview/ExiftoolOverviewLanding";
 import PeOverviewLanding from "../components/FileOverviews/PeOverview/PeOverviewLanding";
 import JsonViewLanding from "../components/FileOverviews/JsonView/JsonViewLanding";
+import ZipOverviewLanding from "../components/FileOverviews/ZipOverview/ZipOverviewLanding";
+import SevenZipOverviewLanding from "../components/FileOverviews/SevenZipOverview/SevenZipOverviewLanding";
+import EncryptedZipOverviewLanding from "../components/FileOverviews/EncryptedZipOverview/EncryptedZipOverviewLanding";
+import RarOverviewLanding from "../components/FileOverviews/RarOverview/RarOverviewLanding";
+
 
 import FileTreeCardWithProvider from "../components/FileFlow/FileTreeCardWithProvider";
 
@@ -312,6 +317,30 @@ const SubmissionsPage = (props) => {
 
           {/* Component Card - File IOCs */}
           <FileIocsLanding
+            selectedNodeData={selectedNodeData}
+            expandAll={expandAll}
+          />
+
+          {/* Component Card - Zip */}
+          <ZipOverviewLanding
+            selectedNodeData={selectedNodeData}
+            expandAll={expandAll}
+          />
+
+          {/* Component Card - SevenZip */}
+          <SevenZipOverviewLanding
+            selectedNodeData={selectedNodeData}
+            expandAll={expandAll}
+          />
+
+          {/* Component Card - Rar */}
+            <RarOverviewLanding
+            selectedNodeData={selectedNodeData}
+            expandAll={expandAll}
+          />
+
+          {/* Component Card - EncryptedZip */}
+          <EncryptedZipOverviewLanding
             selectedNodeData={selectedNodeData}
             expandAll={expandAll}
           />

@@ -1,6 +1,7 @@
 #!/bin/sh
-export FLASK_APP=/app/app.py
+cd /app/strelka_ui || exit
+export FLASK_APP=strelka_ui.__main__:create_app
 flask db init
 flask db migrate
 flask db upgrade
-python app.py
+poetry run python -m strelka_ui

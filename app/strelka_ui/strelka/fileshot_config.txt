@@ -1,0 +1,6 @@
+#This file contains regex matching for the files you want to submit to strelka from stingray. 
+#Always start with a wildcard (since we don't know what archive it'll come from) and seperate by newlines
+.*report\/function.*strings.*.txt
+.*memory_dumps\/.*
+.*additional\/.*.pcap
+.*extracted_files\/.*

@@ -13,15 +13,20 @@
   margin-right: 15px;
 }
 
-/* Container for thumbnails */
-.thumbnail-container {
-  text-align: center; /* Centers the thumbnail if it's smaller than the container */
+.thumbnail-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Light grey background */
+  border: 1px solid #d9d9d9; /* Border to indicate preview */
+  padding: 10px; /* Padding around the image */
+  border-radius: 4px; /* Rounded corners */
 }
 
-/* Wrapper for Thumbnails */
-.thumbnail-wrapper {
-  position: relative;
-  text-align: center; 
+.thumbnail-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Make sure the image fits within the container */
 }
 
 /* Button CSS for Thumbnail Blur */
@@ -64,7 +69,7 @@
 /* Thumbnail image styles */
 .thumbnail-container img {
   width: auto;
-  max-height: 200px;
+  max-height: 178px;
   border: 1px solid #ddd; /* Optional: adds a border around the thumbnail */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
 }

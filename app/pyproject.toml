@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "strelka-ui"
-version = "0.1.0"
+version = "2.43"
 description = "Strelka's File Submission Portal"
 authors = [
     "Paul Hutelmyer <Paul.Hutelmyer@Target.com>",
@@ -46,6 +46,7 @@ Pyrsistent = "0.18.0"
 python = "^3.8"
 Python-Dotenv = "0.17.1"
 Python-Dateutil = "2.8.1"
+rarfile = "^4.2"
 Requests = "2.31.0"
 Six = "1.16.0"
 SQLAlchemy = "1.4.15"
@@ -57,7 +58,8 @@ Urllib3 = "1.26.18"
 Waitress = "2.1.2"
 Wrapt = "1.13.3"
 vt-py = "0.18.0"
-
+py7zr = "^0.21.0"
+python-magic = "^0.4.27"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 
 const GenericLogo = () => {
+  const [darkMode] = useState(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode === 'true' ? true : false;
+  });
+
+  const imageStyle = darkMode ? { filter: 'invert(100%) hue-rotate(180deg)' } : {};
+
+
   return (
     <svg
       version="1.1"
@@ -17,6 +25,7 @@ const GenericLogo = () => {
         height="129"
         x="0"
         y="0"
+        style={imageStyle}
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIEAAACBCAYAAADnoNlQAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
         AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAA
         CXBIWXMAAAsSAAALEgHS3X78AAAd0klEQVR42u19eXRb133m9xZsBAiA4E5wF0mRWmnZlko7jmn3

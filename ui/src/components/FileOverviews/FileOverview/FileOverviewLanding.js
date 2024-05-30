@@ -20,7 +20,6 @@ const FileOverviewLanding = ({
     <Collapse
       style={{ width: "100%", marginBottom: "10px" }}
       defaultActiveKey={["1"]}
-      activeKey={["1"]}
     >
       <Panel
         header={

@@ -4,7 +4,7 @@ from typing import Optional
 from os import getenv
 
 # Environment variables for configuration
-api_base = getenv("STRELKA_API_BASE", "http://localhost:8081/api/strelka")
+api_base = getenv("STRELKA_API_BASE", "http://localhost:8080/api/strelka")
 api_key = getenv("STRELKA_API_KEY", "")
 
 # Define headers
@@ -13,6 +13,7 @@ headers = {
     "Content-Type": "application/json",
     "Accept": "application/json",
 }
+
 
 # Helper function to handle requests
 def make_request(method: str, url: str, **kwargs) -> Optional[str]:
@@ -39,7 +40,7 @@ def get_scan_by_id(scan_id: str) -> Optional[str]:
 def upload_file(filename: str, description: str) -> Optional[str]:
     with open(filename, "rb") as f:
         files = {"file": (filename, f)}
-        data = {"description": description}
+        data = {"description": description, "password": ""}
         return make_request("POST", f"{api_base}/upload", files=files, data=data)
 
 
