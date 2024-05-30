@@ -1,6 +1,17 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2024-05-30
+- **Improved Project Structure**: Strelka UI backend now runs as a package.
+- **Enhanced Metadata**: Structured client metadata added to Strelka events.
+- **Encryption Status Indicators**: Added icons and tooltips for decryption success/failure in `seven_zip`, `rar`, and `encrypted_zip` scanners.
+- **Mimetype/YARA Accuracy**: Refactored handling to show all mimetypes and YARA hits.
+- **Edge Styling Enhancements**: Conditional edge styling and interactive highlights.
+- **Scan Source Edge Addition**: Added source scan information for parent-child relationships.
+- **Tooltips for Checkboxes**: Descriptive tooltips added for checkboxes.
+- **Human Readable Text Option**: Toggle view for `string_text` between human-readable form and array form.
+- **Background for Image**: Added a visual background stage for images.
+- 
 ## 2024-03-29
 - Adding unencrypted VirusTotal submission support
 - Update dependency (Black)
