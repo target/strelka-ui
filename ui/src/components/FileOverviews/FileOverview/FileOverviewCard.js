@@ -6,11 +6,10 @@ import useVirusTotalApiKey from '../../../utils/useVirusTotalApiKey';
 
 const { Text } = Typography;
 
-const VirusTotalInfoContent = styled.div`
-  cursor: pointer;
+const VirusTotalInfoContent = styled(({ isclickable, ...props }) => <div {...props} />)`
   display: flex;
   align-items: center;
-  cursor: ${({ isClickable }) => (isClickable ? "pointer" : "default")};
+  cursor: ${({ isclickable }) => (isclickable ? "pointer" : "default")};
 `;
 
 const VirusTotalTag = styled(Tag)`
@@ -132,7 +131,7 @@ const FileOverviewCard = ({ data, onOpenVT }) => {
           <Text style={{ fontSize: "12px" }}>
             {typeof virustotalData !== "undefined" && virustotalData > -1 && (
               <InfoRow onClick={handleVirusTotalClick}>
-                <VirusTotalInfoContent isClickable={isApiKeyAvailable}>
+                <VirusTotalInfoContent isclickable={isApiKeyAvailable}>
                   <img
                     src="/virustotal.png"
                     alt="VirusTotal"
@@ -150,7 +149,7 @@ const FileOverviewCard = ({ data, onOpenVT }) => {
             )}
             {(typeof virustotalData == "undefined" || virustotalData < 0) && (
               <InfoRow onClick={handleVirusTotalClick}>
-                <VirusTotalInfoContent isClickable={isApiKeyAvailable}>
+                <VirusTotalInfoContent isclickable={isApiKeyAvailable}>
                   <img
                     src="/virustotal.png"
                     alt="VirusTotal"

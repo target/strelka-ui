@@ -36,7 +36,7 @@ export const indexDataType = (index, data) => {
     nodeIocs: 0,
     nodeImage: "",
     nodeDisposition: "",
-    nodeMain: "",
+    nodeMain: [],
     nodeSub: "",
     nodeTlsh: "",
     nodeLabel: "",
@@ -45,10 +45,11 @@ export const indexDataType = (index, data) => {
     nodeMetric: "",
     nodeParentId: "",
     nodeRelationshipId: "",
+    nodeDecryptionSuccess: null,
   };
   switch (index) {
     case "strelka":
-
+      
       // Check if QR data exists and add to nodeData
       let qrData = "";
       if (data.scan?.qr?.data) {
@@ -60,7 +61,10 @@ export const indexDataType = (index, data) => {
       if (data.scan?.tlsh?.match) {
         tlshData = data.scan.tlsh.match;
       }
-      
+
+      // Check decryption status
+      const decryptionSuccess = checkEncryptionStatus(data);
+
       // Extracting the base64_thumbnail from _any_ scanner, if present
       let base64Thumbnail = "";
       if (data["scan"]) {
@@ -72,14 +76,17 @@ export const indexDataType = (index, data) => {
         }
       }
 
+      // Collect mimetypes and yara hits into nodeMain
+      const mimetypes = data["file"]?.["flavors"]?.["mime"] || [];
+      const yaraHits = data["file"]?.["flavors"]?.["yara"] || [];
+      const nodeMain = [...mimetypes, ...yaraHits];
+
       // Get File IOC Matches
       const iocList = data?.iocs?.map(ioc => ioc.ioc) || [];
 
       Object.assign(nodeData, {
         nodeDepth: data["file"]["depth"],
-        nodeMain:
-          data["file"]["flavors"]["yara"]?.[0] ||
-          data["file"]["flavors"]["mime"]?.[0],
+        nodeMain: nodeMain,
         nodeSub: `${data["file"]["size"]} Bytes`,
         nodeLabel: data["file"]["name"] || "No Filename",
         nodeYaraList: data["scan"]?.["yara"]?.["matches"] || "",
@@ -96,7 +103,8 @@ export const indexDataType = (index, data) => {
         nodeInsights: data?.insights?.length,
         nodeIocs: data?.iocs?.length,
         nodeImage: base64Thumbnail,
-        nodeQrData: qrData
+        nodeQrData: qrData,
+        nodeDecryptionSuccess: decryptionSuccess,
       });
       break;
 
@@ -122,4 +130,33 @@ export const indexNodeType = (index) => {
     default:
       return "event";
   }
+};
+
+export const checkEncryptionStatus = (data) => {
+  const scans = ['encrypted_zip', 'seven_zip', 'rar', "zip"];
+  let decryptionFailed = false;
+  let decryptionSuccessful = false;
+
+  for (const scan of scans) {
+    if (data.scan?.[scan]) {
+      const extracted = data.scan[scan]?.total?.extracted;
+      const flags = data.scan[scan]?.flags || [];
+
+      const timedOut = flags.includes('timed_out');
+
+      if ((extracted === 0 || timedOut) && extracted !== undefined) {
+        decryptionFailed = true; // Mark decryption as failed if any scan type shows failure
+      } else if (extracted > 0 && !timedOut) {
+        decryptionSuccessful = true; // Mark decryption as successful if any scan type shows success
+      }
+    }
+  }
+
+  if (decryptionSuccessful) {
+    return true; // Overall decryption is successful if any scan shows success
+  } else if (decryptionFailed) {
+    return false; // Overall decryption is failed if any scan shows failure
+  }
+
+  return null; // No relevant data found
 };
