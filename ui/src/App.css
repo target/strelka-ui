@@ -11,6 +11,11 @@ body {
   text-align: center;
 }
 
+html, body {
+  overflow-y: auto !important;
+  width: 100% !important;
+}
+
 /* Header Styles */
 .App-header {
   background-color: #f5f5f5;
