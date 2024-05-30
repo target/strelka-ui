@@ -13,8 +13,8 @@ import {
   BarChartOutlined,
   KeyOutlined,
   CopyOutlined,
-  BulbOutlined,
-  BulbFilled,
+  MoonOutlined,
+  MoonFilled,
 } from "@ant-design/icons";
 
 import { Link } from "react-router-dom";
@@ -55,13 +55,23 @@ const AppLayout = () => {
   };
 
   useEffect(() => {
-    document.body.style.filter = darkMode ? 'invert(100%)' : 'none';
-  }, [darkMode]);
+    const applyDarkMode = (darkMode) => {
+        const bodyStyle = darkMode ? "invert(80%) hue-rotate(180deg)" : "none";
+        document.body.style.filter = bodyStyle;
+
+        // Applying filter style to <img> elements
+        document.querySelectorAll('img').forEach(img => {
+            img.style.filter = darkMode ? "invert(100%) hue-rotate(180deg)" : "none";
+        });
+    };
+
+    applyDarkMode(darkMode);
+}, [darkMode]);
 
   const toggleDarkMode = (checked) => {
     setDarkMode(checked);
     localStorage.setItem('darkMode', checked ? 'true' : 'false');
-    document.body.style.filter = checked ? "invert(100%)" : "none";
+    document.body.style.filter = checked ? "invert(80%) hue-rotate(180deg)" : "none";
   };
 
 
@@ -129,8 +139,8 @@ const AppLayout = () => {
         <div>
           <Tooltip title="Dark Mode (Beta)" placement="left">
             <Switch
-              checkedChildren={<BulbOutlined />}
-              unCheckedChildren={<BulbFilled />}
+              checkedChildren={<MoonOutlined />}
+              unCheckedChildren={<MoonFilled />}
               onChange={toggleDarkMode}
               checked={darkMode}
             />
@@ -228,7 +238,7 @@ with open(filename, "rb") as f:
     file_data = f.read()
 
 files = [("file", (filename, file_data))]
-data = {"description": description}
+data = {"description": description, "password": ""}
 
 response = requests.post(url_base + url_route, files=files, data=data, headers=headers)
 
