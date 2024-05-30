@@ -2,19 +2,14 @@ import { getIconConfig } from "./iconMappingTable";
 import { indexDataType, indexNodeType } from "./indexDataUtils";
 
 // Recursive function to count all descendants of a node under the same INDEX
-function countDescendants(
-  nodeId,
-  nodeIndex,
-  nodes,
-  edges
-) {
+function countDescendants(nodeId, nodeIndex, nodes, edges) {
   const childEdges = edges.filter((edge) => edge.source === nodeId);
   let total = 0;
 
   childEdges.forEach((edge) => {
     const childNode = nodes.find((n) => n.id === edge.target);
     if (childNode && childNode.data.nodeIndex === nodeIndex) {
-      total++; 
+      total++;
       total += countDescendants(childNode.id, nodeIndex, nodes, edges);
     }
   });
@@ -34,9 +29,7 @@ export const toggleChildrenVisibility = (
   }
   processedNodes.add(currentNodeId);
 
-  const currentNode = nodesList.find(
-    (node) => node.id === currentNodeId
-  );
+  const currentNode = nodesList.find((node) => node.id === currentNodeId);
   if (currentNode.type === "index") {
     return { nodesList, edgesList }; // stop recursion down this branch
   }
@@ -44,9 +37,7 @@ export const toggleChildrenVisibility = (
   const childrenEdges = edgesList.filter(
     (edge) => edge.source === currentNodeId
   );
-  const childrenNodes = childrenEdges.map(
-    (edge) => edge.target
-  );
+  const childrenNodes = childrenEdges.map((edge) => edge.target);
 
   nodesList = nodesList.map((node) => {
     if (node.id === currentNodeId && node.type !== "index") {
@@ -55,14 +46,12 @@ export const toggleChildrenVisibility = (
     return node;
   });
 
-  edgesList = edgesList.map(
-    (edge) => {
-      if (childrenEdges.some((e) => e.id === edge.id)) {
-        return { ...edge, hidden: shouldBeHidden };
-      }
-      return edge;
+  edgesList = edgesList.map((edge) => {
+    if (childrenEdges.some((e) => e.id === edge.id)) {
+      return { ...edge, hidden: shouldBeHidden };
     }
-  );
+    return edge;
+  });
 
   childrenNodes.forEach((childNodeId) => {
     const results = toggleChildrenVisibility(
@@ -85,62 +74,64 @@ export function transformElasticSearchDataToElements(results) {
   let rootNodes = new Set();
   let nodeIdsToIndices = new Map();
   let qrDataPresent = false;
-  
+
   results.forEach((result) => {
-    if (result.scan?.qr?.data){
-      qrDataPresent = true
+    if (result.scan?.qr?.data) {
+      qrDataPresent = true;
     }
-  })
+  });
 
-    results.forEach((result) => {
-      result.index = "strelka"
-      const nodeData = indexDataType(result.index, result);
-      const nodeType = indexNodeType(result.index)
+  results.forEach((result) => {
+    result.index = "strelka";
+    const nodeData = indexDataType(result.index, result);
+    const nodeType = indexNodeType(result.index);
 
-      // Add node ID and its corresponding index-ID to the map
-      nodes.push({
-        id: `${result.index}-${result.file.tree.node}`,
-        data: {
-          record: result,
-          label: result.file.tree.node,
-          color: getIconConfig('strelka', nodeData.nodeMain.toLowerCase()).color,
-          nodeIndex: result.index,
-          nodeDepth: nodeData.nodeDepth,
-          nodeVirustotal: nodeData.nodeVirustotal,
-          nodeInsights: nodeData.nodeInsights,
-          nodeIocs: nodeData.nodeIocs,
-          nodeImage: nodeData.nodeImage,
-          nodeQrData: qrDataPresent || nodeData.nodeQrData,
-          nodeMain: nodeData.nodeMain,
-          nodeSub: nodeData.nodeSub,
-          nodeLabel: nodeData.nodeLabel,
-          nodeMetric: nodeData.nodeMetric,
-          nodeTlshData: nodeData.nodeTlshData,
-          nodeMetricLabel: nodeData.nodeMetricLabel,
-          nodeYaraList: nodeData.nodeYaraList,
-          nodeIocList: nodeData.nodeIocList,
-          nodeParentId: nodeData.nodeParentId,
-          nodeRelationshipId: nodeData.nodeRelationshipId,
-          nodeAlert: false,
-          nodeDatatype: nodeData.nodeDatatype,
-          nodeDisposition: nodeData.nodeDisposition
-        },
-        position: { x: -100, y: 100 },
-        type: nodeType,
-      });
-
-      nodeIdsToIndices.set(result.file.tree.node, nodeData.nodeRelationshipId);
-
-      if (nodeData.nodeParentId === undefined) {
-        edges.push({
-          id: `${result.index}-root-${result.index}-${result.file.tree.node}`,
-          source: `${result.index}-root`,
-          target: `${result.index}-${result.file.tree.node}`,
-          sourceHandle: "root",
-        });
-      }
+    // Add node ID and its corresponding index-ID to the map
+    nodes.push({
+      id: `${result.index}-${result.file.tree.node}`,
+      data: {
+        record: result,
+        label: result.file.tree.node,
+        color: getIconConfig("strelka", nodeData.nodeMain[0].toLowerCase()).color,
+        nodeIndex: result.index,
+        nodeDepth: nodeData.nodeDepth,
+        nodeVirustotal: nodeData.nodeVirustotal,
+        nodeInsights: nodeData.nodeInsights,
+        nodeIocs: nodeData.nodeIocs,
+        nodeImage: nodeData.nodeImage,
+        nodeQrData: qrDataPresent || nodeData.nodeQrData,
+        nodeDecryptionSuccess: nodeData.nodeDecryptionSuccess,
+        nodeMain: nodeData.nodeMain,
+        nodeSub: nodeData.nodeSub,
+        nodeLabel: nodeData.nodeLabel,
+        nodeMetric: nodeData.nodeMetric,
+        nodeTlshData: nodeData.nodeTlshData,
+        nodeMetricLabel: nodeData.nodeMetricLabel,
+        nodeYaraList: nodeData.nodeYaraList,
+        nodeIocList: nodeData.nodeIocList,
+        nodeParentId: nodeData.nodeParentId,
+        nodeRelationshipId: nodeData.nodeRelationshipId,
+        nodeAlert: false,
+        nodeDatatype: nodeData.nodeDatatype,
+        nodeDisposition: nodeData.nodeDisposition,
+        nodeSource: result.file.source,
+      },
+      position: { x: -100, y: 100 },
+      type: nodeType,
     });
- 
+
+    nodeIdsToIndices.set(result.file.tree.node, nodeData.nodeRelationshipId);
+
+    if (nodeData.nodeParentId === undefined) {
+      edges.push({
+        id: `${result.index}-root-${result.index}-${result.file.tree.node}`,
+        source: `${result.index}-root`,
+        target: `${result.index}-${result.file.tree.node}`,
+        sourceHandle: "root",
+        type: "sourceedge",
+      });
+    }
+  });
 
   // Add Possible Relationship Edges
   nodes.forEach((node) => {
@@ -149,14 +140,16 @@ export function transformElasticSearchDataToElements(results) {
     const keyForNodeParentId = Array.from(nodeIdsToIndices.entries()).find(
       ([_, value]) => value === nodeParentId
     )?.[0];
-
+    
     if (keyForNodeParentId) {
       edges.push({
         id: `${keyForNodeParentId}-${node.id}`,
         source: `${nodeIndex}-${keyForNodeParentId}`,
         target: node.id,
-
+        animated: false,
         sourceHandle: "relationship",
+        type: "indexedge",
+        label: `${node.data.nodeSource}`
       });
     }
   });
