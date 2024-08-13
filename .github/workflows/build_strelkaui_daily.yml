@@ -9,4 +9,4 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Builds Strelka UI
-        run: docker-compose build
+        run: docker compose build
