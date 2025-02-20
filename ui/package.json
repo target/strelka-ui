@@ -4,12 +4,12 @@
   "private": true,
   "homepage": "/",
   "dependencies": {
+    "@ant-design/icons": "^5.3.6",
     "@ant-design/pro-form": "^2.25.1",
     "@ant-design/pro-layout": "^7.19.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^13.5.0",
-    "@ant-design/icons": "^5.3.6",
     "ansi-regex": "^6.0.1",
     "antd": "^5.16.1",
     "browserslist": "^4.20.4",
