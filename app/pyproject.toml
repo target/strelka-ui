@@ -5,6 +5,7 @@ description = "Strelka's File Submission Portal"
 authors = [
     "Paul Hutelmyer <Paul.Hutelmyer@Target.com>",
 ]
+package-mode = false
 
 [tool.poetry.dependencies]
 Alembic = "1.6.2"

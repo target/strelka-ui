@@ -12,4 +12,5 @@ git log -p <file>
 - Derek Thomas (@Derekt2)
 - Erin Mozdy (@ecmozdy)
 - Caleb Walch (@cawalch)
-- Kurt Rotzler 
+- Kurt Rotzler
+- Sara Kalupa (@skalupa)

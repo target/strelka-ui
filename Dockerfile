@@ -51,7 +51,7 @@ WORKDIR /app
 COPY ./app/pyproject.toml ./app/poetry.lock ./
 
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-dev && \
+    poetry install --no-root && \
     rm -rf /root/.cache/pypoetry
 
 # Copy the other project files
