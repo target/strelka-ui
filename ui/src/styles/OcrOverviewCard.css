@@ -32,7 +32,7 @@
 /* Button CSS for Thumbnail Blur */
 .centered-button {
   position: absolute;
-  top: 50%; 
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -101,7 +101,7 @@
 
 /* Text for empty thumbnail */
 .thumbnail-placeholder::after {
-  content: 'No Thumbnail';
+  content: "No Thumbnail";
   font-weight: bold;
   color: #ccc;
   position: absolute;

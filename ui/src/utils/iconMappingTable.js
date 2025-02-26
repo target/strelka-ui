@@ -1,617 +1,617 @@
 import {
-  FileTextOutlined,
-  Html5Outlined,
-  PictureOutlined,
-  FilePdfOutlined,
-  PlaySquareOutlined,
-  FileZipOutlined,
-  FileExcelOutlined,
-  NumberOutlined,
-  TableOutlined,
-  DatabaseOutlined,
   CalculatorOutlined,
-  LockOutlined,
-  FileOutlined,
-  FileWordOutlined,
-  FileImageOutlined,
-  FileGifOutlined,
-  FileMarkdownOutlined,
-  MailOutlined,
-  FileUnknownOutlined,
-  ExperimentOutlined,
   CodeOutlined,
+  DatabaseOutlined,
+  ExperimentOutlined,
+  FileExcelOutlined,
+  FileGifOutlined,
+  FileImageOutlined,
+  FileMarkdownOutlined,
+  FileOutlined,
+  FilePdfOutlined,
+  FileTextOutlined,
+  FileUnknownOutlined,
+  FileWordOutlined,
+  FileZipOutlined,
   GlobalOutlined,
+  Html5Outlined,
   LinkOutlined,
+  LockOutlined,
+  MailOutlined,
+  NumberOutlined,
+  PictureOutlined,
+  PlaySquareOutlined,
   SafetyCertificateOutlined,
-} from "@ant-design/icons";
+  TableOutlined,
+} from '@ant-design/icons'
 
-import { antdColors } from "../utils/colors"
+import { antdColors } from '../utils/colors'
 
 export const flowIconMappingTable = {
   strelka: {
     // -----------
     // YARA Types
     // -----------
-    "archive": {
+    archive: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "audio": {
+    audio: {
       icon: PlaySquareOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "capture": {
+    capture: {
       icon: DatabaseOutlined,
-      color: antdColors.geekblue
+      color: antdColors.geekblue,
     },
-    "certificate": {
+    certificate: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "compressed": {
+    compressed: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "document": {
+    document: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "email": {
+    email: {
       icon: MailOutlined,
-      color: antdColors.indigo
+      color: antdColors.indigo,
     },
-    "encoded": {
+    encoded: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "executable": {
+    executable: {
       icon: PlaySquareOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "image": {
+    image: {
       icon: PictureOutlined,
-      color: antdColors.amber
+      color: antdColors.amber,
     },
-    "metadata": {
+    metadata: {
       icon: TableOutlined,
-      color: antdColors.lime
+      color: antdColors.lime,
     },
-    "multimedia": {
+    multimedia: {
       icon: PlaySquareOutlined,
-      color: antdColors.purple
+      color: antdColors.purple,
     },
-    "package": {
+    package: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "script": {
+    script: {
       icon: CodeOutlined,
-      color: antdColors.teal
+      color: antdColors.teal,
     },
-    "text": {
+    text: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "video": {
+    video: {
       icon: PlaySquareOutlined,
-      color: antdColors.magenta
+      color: antdColors.magenta,
     },
-    "PII": {
+    PII: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "7zip_file": {
+    '7zip_file': {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "arj_file": {
+    arj_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "cab_file": {
+    cab_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "cpio_file": {
+    cpio_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "dmg_disk_image": {
+    dmg_disk_image: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "dmg_encrypted_disk_image": {
+    dmg_encrypted_disk_image: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "encrypted_zip": {
+    encrypted_zip: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "encrypted_word_document": {
+    encrypted_word_document: {
       icon: FileWordOutlined,
-      color: antdColors.geekblue
+      color: antdColors.geekblue,
     },
-    "hfsplus_disk_image": {
+    hfsplus_disk_image: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "iso_file": {
+    iso_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "mhtml_file": {
+    mhtml_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "rar_file": {
+    rar_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "tar_file": {
+    tar_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "udf_file": {
+    udf_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "vhd_file": {
+    vhd_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "vhdx_file": {
+    vhdx_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "xar_file": {
+    xar_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "zip_file": {
+    zip_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "mp3_file": {
+    mp3_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "pcap_file": {
+    pcap_file: {
       icon: DatabaseOutlined,
-      color: antdColors.geekblue
+      color: antdColors.geekblue,
     },
-    "pcapng_file": {
+    pcapng_file: {
       icon: DatabaseOutlined,
-      color: antdColors.geekblue
+      color: antdColors.geekblue,
     },
-    "pkcs7_file": {
+    pkcs7_file: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "x509_der_file": {
+    x509_der_file: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "x509_pem_file": {
+    x509_pem_file: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "bzip2_file": {
+    bzip2_file: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "gzip_file": {
+    gzip_file: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "lzma_file": {
+    lzma_file: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "xz_file": {
+    xz_file: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "zlib_file": {
+    zlib_file: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "doc_subheader_file": {
+    doc_subheader_file: {
       icon: FileWordOutlined,
-      color: antdColors.geekblue
+      color: antdColors.geekblue,
     },
-    "excel4_file": {
+    excel4_file: {
       icon: FileExcelOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "iqy_file": {
+    iqy_file: {
       icon: FileExcelOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "onenote_file": {
+    onenote_file: {
       icon: FileWordOutlined,
-      color: antdColors.purple
+      color: antdColors.purple,
     },
-    "mso_file": {
+    mso_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "olecf_file": {
+    olecf_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "ooxml_file": {
+    ooxml_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "pdf_file": {
+    pdf_file: {
       icon: FilePdfOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "poi_hpbf_file": {
+    poi_hpbf_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "rtf_file": {
+    rtf_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "vbframe_file": {
+    vbframe_file: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "wordml_file": {
+    wordml_file: {
       icon: FileWordOutlined,
-      color: antdColors.geekblue
+      color: antdColors.geekblue,
     },
-    "xfdf_file": {
+    xfdf_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "email_file": {
+    email_file: {
       icon: MailOutlined,
-      color: antdColors.indigo
+      color: antdColors.indigo,
     },
-    "tnef_file": {
+    tnef_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "base64_pe": {
+    base64_pe: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "pgp_file": {
+    pgp_file: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "elf_file": {
+    elf_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "lnk_file": {
+    lnk_file: {
       icon: FileOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "macho_file": {
+    macho_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "mz_file": {
+    mz_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "bmp_file": {
+    bmp_file: {
       icon: PictureOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "cmap_file": {
+    cmap_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "gif_file": {
+    gif_file: {
       icon: FileGifOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "jpeg_file": {
+    jpeg_file: {
       icon: PictureOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "postscript_file": {
+    postscript_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "png_file": {
+    png_file: {
       icon: PictureOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "psd_file": {
+    psd_file: {
       icon: FileImageOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "psd_image_file": {
+    psd_image_file: {
       icon: FileImageOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "svg_file": {
+    svg_file: {
       icon: FileImageOutlined,
-      color: antdColors.green
+      color: antdColors.green,
     },
-    "xicc_file": {
+    xicc_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "xmp_file": {
+    xmp_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "jar_manifest_file": {
+    jar_manifest_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "bplist_file": {
+    bplist_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "fws_file": {
+    fws_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.purple
+      color: antdColors.purple,
     },
-    "cws_file": {
+    cws_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.purple
+      color: antdColors.purple,
     },
-    "zws_file": {
+    zws_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.purple
+      color: antdColors.purple,
     },
-    "debian_package_file": {
+    debian_package_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "rpm_file": {
+    rpm_file: {
       icon: FileZipOutlined,
-      color: antdColors.gold
+      color: antdColors.gold,
     },
-    "hacktool_win_shellcode_donut": {
+    hacktool_win_shellcode_donut: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "upx_file": {
+    upx_file: {
       icon: FileZipOutlined,
-      color: antdColors.orange
+      color: antdColors.orange,
     },
-    "batch_file": {
+    batch_file: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "javascript_file": {
+    javascript_file: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "vb_file": {
+    vb_file: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "hta_file": {
+    hta_file: {
       icon: CodeOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "html_file": {
+    html_file: {
       icon: Html5Outlined,
-      color: antdColors.purple
+      color: antdColors.purple,
     },
-    "ini_file": {
+    ini_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "json_file": {
+    json_file: {
       icon: FileOutlined,
-      color: antdColors.indigo
+      color: antdColors.indigo,
     },
-    "php_file": {
+    php_file: {
       icon: CodeOutlined,
-      color: antdColors.deepOrange
+      color: antdColors.deepOrange,
     },
-    "plist_file": {
+    plist_file: {
       icon: FileTextOutlined,
-      color: antdColors.darkGray
+      color: antdColors.darkGray,
     },
-    "soap_file": {
+    soap_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "xml_file": {
+    xml_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
-    "avi_file": {
+    avi_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "wmv_file": {
+    wmv_file: {
       icon: PlaySquareOutlined,
-      color: antdColors.red
+      color: antdColors.red,
     },
-    "credit_cards": {
+    credit_cards: {
       icon: LockOutlined,
-      color: antdColors.cyan
+      color: antdColors.cyan,
     },
-    "vsto_file": {
+    vsto_file: {
       icon: FileTextOutlined,
-      color: antdColors.blue
+      color: antdColors.blue,
     },
     // -----------
     // Mime Types (Overridden by YARA Type, if exists)
     // -----------
-    "application/octet-stream": {
+    'application/octet-stream': {
       icon: NumberOutlined,
       color: antdColors.brown,
     },
-    "text/plain": {
+    'text/plain': {
       icon: FileTextOutlined,
       color: antdColors.gray,
     },
-    "text/html": {
+    'text/html': {
       icon: Html5Outlined,
       color: antdColors.purple,
     },
-    "text/csv": {
+    'text/csv': {
       icon: TableOutlined,
       color: antdColors.lime,
     },
-    "image/png": {
+    'image/png': {
       icon: PictureOutlined,
       color: antdColors.blue,
     },
-    "image/jpeg": {
+    'image/jpeg': {
       icon: PictureOutlined,
       color: antdColors.blue,
     },
-    "application/pdf": {
+    'application/pdf': {
       icon: FilePdfOutlined,
       color: antdColors.red,
     },
-    "text/xml": {
+    'text/xml': {
       icon: FileTextOutlined,
       color: antdColors.orange,
     },
-    "application/x-executable": {
+    'application/x-executable': {
       icon: PlaySquareOutlined,
       color: antdColors.red,
     },
-    "application/zip": {
+    'application/zip': {
       icon: FileZipOutlined,
       color: antdColors.gold,
     },
-    "application/vnd.ms-excel": {
+    'application/vnd.ms-excel': {
       icon: FileExcelOutlined,
       color: antdColors.green,
     },
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
       icon: FileExcelOutlined,
       color: antdColors.green,
     },
-    "application/msword": {
+    'application/msword': {
       icon: FileWordOutlined,
       color: antdColors.geekblue,
     },
-    "application/x-dosexec": {
+    'application/x-dosexec': {
       icon: PlaySquareOutlined,
       color: antdColors.red,
     },
-    "application/x-dbt": {
+    'application/x-dbt': {
       icon: DatabaseOutlined,
       color: antdColors.purple,
     },
-    "application/encrypted": {
+    'application/encrypted': {
       icon: LockOutlined,
       color: antdColors.cyan,
     },
-    "application/x-matlab-data": {
+    'application/x-matlab-data': {
       icon: CalculatorOutlined,
       color: antdColors.yellow,
     },
-    "application/x-pnf": {
+    'application/x-pnf': {
       icon: FileOutlined,
       color: antdColors.gold,
     },
-    "application/x-empty": {
+    'application/x-empty': {
       icon: FileUnknownOutlined,
       color: antdColors.gray,
     },
-    "application/cdfv2": {
+    'application/cdfv2': {
       icon: FileTextOutlined,
       color: antdColors.gray,
     },
-    "application/gzip": {
+    'application/gzip': {
       icon: FileZipOutlined,
       color: antdColors.gold,
     },
-    "image/svg+xml": {
+    'image/svg+xml': {
       icon: FileImageOutlined,
       color: antdColors.green,
     },
-    "message/rfc822": {
+    'message/rfc822': {
       icon: MailOutlined,
       color: antdColors.blue,
     },
-    "text/rtf": {
+    'text/rtf': {
       icon: FileWordOutlined,
       color: antdColors.green,
     },
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
       icon: FileWordOutlined,
       color: antdColors.green,
     },
-    "application/x-wine-extension-ini": {
+    'application/x-wine-extension-ini': {
       icon: ExperimentOutlined,
       color: antdColors.magenta,
     },
-    "application/x-setupscript": {
+    'application/x-setupscript': {
       icon: CodeOutlined,
       color: antdColors.cyan,
     },
-    "text/css": {
+    'text/css': {
       icon: CodeOutlined,
       color: antdColors.teal,
     },
-    "application/json": {
+    'application/json': {
       icon: FileOutlined,
       color: antdColors.indigo,
     },
-    "application/xml": {
+    'application/xml': {
       icon: FileOutlined,
       color: antdColors.deepPurple,
     },
-    "application/javascript": {
+    'application/javascript': {
       icon: CodeOutlined,
       color: antdColors.deepOrange,
     },
-    "text/markdown": {
+    'text/markdown': {
       icon: FileMarkdownOutlined,
       color: antdColors.limeGreen,
     },
-    "image/gif": {
+    'image/gif': {
       icon: FileGifOutlined,
       color: antdColors.amber,
     },
-    "domain": {
+    domain: {
       icon: GlobalOutlined,
       color: antdColors.blue,
     },
-    "url": {
+    url: {
       icon: LinkOutlined,
       color: antdColors.geekblue,
     },
-    "md5": {
+    md5: {
       icon: SafetyCertificateOutlined,
       color: antdColors.violet,
     },
-    "sha1": {
+    sha1: {
       icon: SafetyCertificateOutlined,
       color: antdColors.purple,
     },
-    "sha256": {
+    sha256: {
       icon: SafetyCertificateOutlined,
       color: antdColors.indigo,
     },
-    "ip": {
+    ip: {
       icon: NumberOutlined,
       color: antdColors.orange,
     },
   },
-};
+}
 
 // Default icon and color
 const defaultIconConfig = {
   icon: FileTextOutlined,
   color: antdColors.darkGray,
-};
+}
 
 // Function to get icon configuration
 export const getIconConfig = (category, type) => {
-  if (flowIconMappingTable[category] && flowIconMappingTable[category][type]) {
-    return flowIconMappingTable[category][type];
+  if (flowIconMappingTable[category]?.[type]) {
+    return flowIconMappingTable[category][type]
   }
-  return defaultIconConfig;
-};
+  return defaultIconConfig
+}

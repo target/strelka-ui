@@ -14,3 +14,4 @@ git log -p <file>
 - Caleb Walch (@cawalch)
 - Kurt Rotzler
 - Sara Kalupa (@skalupa)
+- Dan Flettre (@flet)

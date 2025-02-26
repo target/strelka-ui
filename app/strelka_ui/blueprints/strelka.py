@@ -8,12 +8,16 @@ from typing import Dict, Tuple, Union
 
 from flask import Blueprint, jsonify, request, session, Response
 from sqlalchemy import or_, desc, asc, func, case, cast, String
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, defer
 
 from strelka_ui.database import db
 from strelka_ui.models import FileSubmission, User
 from strelka_ui.services.auth import auth_required
-from strelka_ui.services.files import decrypt_file, check_file_size, convert_bytesio_to_filestorage
+from strelka_ui.services.files import (
+    decrypt_file,
+    check_file_size,
+    convert_bytesio_to_filestorage,
+)
 from strelka_ui.services.strelka import get_db_status, get_frontend_status, submit_data
 from strelka_ui.services.virustotal import (
     get_virustotal_positives,
@@ -21,6 +25,8 @@ from strelka_ui.services.virustotal import (
     get_virustotal_widget_url,
 )
 from strelka_ui.services.insights import get_insights
+
+# pylint: disable=no-member
 
 strelka = Blueprint("strelka", __name__, url_prefix="/strelka")
 
@@ -47,7 +53,6 @@ MIMETYPE_PRIORITY = {
     "text/x-python": 3,
     "text/html": 4,  # Web files
     "application/xhtml+xml": 4,
-    "application/xml": 4,
     "text/xml": 4,
     "text/css": 4,
     "application/pdf": 5,  # Documents
@@ -289,10 +294,6 @@ def submit_to_strelka(
                 415,
             )
 
-        # If the Strelka submission was successful, save the analysis results to the database.
-        # Get the submitted file object from the analysis results.
-        submitted_file = response[0]
-
         def get_mimetype_priority(mime_list):
             # Return the highest priority of the mimetypes in the list
             return min(MIMETYPE_PRIORITY.get(mime, 9999) for mime in mime_list)
@@ -337,52 +338,19 @@ def submit_to_strelka(
 
         # Get Strelka Submission IoCs
         # Store a set of IoCs in IoCs field
-        try:
-            iocs = set()
-            for scanned_file in response:
-                if "iocs" in scanned_file:
-                    for ioc in scanned_file["iocs"]:
-                        iocs.add(ioc["ioc"])
-                else:
-                    pass
-        except Exception as e:
-            logging.warning(f"Could not process Insights search with error: {e} ")
 
-        # Get Strelka Submission Insights
-        # Store a set of insights in Insights field
-        # Store a set of insights at the file level
-        try:
-            insights = set()
-            for index, scanned_file in enumerate(response):
-                file_insights = get_insights(scanned_file)
-                if file_insights:
-                    response[index]["insights"] = list(file_insights)
-                    insights.update(file_insights)
-                else:
-                    pass
-        except Exception as e:
-            logging.warning(f"Could not process Insights search with error: {e} ")
 
         # Create a new submission object and add it to the database.
         new_submission = FileSubmission(
-            get_request_id(submitted_file),
             file.filename,
             file_size,
             response,
-            get_mimetypes(response),
-            get_yara_hits(response),
-            len(response),
-            get_scanners_run(response),
-            get_hashes(submitted_file),
-            list(insights),
-            list(iocs),
             submitted_type,
             request.remote_addr,
             request.headers.get("User-Agent"),
             user.id,
             submitted_description,
-            submitted_at,
-            get_request_time(submitted_file),
+            submitted_at
         )
 
         db.session.add(new_submission)
@@ -400,8 +368,8 @@ def submit_to_strelka(
                     "file_id": str(new_submission.file_id),
                     "response": response,
                     "meta": {
-                        "file_size": int(file_size),
-                        "iocs": list(iocs),
+                        "file_size": new_submission.file_size,
+                        "iocs": new_submission.iocs,
                         "vt_positives": list(total_scanned_with_hits),
                     },
                 }
@@ -421,23 +389,6 @@ def submit_to_strelka(
         )
 
 
-def get_request_id(response: dict) -> str:
-    """
-    Get the ID of the request from the Strelka response.
-
-    Args:
-        response (dict): The response from Strelka.
-
-    Returns:
-        str: The ID of the request if it exists, otherwise an empty string.
-    """
-    return (
-        response["request"]["id"]
-        if "request" in response and "id" in response["request"]
-        else ""
-    )
-
-
 def get_request_time(response: dict) -> str:
     """
     Get the time of the request from the Strelka response.
@@ -453,84 +404,6 @@ def get_request_time(response: dict) -> str:
         if "request" in response and "time" in response["request"]
         else ""
     )
-
-
-def get_mimetypes(response: list) -> list:
-    """
-    Get a list of unique MIME types found in the Strelka response.
-
-    Args:
-        response (list): The response from Strelka.
-
-    Returns:
-        list: A list of unique MIME types.
-    """
-    mimetypes = set()
-
-    for r in response:
-        for mimetype in r["file"]["flavors"]["mime"]:
-            mimetypes.add(mimetype)
-    return list(mimetypes)
-
-
-def get_scanners_run(response: list) -> list:
-    """
-    Get a list of scanners that were run on the file in the Strelka response.
-
-    Args:
-        response (list): The response from Strelka.
-
-    Returns:
-        list: A list of scanner names.
-    """
-    scanners = set()
-
-    for r in response:
-        scanners.update(r["file"]["scanners"])
-    return list(scanners)
-
-
-def get_yara_hits(response: list) -> list:
-    """
-    Get a list of unique YARA rules that matched the file in the Strelka response.
-
-    Args:
-        response (list): The response from Strelka.
-
-    Returns:
-        list: A list of YARA rule names.
-    """
-    yarahits = set()
-
-    for r in response:
-        matches = r.get("scan", {}).get("yara", {}).get("matches")
-
-        if not isinstance(matches, list):
-            continue
-
-        for yarahit in matches:
-            yarahits.add(yarahit)
-    return list(yarahits)
-
-
-def get_hashes(response: dict) -> list:
-    """
-    Get a dictionary of hashes and their values from the Strelka response.
-
-    Args:
-        response (dict): The response from Strelka.
-
-    Returns:
-        list: A list of (hash_type, hash_value) tuples.
-    """
-    hashes = (
-        response["scan"]["hash"].copy()
-        if "scan" in response and "hash" in response["scan"]
-        else {}
-    )
-    del hashes["elapsed"]
-    return hashes.items()
-
 
 @strelka.route("/scans/stats")
 @auth_required
@@ -653,7 +526,7 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
     )
 
     # Build the base query with a join to the User table
-    base_query = FileSubmission.query.join(User).options(
+    base_query = FileSubmission.query.options(defer("strelka_response")).join(User).options(
         joinedload(FileSubmission.user)
     )
 
@@ -744,7 +617,7 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
         base_query = base_query.order_by(sort_expression)
 
     # Execute the paginated query
-    submissions = base_query.paginate(page, per_page)
+    submissions = base_query.paginate(page=page, per_page=per_page)
 
     # Convert submission objects to JSON
     paginated_ui = {

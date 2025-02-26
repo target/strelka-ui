@@ -1,0 +1,5 @@
+ui/node_modules
+.git
+Dockerfile.*
+Dockerfile
+app/.venv

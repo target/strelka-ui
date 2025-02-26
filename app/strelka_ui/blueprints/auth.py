@@ -1,6 +1,7 @@
 """
 Authentication controller
 """
+
 from datetime import datetime, timedelta
 from random import choice
 from string import ascii_letters, digits
@@ -57,8 +58,17 @@ def logout():
 @auth.route("/login", methods=["POST"])
 def login():
     """Login handler to authenticate and create user session"""
-    username = request.form.get("username")
-    password = request.form.get("password")
+    mimetype = request.headers.get("Content-Type")
+
+    if mimetype.startswith("application/x-www-form-urlencoded"):
+        username = request.form.get("username")
+        password = request.form.get("password")
+    elif mimetype.startswith("application/json"):
+        data = request.get_json()
+        username = data.get("username")
+        password = data.get("password")
+    else:
+        return (jsonify({"error": "Invalid content type"}), 400)
 
     try:
         validate(

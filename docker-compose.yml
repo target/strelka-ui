@@ -1,13 +1,14 @@
-version: '3.8'
-
 services:
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        REACT_APP_BACKEND_URL: /api
+    develop:
+      watch:
+        - action: rebuild
+          path: ./app/strelka_ui
+        - action: rebuild
+          path: ./ui/src
     container_name: strelka-ui-webapp
     ports:
       - "8080:8080"
@@ -18,12 +19,15 @@ services:
       DATABASE_NAME: strelka_ui
       DATABASE_PASSWORD: postgres
       DATABASE_USERNAME: postgres
-      STRELKA_HOST: strelka_frontend_1
-    networks:
-      - build_net
+      STRELKA_CERT: /certs/strelka_cert.crt
+      CA_CERT_PATH: /tgt-ca-bundle.crt
+      ENV: dev
+    env_file: ./app/strelka_ui/.env
+    volumes:
+      - ./certs:/certs
 
   postgresdb:
-    image: docker.io/bitnami/postgresql:11
+    image: hub.docker.target.com/bitnami/postgresql:17
     container_name: strelka-ui-postgresdb
     environment:
       POSTGRESQL_DATABASE: strelka_ui
@@ -32,13 +36,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - data:/bitnami/postgresql
-    networks:
-      - build_net
+      - data17:/bitnami/postgresql
 
 volumes:
-  data:
+  data17:
 
-networks:
-  build_net:
-    external: true

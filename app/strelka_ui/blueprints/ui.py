@@ -30,3 +30,19 @@ def serve(path: str) -> Any:
         return send_from_directory(static_folder, path)
     else:
         return send_from_directory(static_folder, "index.html")
+
+
+@ui.route("/health", methods=["GET"])
+def health_check():
+    """
+    Health check
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    None
+    """
+    return "Hello"

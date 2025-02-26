@@ -1,90 +1,90 @@
-import { getIconConfig } from "./iconMappingTable";
-import { indexDataType, indexNodeType } from "./indexDataUtils";
+import { getIconConfig } from './iconMappingTable'
+import { indexDataType, indexNodeType } from './indexDataUtils'
 
 // Recursive function to count all descendants of a node under the same INDEX
 function countDescendants(nodeId, nodeIndex, nodes, edges) {
-  const childEdges = edges.filter((edge) => edge.source === nodeId);
-  let total = 0;
+  const childEdges = edges.filter((edge) => edge.source === nodeId)
+  let total = 0
 
-  childEdges.forEach((edge) => {
-    const childNode = nodes.find((n) => n.id === edge.target);
+  for (const edge of childEdges) {
+    const childNode = nodes.find((n) => n.id === edge.target)
     if (childNode && childNode.data.nodeIndex === nodeIndex) {
-      total++;
-      total += countDescendants(childNode.id, nodeIndex, nodes, edges);
+      total++
+      total += countDescendants(childNode.id, nodeIndex, nodes, edges)
     }
-  });
+  }
 
-  return total;
+  return total
 }
 
 export const toggleChildrenVisibility = (
   currentNodeId,
-  nodesList,
-  edgesList,
+  _nodesList,
+  _edgesList,
   shouldBeHidden,
-  processedNodes
+  processedNodes,
 ) => {
   if (processedNodes.has(currentNodeId)) {
-    return { nodesList, edgesList };
+    return { nodesList: _nodesList, edgesList: _edgesList }
   }
-  processedNodes.add(currentNodeId);
+  processedNodes.add(currentNodeId)
 
-  const currentNode = nodesList.find((node) => node.id === currentNodeId);
-  if (currentNode.type === "index") {
-    return { nodesList, edgesList }; // stop recursion down this branch
+  const currentNode = _nodesList.find((node) => node.id === currentNodeId)
+  if (currentNode.type === 'index') {
+    return { nodesList: _nodesList, edgesList: _edgesList } // stop recursion down this branch
   }
 
-  const childrenEdges = edgesList.filter(
-    (edge) => edge.source === currentNodeId
-  );
-  const childrenNodes = childrenEdges.map((edge) => edge.target);
+  const childrenEdges = _edgesList.filter(
+    (edge) => edge.source === currentNodeId,
+  )
+  const childrenNodes = childrenEdges.map((edge) => edge.target)
 
-  nodesList = nodesList.map((node) => {
-    if (node.id === currentNodeId && node.type !== "index") {
-      return { ...node, hidden: shouldBeHidden };
+  let nodesList = _nodesList.map((node) => {
+    if (node.id === currentNodeId && node.type !== 'index') {
+      return { ...node, hidden: shouldBeHidden }
     }
-    return node;
-  });
+    return node
+  })
 
-  edgesList = edgesList.map((edge) => {
+  let edgesList = _edgesList.map((edge) => {
     if (childrenEdges.some((e) => e.id === edge.id)) {
-      return { ...edge, hidden: shouldBeHidden };
+      return { ...edge, hidden: shouldBeHidden }
     }
-    return edge;
-  });
+    return edge
+  })
 
-  childrenNodes.forEach((childNodeId) => {
+  for (const childNodeId of childrenNodes) {
     const results = toggleChildrenVisibility(
       childNodeId,
       nodesList,
       edgesList,
       shouldBeHidden,
-      processedNodes
-    );
-    nodesList = results.nodesList;
-    edgesList = results.edgesList;
-  });
+      processedNodes,
+    )
+    nodesList = results.nodesList
+    edgesList = results.edgesList
+  }
 
-  return { nodesList, edgesList };
-};
+  return { nodesList: nodesList, edgesList: _edgesList }
+}
 
 export function transformElasticSearchDataToElements(results) {
-  const nodes = [];
-  const edges = [];
-  let rootNodes = new Set();
-  let nodeIdsToIndices = new Map();
-  let qrDataPresent = false;
+  const nodes = []
+  const edges = []
+  const rootNodes = new Set()
+  const nodeIdsToIndices = new Map()
+  let qrDataPresent = false
 
-  results.forEach((result) => {
+  for (const result of results) {
     if (result.scan?.qr?.data) {
-      qrDataPresent = true;
+      qrDataPresent = true
     }
-  });
+  }
 
-  results.forEach((result) => {
-    result.index = "strelka";
-    const nodeData = indexDataType(result.index, result);
-    const nodeType = indexNodeType(result.index);
+  for (const result of results) {
+    result.index = 'strelka'
+    const nodeData = indexDataType(result.index, result)
+    const nodeType = indexNodeType(result.index)
 
     // Add node ID and its corresponding index-ID to the map
     nodes.push({
@@ -92,7 +92,8 @@ export function transformElasticSearchDataToElements(results) {
       data: {
         record: result,
         label: result.file.tree.node,
-        color: getIconConfig("strelka", nodeData.nodeMain[0].toLowerCase()).color,
+        color: getIconConfig('strelka', nodeData.nodeMain[0].toLowerCase())
+          .color,
         nodeIndex: result.index,
         nodeDepth: nodeData.nodeDepth,
         nodeVirustotal: nodeData.nodeVirustotal,
@@ -118,74 +119,73 @@ export function transformElasticSearchDataToElements(results) {
       },
       position: { x: -100, y: 100 },
       type: nodeType,
-    });
+    })
 
-    nodeIdsToIndices.set(result.file.tree.node, nodeData.nodeRelationshipId);
+    nodeIdsToIndices.set(result.file.tree.node, nodeData.nodeRelationshipId)
 
     if (nodeData.nodeParentId === undefined) {
       edges.push({
         id: `${result.index}-root-${result.index}-${result.file.tree.node}`,
         source: `${result.index}-root`,
         target: `${result.index}-${result.file.tree.node}`,
-        sourceHandle: "root",
-        type: "sourceedge",
-      });
+        sourceHandle: 'root',
+      })
     }
-  });
+  }
 
   // Add Possible Relationship Edges
-  nodes.forEach((node) => {
+  for (const node of nodes) {
     // Extract the relevant details from the node's data
-    const { nodeParentId, nodeIndex } = node.data;
+    const { nodeParentId, nodeIndex } = node.data
     const keyForNodeParentId = Array.from(nodeIdsToIndices.entries()).find(
-      ([_, value]) => value === nodeParentId
-    )?.[0];
-    
+      ([_, value]) => value === nodeParentId,
+    )?.[0]
+
     if (keyForNodeParentId) {
       edges.push({
         id: `${keyForNodeParentId}-${node.id}`,
         source: `${nodeIndex}-${keyForNodeParentId}`,
         target: node.id,
         animated: false,
-        sourceHandle: "relationship",
-        type: "indexedge",
-        label: `${node.data.nodeSource}`
-      });
+        type: 'indexedge',
+        label: `${node.data.nodeSource}`,
+      })
     }
-  });
+  }
 
   // Update the number of descendants for each root node under the same INDEX
-  nodes.forEach((node) => {
-    if (node.type === "index") {
+  for (const node of nodes) {
+    if (node.type === 'index') {
       node.data.childrenCount = countDescendants(
         node.id,
         node.data.label,
         nodes,
-        edges
-      );
+        edges,
+      )
     }
-  });
+  }
 
   // Identify root nodes that are connected to non-root nodes
-  edges.forEach((edge) => {
+  for (const edge of edges) {
     if (rootNodes.has(edge.source) && !rootNodes.has(edge.target)) {
-      rootNodes.delete(edge.source);
+      rootNodes.delete(edge.source)
     }
+
     if (rootNodes.has(edge.target) && !rootNodes.has(edge.source)) {
-      rootNodes.delete(edge.target);
+      rootNodes.delete(edge.target)
     }
-  });
+  }
 
   // Update the edges connected to root nodes without non-root children
-  edges.forEach((edge) => {
+  for (const edge of edges) {
     if (rootNodes.has(edge.source) || rootNodes.has(edge.target)) {
-      edge.label = "false";
-      edge.animated = "true";
+      edge.label = 'false'
+      edge.animated = 'true'
     }
-  });
+  }
 
   return {
     nodes,
     edges,
-  };
+  }
 }
