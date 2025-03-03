@@ -1,9 +1,9 @@
-FROM node:16-slim AS UI_BUILDER
+FROM node:22-slim AS ui-builder
 # We are using a multi-stage build as we require node for 
 # building react. 
 
 # Copy package.json and package-lock.json into the builder.
-# Copying just these files first allows us to take advantage
+# Copying just these files first allows us to take advantage 
 # of cached Docker layers.
 
 # Define UI build arguments.
@@ -25,16 +25,18 @@ COPY ./ui .
 # Build the js app for production
 RUN yarn run build
 
-# Since we are serving it all from python, switch over to
+# Since we are serving it all from python, switch over to 
 # a more appropriate base image.
-FROM python:3.9-slim
+FROM python:3.10-slim as strelka-oss-runner
 
-RUN apt-get -y update && apt-get -y upgrade
+RUN apt-get -y update
 RUN apt-get install -y build-essential libpq-dev libmagic1
 
 # Set Runtime Variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV POETRY_VIRTUALENVS_IN_PROJECT=1
+ENV POETRY_VIRTUALENVS_CREATE=1
 
 # Install Poetry globally and copy project files
 RUN python3 -m pip install -U pip setuptools && \
@@ -44,25 +46,17 @@ RUN python3 -m pip install -U pip setuptools && \
 # Set the working directory and copy the project files
 WORKDIR /app
 
-# Use Poetry to install the project dependencies globally
-# This step is after the COPY step because it is more likely to change,
-# and therefore should not be included in earlier layers that can be cached.
-
+# Copy only the pyproject.toml and poetry.lock files
 COPY ./app/pyproject.toml ./app/poetry.lock ./
 
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-root && \
-    rm -rf /root/.cache/pypoetry
+RUN poetry install --no-root
 
-# Copy the other project files
-COPY ./app .
+COPY ./app/strelka_ui/ ./strelka_ui/
 
-# Use Poetry to install the local package strelka-ui
-RUN poetry install --only-root && \
-    rm -rf /root/.cache/pypoetry
+RUN poetry install --only-root
 
-# Copy the production UI assets into the new base image.
-COPY --from=UI_BUILDER /usr/src/app/build/ ./strelka_ui/react-app/
+# Copy the production UI assets into the new base image.  
+COPY --from=ui-builder /usr/src/app/build/ ./strelka_ui/react-app/
 
 # Run App
 COPY entrypoint.sh .

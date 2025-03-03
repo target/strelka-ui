@@ -10,7 +10,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from flask_migrate import Migrate, upgrade
+from flask_migrate import Migrate
 from paste.translogger import TransLogger
 from waitress import serve
 
@@ -18,6 +18,7 @@ from strelka_ui.blueprints.auth import auth
 from strelka_ui.blueprints.strelka import strelka
 from strelka_ui.blueprints.ui import ui
 from strelka_ui.models import db
+
 
 def create_app() -> Flask:
     """Start and serve app assets and API endpoints"""
@@ -30,14 +31,15 @@ def create_app() -> Flask:
     app: Flask = Flask(__name__, static_folder=ui_folder)
     app.logger.info("Serving app static assets from %s", ui_folder)
 
-    if app.config["ENV"] == "production":
+    # TODO: this is always false since config is not loaded. change to os.environ? will this break anything?
+    if app.config.get("ENV") == "production":
         app.config.from_object("strelka_ui.config.config.ProductionConfig")
     else:
         app.config.from_object("strelka_ui.config.config.DevelopmentConfig")
 
     app.logger.info(
         "Using %s configuration",
-        "production" if app.config["ENV"] == "production" else "development",
+        "production" if app.config.get("ENV") == "production" else "development",
     )
 
     app.secret_key = app.config["SECRET_KEY"]

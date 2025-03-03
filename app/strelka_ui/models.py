@@ -1,27 +1,22 @@
 import datetime
-from typing import List
+import logging
+from typing import List, Tuple
 
+from sqlalchemy import inspect
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
 from strelka_ui.database import db
-
+from strelka_ui.services.insights import get_insights
 
 class FileSubmission(db.Model):
     """
     A model representing a file submission.
 
     Attributes:
-        id (int): The primary key of the submission.
         file_id (str): A unique identifier for the file.
         file_name (str): The name of the file.
         file_size (int): The size of the file in bytes.
         strelka_response (dict): A dictionary containing the response from the Strelka scanner.
-        mime_types (list): A list of MIME types associated with the file.
-        yara_hits (list): A list of YARA rule IDs that matched the file.
-        files_seen (int): A count of files seen during analysis.
-        scanners_run (list): A list of scanners that were run on the file.
-        hashes (list): A list of hashes associated with the file.
         submitted_type (str): The type of submission that occurred (e.g., UI, VirusTotal)
         submitted_from_ip (str): The IP address of the client that submitted the file.
         submitted_from_client (str): The name of the client that submitted the file.
@@ -32,6 +27,9 @@ class FileSubmission(db.Model):
         processed_at (datetime.datetime): The date and time the file was processed.
         insights (list): A list of insights observed for submitted files.
         iocs (list): A list of iocs observed for submitted files.
+        highest_vt_count (int): The highest number of VirusTotal hits for a file.
+        highest_vt_sha256 (str): The SHA256 hash of the file with the highest number of VirusTotal hits.
+        mime_type (str): The MIME type of the file.
     """
 
     __tablename__ = "file_submission"
@@ -41,7 +39,7 @@ class FileSubmission(db.Model):
 
     # File Metadata
     file_id: str = db.Column(db.String(), unique=True)
-    file_name: str = db.Column(db.String())
+    file_name: str = db.Column(db.String(), index=True)
     file_size: int = db.Column(db.Integer())
 
     # Strelka Metadata
@@ -53,12 +51,15 @@ class FileSubmission(db.Model):
     hashes: list = db.Column(db.ARRAY(db.String(), dimensions=2))
     insights: list = db.Column(db.ARRAY(db.String(), dimensions=1))
     iocs: list = db.Column(db.ARRAY(db.String(), dimensions=1))
+    highest_vt_count: int = db.Column(db.Integer(), default=-1, nullable=False)
+    highest_vt_sha256: str = db.Column(db.String())
+
 
     # Submission Metadata
     submitted_type: str = db.Column(db.String())
     submitted_from_ip: str = db.Column(db.String())
     submitted_from_client: str = db.Column(db.String())
-    submitted_description: str = db.Column(db.String())
+    submitted_description: str = db.Column(db.String(), index=True)
     submitted_by_user_id: int = db.Column(
         db.ForeignKey("user.id"), nullable=False, index=True
     )
@@ -70,50 +71,225 @@ class FileSubmission(db.Model):
 
     def __init__(
         self,
-        file_id: str,
         file_name: str,
         file_size: int,
         strelka_response: dict,
-        mime_types: list,
-        yara_hits: list,
-        files_seen: int,
-        scanners_run: list,
-        hashes: list,
-        insights: list,
-        iocs: list,
         submitted_type: str,
         submitted_from_ip: str,
         submitted_from_client: str,
         submitted_by_user_id: int,
         submitted_description: str,
         submitted_at: datetime.datetime,
-        processed_at: datetime.datetime,
+
     ):
-        self.file_id = file_id
+        self.file_id = get_request_id(strelka_response[0]) # submitted_file
         self.file_name = file_name
         self.file_size = file_size
         self.strelka_response = strelka_response
-        self.mime_types = mime_types
-        self.yara_hits = yara_hits
-        self.files_seen = files_seen
-        self.scanners_run = scanners_run
-        self.hashes = hashes
-        self.insights = insights
-        self.iocs = iocs
+
         self.submitted_type = submitted_type
         self.submitted_from_ip = submitted_from_ip
         self.submitted_from_client = submitted_from_client
         self.submitted_by_user_id = submitted_by_user_id
         self.submitted_description = submitted_description
         self.submitted_at = submitted_at
-        self.processed_at = processed_at
+        self.processed_at = get_request_time(strelka_response[0])
+
+        # get vt count and sha useing get_highest_vt
+        vt_count, vt_sha256 = get_highest_vt(strelka_response)
+        self.highest_vt_count = vt_count
+        self.highest_vt_sha256 = vt_sha256
+
+        self.mime_types = get_mimetypes(strelka_response)
+        self.yara_hits = get_yara_hits(strelka_response)
+        self.scanners_run = get_scanners_run(strelka_response)
+        self.files_seen = len(strelka_response)
+        self.hashes = get_hashes(strelka_response[0])
+        self.insights = get_all_insights(strelka_response)
+        self.iocs = get_all_iocs(strelka_response)
+
 
     def __repr__(self):
         return "<id {}>".format(self.id)
 
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name not in inspect(self).unloaded}
 
+def get_all_iocs(response: list):
+    """
+        Get Strelka Submission IoCs
+        Store a set of IoCs in IoCs field
+    """
+    iocs = set()
+
+    try:
+        for scanned_file in response:
+            if "iocs" in scanned_file:
+                for ioc in scanned_file["iocs"]:
+                    iocs.add(ioc["ioc"])
+            else:
+                pass
+    except Exception as e:
+        logging.warning(f"Could not process Insights search with error: {e} ")
+
+    return iocs
+
+def get_all_insights(response: list) -> list:
+    """
+    Get all insights from the Strelka response.
+    
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of insights.
+    """
+    
+    insights = set()
+
+    try:
+        for index, scanned_file in enumerate(response):
+            file_insights = get_insights(scanned_file)
+            if file_insights:
+                response[index]["insights"] = list(file_insights)
+                insights.update(file_insights)
+            else:
+                pass
+    except Exception as e:
+        logging.warning(f"Could not process Insights search with error: {e} ")
+
+    return insights
+
+def get_request_id(response: dict) -> str:
+    """
+    Get the ID of the request from the Strelka response.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        str: The ID of the request if it exists, otherwise an empty string.
+    """
+    return (
+        response["request"]["id"]
+        if "request" in response and "id" in response["request"]
+        else ""
+    )
+
+
+def get_request_time(response: dict) -> str:
+    """
+    Get the time of the request from the Strelka response.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        str: The time of the request if it exists, otherwise an empty string.
+    """
+    return (
+        str(datetime.datetime.fromtimestamp(response["request"]["time"]))
+        if "request" in response and "time" in response["request"]
+        else ""
+    )
+
+def get_highest_vt(response: dict) -> Tuple[int, str]:
+    """
+    Get the highest number of VirusTotal hits and the corresponding SHA256 hash.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        int: The highest number of VirusTotal hits.
+        str: The SHA256 hash of the file with the highest number of VirusTotal hits.
+    """
+    highest_vt_count = -1
+    highest_vt_sha256 = ""
+
+    for r in response:
+        vt_count = r.get("enrichment", {}).get("virustotal", 0)
+        if vt_count > highest_vt_count:
+            highest_vt_count = vt_count
+            highest_vt_sha256 = r["scan"]["hash"]["sha256"]
+
+    return highest_vt_count, highest_vt_sha256
+
+
+def get_mimetypes(response: list) -> list:
+    """
+    Get a list of unique MIME types found in the Strelka response.
+
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of unique MIME types.
+    """
+    mimetypes = set()
+
+    for r in response:
+        for mimetype in r["file"]["flavors"]["mime"]:
+            mimetypes.add(mimetype)
+    return list(mimetypes)
+
+
+def get_scanners_run(response: list) -> list:
+    """
+    Get a list of scanners that were run on the file in the Strelka response.
+
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of scanner names.
+    """
+    scanners = set()
+
+    for r in response:
+        scanners.update(r["file"]["scanners"])
+    return list(scanners)
+
+
+def get_yara_hits(response: list) -> list:
+    """
+    Get a list of unique YARA rules that matched the file in the Strelka response.
+
+    Args:
+        response (list): The response from Strelka.
+
+    Returns:
+        list: A list of YARA rule names.
+    """
+    yarahits = set()
+
+    for r in response:
+        matches = r.get("scan", {}).get("yara", {}).get("matches")
+
+        if not isinstance(matches, list):
+            continue
+
+        for yarahit in matches:
+            yarahits.add(yarahit)
+    return list(yarahits)
+
+def get_hashes(response: dict) -> list:
+    """
+    Get a dictionary of hashes and their values from the Strelka response.
+
+    Args:
+        response (dict): The response from Strelka.
+
+    Returns:
+        list: A list of (hash_type, hash_value) tuples.
+    """
+    hashes = (
+        response["scan"]["hash"].copy()
+        if "scan" in response and "hash" in response["scan"]
+        else {}
+    )
+    del hashes["elapsed"]
+    return hashes.items()
 
 class User(db.Model):
     """

@@ -1,6 +1,28 @@
 # Changelog
 Changes to the project will be tracked in this file via the date of change.
 
+## 2025-02-26
+- Added client-side caching to backend calls to reduce extra data calls and speed up navigation.
+- Updated Submission table data fetching to avoid fetching `strelka_response` for every row, improving pagination and display speed.
+- Allowed sorting by VT+ column.
+- UI layout and styling updated to improve readability and user experience.
+- Improved Dark Mode support.
+- Refactored submission upload and table fetching to improve speed.
+- Updated Submission Statistics chart to display data more clearly.
+- Switched from react-scripts to Vite for faster builds and better performance and better long-term support.
+- Migrated to TypeScript for better type safety and code quality.
+- Updated Auth flow by updating hooks and services to streamline the authentication process.
+- added BiomeJS for more uniform code stylization and linting.
+- Updated docker-compose to work with the latest version of the application.
+- Dependency Updates:
+  - Updated package dependencies for vulnerability remediation.
+  - Added `jinja2` dependency to `pyproject.toml` to resolve SCA vulnerability.
+  - Updated Kaniko version for Vela build.
+  - Updated `yarn` and `python-dateutil` dependencies.
+  - Updated `python-dateutil` version.
+  - Updated React and React-DOM to version 18.
+  - Updated React Router to version 7, replacing `react-router-dom`.
+
 ## 2024-05-30
 - **Improved Project Structure**: Strelka UI backend now runs as a package.
 - **Enhanced Metadata**: Structured client metadata added to Strelka events.

@@ -1,18 +1,14 @@
-/* TlshOverviewCard.css */
-
 .tlsh-overview-card {
   padding-left: 20px;
   padding-bottom: 10px;
-  background: #fff;
   border-radius: 8px;
 }
 
-
 .score-value {
   font-size: 1.5em;
-  color: #333;
   font-weight: bold;
 }
+
 .card-header {
   align-items: center;
   margin-bottom: 10px;
@@ -32,7 +28,6 @@
 .slider-box {
   flex-grow: 1;
   margin: 0 2px;
-  background-color: #eee;
   position: relative;
   display: flex;
   justify-content: center;
@@ -41,18 +36,17 @@
 
 .score-value {
   font-size: 1.5em;
-  color: #333;
   font-weight: bold;
 }
 
 .score-heading {
   display: block;
-
 }
 
 /* If the score is 0, the first box should be red */
 .slider-box.first-box {
-  background-color: "#ff4d4f"; /* Use the red color from antdColors */
+  background-color: "#ff4d4f";
+  /* Use the red color from antdColors */
   animation: pulseGlow 2s infinite;
 }
 
@@ -63,14 +57,15 @@
 
 /* Keyframes for the pulsing glow effect */
 @keyframes pulseGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 8px var(--box-glow-color);
   }
+
   50% {
     box-shadow: 0 0 15px var(--box-glow-color);
   }
 }
-
 
 .score-text {
   position: absolute;
@@ -79,16 +74,15 @@
   transform: translate(-50%, -50%);
   font-size: 11px;
   font-weight: 800;
-  color: white;
   word-break: keep-all;
 }
 
 .tick-text {
   position: absolute;
-  bottom: -40px; 
-  width: 120px; 
+  bottom: -40px;
+  width: 120px;
   text-align: center;
-  font-weight:600;
+  font-weight: 600;
   font-size: 11px;
   word-break: keep-all;
 }
@@ -122,5 +116,4 @@
   transform: translateX(-50%);
   width: 2px;
   height: 10px;
-  background-color: black;
 }

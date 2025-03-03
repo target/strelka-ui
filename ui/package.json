@@ -2,76 +2,45 @@
   "name": "ui",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "homepage": "/",
   "dependencies": {
-    "@ant-design/icons": "^5.3.6",
+    "@ant-design/icons": "^5.5.1",
     "@ant-design/pro-form": "^2.25.1",
     "@ant-design/pro-layout": "^7.19.0",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^13.5.0",
-    "ansi-regex": "^6.0.1",
-    "antd": "^5.16.1",
-    "browserslist": "^4.20.4",
-    "chroma-js": "^2.4.2",
-    "css-what": "^5.1.0",
+    "@microlink/react-json-view": "^1.24.0",
+    "@tanstack/react-query": "^5.64.1",
+    "@tanstack/react-query-devtools": "^5.64.1",
+    "@types/chroma-js": "^2.4.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@xyflow/react": "^12.4.0",
+    "antd": "^5.22.5",
+    "axios": "^1.7.9",
+    "chroma-js": "^3.1.2",
     "dagre": "^0.8.5",
-    "dns-packet": "^5.4.0",
-    "ejs": "^3.1.8",
-    "follow-redirects": "1.15.6",
-    "glob-parent": "^6.0.2",
     "html-to-image": "^1.11.11",
-    "loader-utils": "^2.0.4",
-    "normalize-url": "^7.0.3",
-    "nth-check": "^2.0.1",
-    "path-parse": "^1.0.7",
-    "postcss": "^8.4.31",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-json-view": "^1.21.3",
-    "react-router-dom": "^5.2.0",
-    "reactflow": "^11.10.1",
-    "recharts": "^2.10.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-router": "^7.0.2",
+    "recharts": "^2.15.0",
     "styled-components": "^6.1.1",
-    "web-vitals": "^1.0.1",
-    "ws": "^8.8.0"
+    "typescript": "^5.7.2",
+    "vite-plugin-checker": "^0.8.0"
   },
   "devDependencies": {
-    "react-scripts": "^5.0.1"
-  },
-  "resolutions": {
-    "browserslist": "^4.16.5",
-    "glob-parent": "^5.1.2",
-    "ws": "^6.2.2",
-    "immer": "^9.0.6",
-    "ejs": "^3.1.7",
-    "css-what": "^6.0.1",
-    "path-parse": "^1.0.7",
-    "dns-packet": "^5.2.2",
-    "normalize-url": "^4.5.1"
+    "@biomejs/biome": "1.9.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build -m production",
+    "serve": "vite preview",
+    "test": "yarn lint",
+    "lint": "biome check  --reporter=summary ./src",
+    "format": "biome check --organize-imports-enabled=true --write"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
