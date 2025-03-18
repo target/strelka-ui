@@ -1,45 +1,34 @@
 name: Publish Latest Images to Docker Hub
 
 on:
-  create:
-    tags:
-      - '*'
-
-permissions:
-  contents: read
+  release:
+    types: [published]
 
 jobs:
-  publish:
+  build_and_publish:
     runs-on: ubuntu-latest
+
     steps:
       - name: Clone Action Repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
+
+      - name: Get Short Commit Hash
+        id: vars
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build, Tag, and Push Image
-        run: |
-          # Enable Docker BuildKit
-          export DOCKER_BUILDKIT=1
-          
-          # Set tag variables
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          TAG_NAME=$(git describe --tags --abbrev=0)
-          
-          # Image details
-          IMAGE_NAME="target/strelka-ui"
-          DOCKERFILE_PATH="./Dockerfile"
-          
-          # Build, tag, and push image
-          docker build -f "${DOCKERFILE_PATH}" -t "${IMAGE_NAME}:${TAG_NAME}" -t "${IMAGE_NAME}:latest" .
-          docker push "${IMAGE_NAME}:${TAG_NAME}"
-          docker push "${IMAGE_NAME}:latest"
-          
-      - name: Logout from Docker Hub
-        run: docker logout
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          tags: |
+            ${{ github.repository_owner }}/${{ github.repository }}:${{ github.release.tag_name }}
+            ${{ github.repository_owner }}/${{ github.repository }}:latest
+            ${{ github.repository_owner }}/${{ github.repository }}:release
+            ${{ github.repository_owner }}/${{ github.repository }}:${{ env.COMMIT_HASH }}
+          push: true
