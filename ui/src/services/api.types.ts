@@ -69,11 +69,16 @@ interface Ioc {
   scanner: string
 }
 
-interface StrelkaResponse {
+export interface StrelkaResponse {
   file: FileDetails
   insights: string[]
   request: RequestDetails
   scan: ScanDetails
+  enrichment?: Enrichment
+}
+
+interface Enrichment {
+  virustotal?: number
 }
 
 interface FileDetails {

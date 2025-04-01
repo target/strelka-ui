@@ -10,24 +10,29 @@ import {
   Controls,
   MiniMap,
   useReactFlow,
+  type Node,
+  type NodeChange,
+  type EdgeChange,
 } from '@xyflow/react'
 import { initialEdges, initialNodes } from '../../data/initialData.js'
 import { IndexConnectEdge } from './EdgeTypes/IndexConnectEdge'
-import EventNode from './NodeTypes/EventNode'
+import EventNode from './NodeTypes/EventNode.js'
 import '@xyflow/react/dist/style.css'
-import ClickGuide from '../../utils/ClickGuide'
-import ExceededGuide from '../../utils/ExceededGuide'
-import NodeSearchPanel from '../../utils/NodeSearchPanel'
-import ShowFileListing from '../../utils/ShowFileListing'
-import { antdColors } from '../../utils/colors'
+import ClickGuide from '../../utils/ClickGuide.jsx'
+import ExceededGuide from '../../utils/ExceededGuide.jsx'
+import NodeSearchPanel from '../../utils/NodeSearchPanel.jsx'
+import ShowFileListing from '../../utils/ShowFileListing.jsx'
+import { antdColors } from '../../utils/colors.js'
 import { getDagreLayout } from '../../utils/dagreLayout.js'
-import DownloadImage from '../../utils/downloadImage'
+import DownloadImage from '../../utils/downloadImage.jsx'
 import {
   toggleChildrenVisibility,
   transformElasticSearchDataToElements,
-} from '../../utils/layoutUtils.js'
+} from '../../utils/layoutUtils.ts'
 
-import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
+import { useDarkModeSetting } from '../../hooks/useDarkModeSetting.ts'
+import type { NodeData } from '../../utils/indexDataUtils.ts'
+import type { StrelkaResponse } from '../../services/api.types.ts'
 
 const nodeTypes = {
   event: EventNode,
@@ -37,11 +42,23 @@ const edgeTypes = {
   indexedge: IndexConnectEdge,
 }
 
-const snapGrid = [16, 16]
+const snapGrid: [number, number] = [16, 16]
 
-const FileTreeCard = ({
+interface FileTreeCardProps {
+  data: StrelkaResponse[]
+  alertId: string
+  onNodeSelect: (record: NodeData) => void
+  fileTypeFilter?: string
+  fileYaraFilter?: string
+  fileIocFilter?: string
+  fileNameFilter?: string
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  selectedNodeData: any
+  setSelectedNodeData: (data: NodeData) => void
+}
+
+const FileTreeCard: React.FC<FileTreeCardProps> = ({
   data,
-  alertId,
   onNodeSelect,
   fileTypeFilter,
   fileYaraFilter,
@@ -50,23 +67,23 @@ const FileTreeCard = ({
   selectedNodeData,
   setSelectedNodeData,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const { fitView } = useReactFlow()
 
   const layoutedElements = useMemo(
     () => getDagreLayout(initialNodes, initialEdges),
     [],
   )
-  const layoutedNodes = layoutedElements.filter(isNode)
+  const layoutedNodes = layoutedElements.filter(isNode) as Node[]
   const layoutedEdges = layoutedElements.filter((el) => !isNode(el))
   const [nodes, setNodes] = useNodesState(layoutedNodes)
   const [edges, setEdges] = useEdgesState(layoutedEdges)
   const showClickGuide = !selectedNodeData
-  const [showExceededGuide, setShowExceededGuide] = useState(false)
-  const ref = useRef(null)
+  const [showExceededGuide, setShowExceededGuide] = useState<boolean>(false)
+  const ref = useRef<HTMLDivElement | null>(null)
 
-  const [highlightedEdge, setHighlightedEdge] = useState(null)
-  const [highlightedNode, setHighlightedNode] = useState(null)
+  const [highlightedEdge, setHighlightedEdge] = useState<string | null>(null)
+  const [highlightedNode, setHighlightedNode] = useState<string | null>(null)
 
   useEffect(() => {
     const vtExceeded = data.some((item) => {
@@ -75,19 +92,19 @@ const FileTreeCard = ({
     setShowExceededGuide(vtExceeded)
   }, [data])
 
-  const onSearchChange = (search) => {
+  const onSearchChange = (search: string) => {
     setSearchTerm(search)
   }
 
   const onNodesChange = useCallback(
-    (changes) => {
+    (changes: NodeChange[]) => {
       setNodes((currentNodes) => applyNodeChanges(changes, currentNodes))
     },
     [setNodes],
   )
 
   const onEdgesChange = useCallback(
-    (changes) => {
+    (changes: EdgeChange[]) => {
       setEdges((currentEdges) => applyEdgeChanges(changes, currentEdges))
     },
     [setEdges],
@@ -95,23 +112,31 @@ const FileTreeCard = ({
 
   const filteredNodes = useMemo(() => {
     let nodesToFilter = fileTypeFilter
-      ? nodes.filter((node) => node.data.nodeMain.includes(fileTypeFilter))
+      ? nodes.filter((node) =>
+          (node.data as unknown as NodeData).nodeMain.includes(fileTypeFilter),
+        )
       : nodes
 
     if (fileNameFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        node.data.nodeRelationshipId?.includes(fileNameFilter),
+        (node.data as unknown as NodeData).nodeRelationshipId?.includes(
+          fileNameFilter,
+        ),
       )
     }
     if (fileYaraFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        node.data.nodeYaraList?.includes(fileYaraFilter),
+        (node.data as unknown as NodeData).nodeYaraList?.includes(
+          fileYaraFilter,
+        ),
       )
     }
 
     if (fileIocFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        node.data.nodeIocList?.includes(fileIocFilter),
+        (node.data as { nodeIocList?: string }).nodeIocList?.includes(
+          fileIocFilter,
+        ),
       )
     }
 
@@ -132,12 +157,11 @@ const FileTreeCard = ({
     fileNameFilter,
   ])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: TODO: use the correct dependencies
   useEffect(() => {
     fitView({ padding: 0.2 })
-  }, [fileTypeFilter, fileYaraFilter, fileNameFilter, fitView])
+  }, [fitView])
 
-  const handleNodeClick = (event, node) => {
+  const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
     if (node.type === 'index') {
       const rootNodeIds = nodes
         .filter((n) => n.type === 'index')
@@ -176,13 +200,13 @@ const FileTreeCard = ({
       setNodes(updatedNodes)
       setEdges(updatedEdges)
     } else {
-      setSelectedNodeData(node.data)
-      onNodeSelect(node.data.record)
+      setSelectedNodeData(node.data as unknown as NodeData)
+      onNodeSelect(node.data as unknown as NodeData)
     }
   }
 
   const handleNodeMouseEnter = useCallback(
-    (event, node) => {
+    (_event: React.MouseEvent, node: Node) => {
       const relatedEdge = edges.find((edge) => edge.target === node.id)
       if (relatedEdge) {
         setHighlightedEdge(relatedEdge.id)
@@ -225,7 +249,7 @@ const FileTreeCard = ({
 
   useEffect(() => {
     const { nodes: transformedNodes, edges: transformedEdges } =
-      transformElasticSearchDataToElements(data, alertId)
+      transformElasticSearchDataToElements(data)
 
     const nodesToLayout = transformedNodes.filter(isNode)
     const edgesToLayout = transformedEdges.filter((el) => !isNode(el))
@@ -234,7 +258,7 @@ const FileTreeCard = ({
 
     setNodes(layoutedData.filter(isNode))
     setEdges(layoutedData.filter((el) => !isNode(el)))
-  }, [alertId, data, setEdges, setNodes])
+  }, [data, setEdges, setNodes])
 
   const { isDarkMode } = useDarkModeSetting()
   const colorMode = isDarkMode ? 'dark' : 'light'
@@ -267,7 +291,7 @@ const FileTreeCard = ({
         colorMode={colorMode}
       >
         <MiniMap
-          nodeColor={(n) => n.data.color}
+          nodeColor={(n) => n.data.color as string}
           nodeStrokeWidth={3}
           zoomable
           pannable

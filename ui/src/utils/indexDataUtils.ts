@@ -20,6 +20,31 @@ export const indexColorThemes = (index) => {
   }
 }
 
+export interface NodeData {
+  nodeDatatype: string
+  nodeVirustotal: string
+  nodeInsights: number
+  nodeIocs: number
+  nodeImage: string
+  nodeDisposition: string
+  nodeMain: string[]
+  nodeSub: string
+  nodeTlsh: string
+  nodeLabel: string
+  nodeYaraList: string[]
+  nodeIocList: string
+  nodeMetric: string
+  nodeParentId: string
+  nodeRelationshipId: string
+  nodeDecryptionSuccess: boolean | null
+  nodeDepth?: number
+  nodeAlert?: boolean
+  nodeTlshData?: { family: string }
+  nodeMetricLabel?: string
+  nodeQrData?: string
+  color?: string
+}
+
 /**
  * Transforms raw data into a structured nodeData object based on the index.
  *
@@ -29,7 +54,7 @@ export const indexColorThemes = (index) => {
  * @returns A structured nodeData object.
  */
 export const indexDataType = (index, data) => {
-  const nodeData = {
+  const nodeData: NodeData = {
     nodeDatatype: 'strelka',
     nodeVirustotal: 'Not Found',
     nodeInsights: 0,
@@ -40,7 +65,7 @@ export const indexDataType = (index, data) => {
     nodeSub: '',
     nodeTlsh: '',
     nodeLabel: '',
-    nodeYaraList: '',
+    nodeYaraList: [],
     nodeIocList: '',
     nodeMetric: '',
     nodeParentId: '',

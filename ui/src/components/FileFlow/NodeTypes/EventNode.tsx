@@ -10,10 +10,12 @@ import { Handle, Position } from '@xyflow/react'
 import styled, { createGlobalStyle } from 'styled-components'
 import { antdColors } from '../../../utils/colors'
 import { getIconConfig } from '../../../utils/iconMappingTable'
+import type { NodeData } from '../../../utils/indexDataUtils'
+
 const { useToken } = theme
 
 // Helper Functions
-function lightenHexColor(hexColor, factor) {
+function lightenHexColor(hexColor: string, factor: number): string {
   const r = Number.parseInt(hexColor.slice(1, 3), 16)
   const g = Number.parseInt(hexColor.slice(3, 5), 16)
   const b = Number.parseInt(hexColor.slice(5, 7), 16)
@@ -66,7 +68,7 @@ const UnlockIndicatorWrapper = styled.div`
   cursor: pointer;
 `
 
-const QrCodePreviewWrapper = styled.div`
+const QrCodePreviewWrapper = styled.div<{ hasImage: boolean }>`
   position: absolute;
   bottom: 10px;
   right: ${({ hasImage }) => (hasImage ? '40px' : '10px')};
@@ -113,7 +115,7 @@ const ImagePreviewWrapper = styled.div`
 const ImageTooltip = styled(Tooltip)`
   .ant-tooltip-inner {
     max-width: 100%;
-    max-height: 100%
+    max-height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,7 +151,11 @@ const VirustotalWrapper = styled.div`
   letter-spacing: 0.5px;
 `
 
-const NodeWrapper = styled.div`
+const NodeWrapper = styled.div<{
+  $nodeAlert?: boolean
+  $glow?: boolean
+  $bgColor?: string
+}>`
   position: relative;
   width: 450px;
   height: 100px;
@@ -168,7 +174,7 @@ const NodeWrapper = styled.div`
   align-items: center;
 `
 
-const LeftWrapper = styled.div`
+const LeftWrapper = styled.div<{ $bgColor?: string }>`
   width: 44px;
   height: 44px;
   background-color: ${({ $bgColor }) => $bgColor || '#91caff'};
@@ -191,7 +197,7 @@ const LeftWrapper = styled.div`
   }
 `
 
-const RightWrapper = styled.div`
+const RightWrapper = styled.div<{ $acColor?: string }>`
   flex: 1 1 auto;
   text-align: left;
   margin-left: 12px;
@@ -236,13 +242,18 @@ const RightWrapper = styled.div`
 // Main Component
 // -------------------------
 
-const EventNode = memo(({ data, selected }) => {
-  // Initialize isBlurred based on the presence of data.nodeQrData
+interface EventNodeProps {
+  data: NodeData
+  selected: boolean
+}
+
+const EventNode = memo(({ data, selected }: EventNodeProps) => {
   const [isBlurred] = useState(!!data.nodeQrData)
   const [vtStatus, setVtStatus] = useState('...')
-  const [vtColor, setVtColor] = useState('default')
+  const [vtColor, setVtColor] = useState<
+    'default' | 'success' | 'warning' | 'error'
+  >('default')
 
-  // Example of conditional styling for blur effect
   const previewStyle = isBlurred ? { filter: 'blur(4px)' } : {}
 
   const { token } = useToken()
