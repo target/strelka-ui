@@ -1,5 +1,5 @@
 import { getIconConfig } from './iconMappingTable'
-import { indexDataType, indexNodeType } from './indexDataUtils'
+import { indexDataType, indexNodeType } from './indexDataUtils.ts'
 
 // Recursive function to count all descendants of a node under the same INDEX
 function countDescendants(nodeId, nodeIndex, nodes, edges) {

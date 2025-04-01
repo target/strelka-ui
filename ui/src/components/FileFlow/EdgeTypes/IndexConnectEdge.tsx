@@ -1,10 +1,16 @@
-import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react'
+import {
+  BaseEdge,
+  EdgeLabelRenderer,
+  getBezierPath,
+  type Position,
+} from '@xyflow/react'
 import styled from 'styled-components'
 import { antdColors } from '../../../utils/colors'
 import { theme } from 'antd'
+
 const { useToken } = theme
 
-const EdgeLabel = styled.div`
+const EdgeLabel = styled.div<{ $markerColor: string }>`
   position: absolute;
   transform: translate(-50%, -50%);
   font-size: 11px;
@@ -14,6 +20,19 @@ const EdgeLabel = styled.div`
   border-radius: 3px;
   pointer-events: all;
 `
+
+export interface IndexConnectEdgeProps {
+  id: string
+  sourceX: number
+  sourceY: number
+  targetX: number
+  targetY: number
+  sourcePosition: Position
+  targetPosition: Position
+  style?: React.CSSProperties
+  label?: React.ReactNode
+  isHighlighted?: boolean
+}
 
 export function IndexConnectEdge({
   id,
@@ -26,7 +45,7 @@ export function IndexConnectEdge({
   style = {},
   label,
   isHighlighted,
-}) {
+}: IndexConnectEdgeProps) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -41,7 +60,10 @@ export function IndexConnectEdge({
   const labelOffsetY = (targetY - sourceY) * 0.3
   const { token } = useToken()
 
-  const markerColor = isHighlighted ? antdColors.darkGray : style.stroke
+  const markerColor = isHighlighted
+    ? antdColors.darkGray
+    : (style.stroke as string)
+
   return (
     <>
       <BaseEdge
@@ -57,11 +79,12 @@ export function IndexConnectEdge({
               labelX + labelOffsetX
             }px,${labelY + labelOffsetY}px)`,
             backgroundColor: token.colorBgContainer,
-            boxShadow: `0 2px 5px${token.colorBorder}`,
+            boxShadow: `0 2px 5px ${token.colorBorder}`,
             border: `1px solid ${token.colorBorder}`,
             color: markerColor,
           }}
           className="nodrag nopan"
+          $markerColor={markerColor}
         >
           {label}
         </EdgeLabel>
