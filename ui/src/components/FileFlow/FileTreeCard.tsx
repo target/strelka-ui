@@ -200,8 +200,8 @@ const FileTreeCard: React.FC<FileTreeCardProps> = ({
       setNodes(updatedNodes)
       setEdges(updatedEdges)
     } else {
-      setSelectedNodeData(node.data as unknown as NodeData)
-      onNodeSelect(node.data.record as unknown as NodeData)
+      setSelectedNodeData(node.data as NodeData)
+      onNodeSelect(node.data as NodeData)
     }
   }
 
