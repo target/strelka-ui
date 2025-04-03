@@ -1,6 +1,6 @@
 import { Card, Col, Descriptions, Row, Tag, Typography } from 'antd'
-import React from 'react'
 import { antdColors } from '../../../utils/colors'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
@@ -15,7 +15,7 @@ const getExtractionColor = (extracted, total) => {
   return colorObj
 }
 
-const EncryptedZipOverviewCard = ({ data }) => {
+const EncryptedZipOverviewCard = ({ data }: OverviewCardProps) => {
   const extracted = data.scan.encrypted_zip.total.extracted
   const total = data.scan.encrypted_zip.total.files
   const extractionColor = getExtractionColor(extracted, total)

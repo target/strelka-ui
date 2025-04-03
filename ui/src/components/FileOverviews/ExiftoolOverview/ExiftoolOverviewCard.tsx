@@ -1,10 +1,11 @@
 import { Checkbox, Col, Input, Row, Typography } from 'antd'
-import React, { useState } from 'react'
 import '../../../styles/ExiftoolOverviewCard.css'
+import { useState } from 'react'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
-const ExifToolCard = ({ data }) => {
+const ExifToolCard = ({ data }: OverviewCardProps) => {
   const [filter, setFilter] = useState('')
   const [wrapText, setWrapText] = useState(false)
   const [trimText, setTrimText] = useState(true)

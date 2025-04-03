@@ -1,12 +1,9 @@
-import React from 'react'
-import EncryptedZipOverviewCard from './EncryptedZipOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
+import EncryptedZipOverviewCard from './EncryptedZipOverviewCard'
 
-const EncryptedZipOverviewLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const EncryptedZipOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.encrypted_zip) {
     return null
   }

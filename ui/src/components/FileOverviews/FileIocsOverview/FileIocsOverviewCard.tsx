@@ -1,7 +1,8 @@
 import { Space, Tag, Tooltip, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import { getIconConfig } from '../../../utils/iconMappingTable'
+import type { FileIocsOverviewProps } from '../types'
 
 const { Text } = Typography
 
@@ -9,12 +10,21 @@ const { Text } = Typography
  * Displays an overview of IOC matches for files, categorized into IOC types.
  * @param {{ data: Object, onFileIocSelect: Function }} props
  */
-const FileIocsOverviewCard = ({ data, onFileIocSelect }) => {
+const FileIocsOverviewCard = (props: FileIocsOverviewProps) => {
+  const { data, onFileIocSelect } = props
   const [selectedIoc, setSelectedIoc] = useState(null)
   const [showMore, setShowMore] = useState(false) // State to control showing more IOCs
 
+  interface IocCounts {
+    [ioc: string]: {
+      type: string
+      count: number
+      files: Set<string>
+    }
+  }
+
   // Initialize an object to store details for each unique IOC value
-  const iocCounts = {}
+  const iocCounts: IocCounts = {}
 
   // Helper function descriptions
   /**
@@ -180,7 +190,7 @@ const FileIocsOverviewCard = ({ data, onFileIocSelect }) => {
         <>
           {Object.entries(iocTypeLabels)
             .filter(([iocType]) => iocData.some((ioc) => ioc.type === iocType)) // Filter out the IOC types that have no data
-            .map(([iocType, label]) => {
+            .map(([iocType, _label]) => {
               const iocsForType = iocData.filter(
                 (iocData) => iocData.type === iocType,
               )

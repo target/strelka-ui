@@ -1,12 +1,12 @@
 import {
   BaseEdge,
   EdgeLabelRenderer,
-  getBezierPath,
   type Position,
+  getBezierPath,
 } from '@xyflow/react'
+import { theme } from 'antd'
 import styled from 'styled-components'
 import { antdColors } from '../../../utils/colors'
-import { theme } from 'antd'
 
 const { useToken } = theme
 

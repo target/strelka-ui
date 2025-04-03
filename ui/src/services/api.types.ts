@@ -75,6 +75,7 @@ export interface StrelkaResponse {
   request: RequestDetails
   scan: ScanDetails
   enrichment?: Enrichment
+  iocs?: Ioc[]
 }
 
 interface Enrichment {
@@ -89,6 +90,15 @@ interface FileDetails {
   size: number
   source?: string
   tree: Tree
+  scan: FileScanDetails
+}
+
+interface FileScanDetails {
+  count: number
+  files: string[]
+  hash: {
+    md5: string
+  }
 }
 
 interface Flavors {
@@ -124,6 +134,8 @@ interface Metadata {
 }
 
 interface ScanDetails {
+  email?: Email
+  encrypted_zip?: EncryptedZip
   entropy?: Entropy
   exiftool?: Exiftool
   footer?: Footer
@@ -261,4 +273,42 @@ interface User {
   last_name: string
   login_count: number
   user_cn: string
+}
+
+interface EncryptedZip {
+  total: {
+    files: number
+    extracted: number
+  }
+  cracked_password: boolean
+  elapsed: number
+  flags?: string[]
+  files: {
+    [fileName: string]: {
+      file_name: string
+      file_size: number
+      file_type: string
+      file_type_extension: string
+      is_encrypted: boolean
+      is_encrypted_password_protected: boolean
+      password_protected: boolean
+    }
+  }
+}
+
+interface Email {
+  subject: string
+  base64_thumbnail: string
+  total: {
+    attachments: number
+  }
+  attachments: {
+    filenames: string[]
+  }
+  from: string
+  to: string[]
+  date_utc: string
+  message_id: string
+  received_domain: string[]
+  body: string
 }

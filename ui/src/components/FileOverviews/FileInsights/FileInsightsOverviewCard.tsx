@@ -1,11 +1,14 @@
 import { Alert, List, Typography } from 'antd'
-import React from 'react'
 
 const { Text } = Typography
 
-const InsightsCard = ({ data }) => {
+interface InsightsCardProps {
+  data: string[]
+}
+
+const InsightsCard = ({ data }: InsightsCardProps) => {
   // Conditional styling based on whether there are insights
-  const cardStyle =
+  const cardStyle: React.CSSProperties =
     data?.length === 0
       ? {
           maxHeight: '200px',

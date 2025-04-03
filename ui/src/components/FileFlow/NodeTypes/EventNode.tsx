@@ -4,13 +4,13 @@ import {
   QrcodeOutlined,
   UnlockOutlined,
 } from '@ant-design/icons'
+import { Handle, Position } from '@xyflow/react'
 import { Tag, Tooltip, theme } from 'antd'
 import { memo, useEffect, useState } from 'react'
-import { Handle, Position } from '@xyflow/react'
 import styled, { createGlobalStyle } from 'styled-components'
 import { antdColors } from '../../../utils/colors'
 import { getIconConfig } from '../../../utils/iconMappingTable'
-import type { NodeData } from '../../../utils/indexDataUtils'
+import type { StrelkaNodeData } from '../../../utils/indexDataUtils'
 
 const { useToken } = theme
 
@@ -243,7 +243,7 @@ const RightWrapper = styled.div<{ $acColor?: string }>`
 // -------------------------
 
 interface EventNodeProps {
-  data: NodeData
+  data: StrelkaNodeData
   selected: boolean
 }
 

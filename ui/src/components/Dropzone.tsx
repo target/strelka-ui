@@ -1,11 +1,10 @@
-import React from 'react'
-
 import { InboxOutlined } from '@ant-design/icons'
 import { Upload } from 'antd'
+import type { UploadProps } from 'antd/lib/upload/interface'
 
 const { Dragger } = Upload
 
-const Dropzone = (props) => {
+const Dropzone = (props: UploadProps) => {
   return (
     <Dragger {...props}>
       <p className="ant-upload-drag-icon">

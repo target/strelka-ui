@@ -1,11 +1,13 @@
 import { Collapse, Tag, Typography } from 'antd'
-import React, { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import FileIocsOverviewCard from './FileIocsOverviewCard'
+import { useState } from 'react'
+import type { FileIocsOverviewProps } from '../types'
 
 const { Text } = Typography
 
-const FileIocsOverviewLanding = ({ data, onFileIocSelect }) => {
+const FileIocsOverviewLanding = (props: FileIocsOverviewProps) => {
+  const { data, onFileIocSelect } = props
   const [filterApplied, setFilterApplied] = useState(false)
 
   const handleIocSelect = (selectedIoc) => {

@@ -1,10 +1,9 @@
 import { PictureOutlined } from '@ant-design/icons'
+import { Panel, getViewportForBounds, useReactFlow } from '@xyflow/react'
 import { Button } from 'antd'
 import { toPng } from 'html-to-image'
-import React from 'react'
-import { Panel, getViewportForBounds, useReactFlow } from '@xyflow/react'
 
-function downloadImage(dataUrl) {
+function downloadImage(dataUrl: string) {
   const a = document.createElement('a')
 
   a.setAttribute('download', 'reactflow.png')
@@ -21,7 +20,6 @@ function DownloadImage() {
     // we calculate a transform for the nodes so that all nodes are visible
     // we then overwrite the transform of the `.react-flow__viewport` element
     // with the style option of the html-to-image library
-    const nodes = getNodes()
     const nodesBounds = getNodesBounds(getNodes())
     const viewport = getViewportForBounds(
       nodesBounds,
@@ -32,12 +30,12 @@ function DownloadImage() {
       0.1, // padding - need this set to avoid NaN bug in getViewportForBounds
     )
 
-    toPng(document.querySelector('.react-flow__viewport'), {
+    toPng(document.querySelector('.react-flow__viewport') as HTMLElement, {
       width: imageWidth,
       height: imageHeight,
       style: {
-        width: imageWidth,
-        height: imageHeight,
+        width: String(imageWidth),
+        height: String(imageHeight),
         transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
       },
     }).then(downloadImage)

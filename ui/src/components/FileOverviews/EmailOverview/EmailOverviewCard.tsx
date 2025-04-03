@@ -1,8 +1,9 @@
 import { Col, List, Modal, Row, Tag, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import '../../../styles/OcrOverviewCard.css'
+import type { OverviewCardProps } from '../types'
 
-const EmailOverviewCard = ({ data }) => {
+const EmailOverviewCard = ({ data }: OverviewCardProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const { Text } = Typography
@@ -94,9 +95,9 @@ const EmailOverviewCard = ({ data }) => {
                     title={
                       <div>
                         <Text strong style={{ fontSize: 12 }}>
-                          {item.title}
+                          {item?.title}
                         </Text>
-                        {item.tag && (
+                        {item?.tag && (
                           <Tag
                             color={
                               item.tag === 'Informational'
@@ -114,12 +115,11 @@ const EmailOverviewCard = ({ data }) => {
                       </div>
                     }
                     description={
-                      item.description &&
+                      item?.description &&
                       (Array.isArray(item.description) ? (
                         <ul style={{ paddingLeft: 16 }}>
-                          {item.description.map((subItem, index) => (
-                            // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Add appropriate unique key
-                            <li key={index}>
+                          {item.description.map((subItem) => (
+                            <li key={subItem.name || subItem.domain}>
                               <Text style={{ fontSize: 12 }} copyable>
                                 {subItem.name || subItem.domain}
                               </Text>

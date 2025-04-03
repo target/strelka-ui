@@ -1,11 +1,11 @@
-import * as React from 'react'
+import React from 'react'
 import { Route, Routes } from 'react-router'
 import PrivateRoutes from './PrivateRoutes'
 
 const DashboardPage = React.lazy(() => import('../pages/Dashboard'))
 const SubmissionViewPage = React.lazy(() => import('../pages/SubmissionView'))
 
-export const InternalRouter = () => {
+export function InternalRouter() {
   return (
     <React.Suspense fallback={<div>Loading...</div>}>
       <Routes>

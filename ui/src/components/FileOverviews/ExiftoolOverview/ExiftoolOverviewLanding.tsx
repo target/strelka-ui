@@ -1,12 +1,9 @@
-import React from 'react'
-import FileExiftoolCard from './ExiftoolOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
+import FileExiftoolCard from './ExiftoolOverviewCard'
 
-const ExiftoolOverviewLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const ExiftoolOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.exiftool) {
     return null
   }
