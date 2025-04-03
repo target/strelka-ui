@@ -1,11 +1,17 @@
 import { Collapse, Tag, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import FileTypeOverviewCard from './FileTypeOverviewCard'
+import type { ScanData } from '../types'
 
 const { Text } = Typography
 
-const FileTypeOverviewLanding = ({ data, onFileTypeSelect }) => {
+interface FileTypeOverviewLandingProps extends ScanData {
+  onFileTypeSelect: (fileType: string) => void
+}
+
+const FileTypeOverviewLanding = (props: FileTypeOverviewLandingProps) => {
+  const { data, onFileTypeSelect } = props
   const [filterApplied, setFilterApplied] = useState(false)
 
   const handleFileTypeSelect = (selectedFileType) => {

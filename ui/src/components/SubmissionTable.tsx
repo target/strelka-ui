@@ -15,7 +15,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
-import React, { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
 import { useVirusTotalApiKey } from '../hooks/useVirusTotalApiKey'
@@ -90,7 +90,7 @@ const SubmissionTable = () => {
     setCurrentPage(1)
   }
 
-  const handleTableChange = (newPagination, filters, newSorter) => {
+  const handleTableChange = (newPagination, _filters, newSorter) => {
     // If the newSorter object has a 'field' and 'order', it means a column was clicked for sorting.
     if (newSorter.field && newSorter.order) {
       setSorter({
@@ -113,7 +113,7 @@ const SubmissionTable = () => {
   const columns = [
     {
       title: <UploadOutlined style={{ fontSize: '1rem' }} />,
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'submitted_type',
       key: 'submitted_type',
       width: 1,
@@ -135,13 +135,13 @@ const SubmissionTable = () => {
     },
     {
       title: 'Submitted',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'submitted_at',
       key: 'submitted_at',
       width: 1,
       sorter: true,
-      defaultSortOrder: sorter.order,
-      render: (submitted_at, submitted_type, full) => {
+      defaultSortOrder: sorter.order as 'ascend' | 'descend',
+      render: (submitted_at, _submitted_type, _full) => {
         return submitted_at ? (
           <p>
             {new Date(submitted_at).toLocaleDateString(undefined, {
@@ -162,7 +162,7 @@ const SubmissionTable = () => {
           <InfoCircleOutlined style={{ marginLeft: 4 }} />
         </Tooltip>
       ),
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'highest_vt_count',
       key: 'vt',
       width: 1,
@@ -172,7 +172,7 @@ const SubmissionTable = () => {
           fontSize: '10px',
           fontWeight: 'bold',
           width: '80%',
-          textAlignLast: 'center',
+          textAlign: 'center' as const,
           maxWidth: '75px',
         }
 
@@ -180,7 +180,7 @@ const SubmissionTable = () => {
           fontSize: '10px',
           fontWeight: 'bold',
           width: '80%',
-          textAlignLast: 'center',
+          textAlign: 'center' as const,
           maxWidth: '75px',
           cursor: 'pointer',
         }
@@ -253,7 +253,7 @@ const SubmissionTable = () => {
 
     {
       title: 'Uploader',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'user.user_cn',
       key: 'user.user_cn',
       width: 1,
@@ -261,7 +261,7 @@ const SubmissionTable = () => {
     },
     {
       title: 'Size',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'file_size',
       key: 'file_size',
       width: 1,
@@ -270,7 +270,7 @@ const SubmissionTable = () => {
     },
     {
       title: 'Files',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'files_seen',
       key: 'files_seen',
       width: 1,
@@ -278,7 +278,7 @@ const SubmissionTable = () => {
     },
     {
       title: 'IOCs',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'iocs',
       key: 'iocs',
       width: 1,
@@ -288,7 +288,7 @@ const SubmissionTable = () => {
           fontSize: '10px',
           fontWeight: 'bold',
           width: '80%',
-          textAlignLast: 'center',
+          textAlign: 'center' as const,
           maxWidth: '75px',
         }
 
@@ -305,7 +305,7 @@ const SubmissionTable = () => {
     },
     {
       title: 'Insights',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'insights',
       key: 'insights',
       width: 1,
@@ -318,7 +318,7 @@ const SubmissionTable = () => {
           fontSize: '10px',
           fontWeight: 'bold',
           width: '80%',
-          textAlignLast: 'center',
+          textAlign: 'center' as const,
           maxWidth: '75px',
         }
 
@@ -333,12 +333,12 @@ const SubmissionTable = () => {
     },
     {
       title: 'Type',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'mime_types',
       key: 'mime_types',
       width: 1,
       sorter: true,
-      render: (value, full) => {
+      render: (value, _full) => {
         const mimeType = value[0] || 'N/A'
         // Clone the strelka_response to avoid directly mutating the state
         // const strelkaResponse = [...full.strelka_response]
@@ -368,7 +368,7 @@ const SubmissionTable = () => {
           fontSize: '10px',
           fontWeight: 'bold',
           width: '100%',
-          textAlignLast: 'center',
+          textAlign: 'center' as const,
           maxWidth: '150px',
           paddingLeft: '5px',
           paddingRight: '5px',
@@ -396,7 +396,7 @@ const SubmissionTable = () => {
     },
     {
       title: 'YARAs',
-      align: 'center',
+      align: 'center' as const,
       dataIndex: 'yara_hits',
       key: 'yara_hits',
       width: 1,
@@ -409,7 +409,7 @@ const SubmissionTable = () => {
           fontSize: '10px',
           fontWeight: 'bold',
           width: '80%',
-          textAlignLast: 'center',
+          textAlign: 'center' as const,
           maxWidth: '75px',
         }
         return (
@@ -423,7 +423,7 @@ const SubmissionTable = () => {
     },
     {
       title: 'Scanners',
-      align: 'center',
+      align: 'center' as const,
       key: 'scanners_run',
       dataIndex: 'scanners_run',
       width: 1,
@@ -432,10 +432,10 @@ const SubmissionTable = () => {
     },
     {
       title: 'Actions',
-      align: 'center',
+      align: 'center' as const,
       key: 'action',
       width: 1,
-      render: (text, record) => {
+      render: (_text, record) => {
         // Find the sha256 hash in the array of hashes
         const sha256Array = record.hashes.find(
           (hashArray) => hashArray[0] === 'sha256',
@@ -538,7 +538,7 @@ export default SubmissionTable
 
 function formatFileSize(fileSize) {
   let unit = 'B'
-  let formattedSize
+  let formattedSize: string
   if (fileSize >= 1024 * 1024) {
     formattedSize = (fileSize / (1024 * 1024)).toFixed(2)
     unit = 'MB'

@@ -1,8 +1,8 @@
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { Col, Row, Tag, Tooltip, Typography } from 'antd'
-import React from 'react'
 import styled from 'styled-components'
 import { useVirusTotalApiKey } from '../../../hooks/useVirusTotalApiKey'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
@@ -40,6 +40,10 @@ const getVirusTotalTagProps = (positives) => {
   return vtColor
 }
 
+interface FileOverviewCardProps extends OverviewCardProps {
+  onOpenVT: (hash: string) => void
+}
+
 /**
  * Component that displays an overview of a file's properties.
  *
@@ -48,7 +52,7 @@ const getVirusTotalTagProps = (positives) => {
  * @param {Object} props.data - The data object containing file and scan information.
  * @returns {JSX.Element} A JSX element representing the card.
  */
-const FileOverviewCard = ({ data, onOpenVT }) => {
+const FileOverviewCard = ({ data, onOpenVT }: FileOverviewCardProps) => {
   const virustotalData = data?.enrichment?.virustotal
   const vtColor = getVirusTotalTagProps(virustotalData)
   const { isApiKeyAvailable } = useVirusTotalApiKey()

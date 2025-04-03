@@ -10,29 +10,26 @@ import {
   Controls,
   MiniMap,
   useReactFlow,
-  type Node,
-  type NodeChange,
-  type EdgeChange,
 } from '@xyflow/react'
 import { initialEdges, initialNodes } from '../../data/initialData.js'
 import { IndexConnectEdge } from './EdgeTypes/IndexConnectEdge'
-import EventNode from './NodeTypes/EventNode.js'
+import EventNode from './NodeTypes/EventNode'
 import '@xyflow/react/dist/style.css'
-import ClickGuide from '../../utils/ClickGuide.jsx'
-import ExceededGuide from '../../utils/ExceededGuide.jsx'
-import NodeSearchPanel from '../../utils/NodeSearchPanel.jsx'
-import ShowFileListing from '../../utils/ShowFileListing.jsx'
-import { antdColors } from '../../utils/colors.js'
+import ClickGuide from '../../utils/ClickGuide'
+import ExceededGuide from '../../utils/ExceededGuide'
+import NodeSearchPanel from '../../utils/NodeSearchPanel'
+import ShowFileListing from '../../utils/ShowFileListing'
+import { antdColors } from '../../utils/colors'
 import { getDagreLayout } from '../../utils/dagreLayout.js'
-import DownloadImage from '../../utils/downloadImage.jsx'
+import DownloadImage from '../../utils/DownloadImage'
 import {
   toggleChildrenVisibility,
   transformElasticSearchDataToElements,
-} from '../../utils/layoutUtils.ts'
+} from '../../utils/layoutUtils.js'
 
-import { useDarkModeSetting } from '../../hooks/useDarkModeSetting.ts'
-import type { NodeData } from '../../utils/indexDataUtils.ts'
-import type { StrelkaResponse } from '../../services/api.types.ts'
+import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
+import type { StrelkaNodeData } from '../../utils/indexDataUtils.js'
+import type { StrelkaResponse } from '../../services/api.types.js'
 
 const nodeTypes = {
   event: EventNode,
@@ -44,46 +41,45 @@ const edgeTypes = {
 
 const snapGrid: [number, number] = [16, 16]
 
-interface FileTreeCardProps {
+export interface FileTreeCardProps {
   data: StrelkaResponse[]
-  alertId: string
-  onNodeSelect: (record: NodeData) => void
-  fileTypeFilter?: string
-  fileYaraFilter?: string
-  fileIocFilter?: string
-  fileNameFilter?: string
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  selectedNodeData: any
-  setSelectedNodeData: (data: NodeData) => void
+  onNodeSelect: (nodeData: StrelkaNodeData) => void
+  fileTypeFilter: string
+  fileYaraFilter: string
+  fileIocFilter: string
+  fileNameFilter: string
+  selectedNodeData: StrelkaNodeData
+  setSelectedNodeData: (nodeData: StrelkaNodeData) => void
 }
 
-const FileTreeCard: React.FC<FileTreeCardProps> = ({
-  data,
-  onNodeSelect,
-  fileTypeFilter,
-  fileYaraFilter,
-  fileIocFilter,
-  fileNameFilter,
-  selectedNodeData,
-  setSelectedNodeData,
-}) => {
-  const [searchTerm, setSearchTerm] = useState<string>('')
+const FileTreeCard = (props: FileTreeCardProps) => {
+  const {
+    data,
+    onNodeSelect,
+    fileTypeFilter,
+    fileYaraFilter,
+    fileIocFilter,
+    fileNameFilter,
+    selectedNodeData,
+    setSelectedNodeData,
+  } = props
+  const [searchTerm, setSearchTerm] = useState('')
   const { fitView } = useReactFlow()
 
   const layoutedElements = useMemo(
     () => getDagreLayout(initialNodes, initialEdges),
     [],
   )
-  const layoutedNodes = layoutedElements.filter(isNode) as Node[]
+  const layoutedNodes = layoutedElements.filter(isNode)
   const layoutedEdges = layoutedElements.filter((el) => !isNode(el))
   const [nodes, setNodes] = useNodesState(layoutedNodes)
   const [edges, setEdges] = useEdgesState(layoutedEdges)
   const showClickGuide = !selectedNodeData
-  const [showExceededGuide, setShowExceededGuide] = useState<boolean>(false)
-  const ref = useRef<HTMLDivElement | null>(null)
+  const [showExceededGuide, setShowExceededGuide] = useState(false)
+  const ref = useRef(null)
 
-  const [highlightedEdge, setHighlightedEdge] = useState<string | null>(null)
-  const [highlightedNode, setHighlightedNode] = useState<string | null>(null)
+  const [highlightedEdge, setHighlightedEdge] = useState(null)
+  const [highlightedNode, setHighlightedNode] = useState(null)
 
   useEffect(() => {
     const vtExceeded = data.some((item) => {
@@ -92,41 +88,44 @@ const FileTreeCard: React.FC<FileTreeCardProps> = ({
     setShowExceededGuide(vtExceeded)
   }, [data])
 
-  const onSearchChange = (search: string) => {
+  const onSearchChange = (search) => {
     setSearchTerm(search)
   }
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) => {
+    (changes) => {
       setNodes((currentNodes) => applyNodeChanges(changes, currentNodes))
     },
     [setNodes],
   )
 
   const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => {
+    (changes) => {
       setEdges((currentEdges) => applyEdgeChanges(changes, currentEdges))
     },
     [setEdges],
   )
 
   const filteredNodes = useMemo(() => {
+    console.log('Filtering nodes', nodes)
     let nodesToFilter = fileTypeFilter
       ? nodes.filter((node) =>
-          (node.data as unknown as NodeData).nodeMain.includes(fileTypeFilter),
+          (node.data as unknown as StrelkaNodeData).nodeMain.includes(
+            fileTypeFilter,
+          ),
         )
       : nodes
 
     if (fileNameFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        (node.data as unknown as NodeData).nodeRelationshipId?.includes(
+        (node.data as unknown as StrelkaNodeData).nodeRelationshipId?.includes(
           fileNameFilter,
         ),
       )
     }
     if (fileYaraFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        (node.data as unknown as NodeData).nodeYaraList?.includes(
+        (node.data as unknown as StrelkaNodeData).nodeYaraList?.includes(
           fileYaraFilter,
         ),
       )
@@ -134,7 +133,7 @@ const FileTreeCard: React.FC<FileTreeCardProps> = ({
 
     if (fileIocFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        (node.data as { nodeIocList?: string }).nodeIocList?.includes(
+        (node.data as unknown as StrelkaNodeData).nodeIocList?.includes(
           fileIocFilter,
         ),
       )
@@ -157,11 +156,12 @@ const FileTreeCard: React.FC<FileTreeCardProps> = ({
     fileNameFilter,
   ])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: TODO: use the correct dependencies
   useEffect(() => {
     fitView({ padding: 0.2 })
-  }, [fitView])
+  }, [fileTypeFilter, fileYaraFilter, fileNameFilter, fitView])
 
-  const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
+  const handleNodeClick = (_event, node) => {
     if (node.type === 'index') {
       const rootNodeIds = nodes
         .filter((n) => n.type === 'index')
@@ -200,13 +200,13 @@ const FileTreeCard: React.FC<FileTreeCardProps> = ({
       setNodes(updatedNodes)
       setEdges(updatedEdges)
     } else {
-      setSelectedNodeData(node.data as unknown as NodeData)
-      onNodeSelect(node.data as unknown as NodeData)
+      setSelectedNodeData(node.data)
+      onNodeSelect(node.data.record)
     }
   }
 
   const handleNodeMouseEnter = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
+    (_event, node) => {
       const relatedEdge = edges.find((edge) => edge.target === node.id)
       if (relatedEdge) {
         setHighlightedEdge(relatedEdge.id)

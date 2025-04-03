@@ -1,12 +1,10 @@
-import React from 'react'
-import EmailOverviewCard from './EmailOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import EmailOverviewCard from './EmailOverviewCard'
+import type { OverviewLandingProps } from '../types'
 
-const EmailOverviewLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const EmailOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
+
   if (!selectedNodeData?.scan?.email) {
     return null
   }

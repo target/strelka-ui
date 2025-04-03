@@ -1,11 +1,24 @@
 import { Space, Tag, Tooltip, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import { getIconConfig } from '../../../utils/iconMappingTable'
+import type { ScanData } from '../types'
 
 const { Text } = Typography
 
-const FileTypeOverviewCard = ({ data, onFileTypeSelect }) => {
+interface FileTypeOverviewCardProps extends ScanData {
+  onFileTypeSelect: (fileType: string | null) => void
+}
+
+interface MimeTypeDetails {
+  [mimeType: string]: {
+    count: number
+    files: string[]
+  }
+}
+
+const FileTypeOverviewCard = (props: FileTypeOverviewCardProps) => {
+  const { data, onFileTypeSelect } = props
   const [selectedFileType, setSelectedFileType] = useState(null)
   const [showMoreFileTypes, setShowMoreFileTypes] = useState(false)
   const MAX_ITEMS_VISIBLE = 10
@@ -17,8 +30,7 @@ const FileTypeOverviewCard = ({ data, onFileTypeSelect }) => {
     onFileTypeSelect(newSelectedFileType) // Pass null if deselected to remove filter
   }
 
-  // Create an object to hold the count and associated filenames of mime types
-  const mimeTypeDetails = {}
+  const mimeTypeDetails: MimeTypeDetails = {}
 
   // Iterate over the strelka_response to populate mimeTypeDetails
   for (const response of data.strelka_response) {

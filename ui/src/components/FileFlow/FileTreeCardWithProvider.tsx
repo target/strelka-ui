@@ -1,8 +1,7 @@
-import React from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
-import FileTreeCard from './FileTreeCard' // Adjust the import path as needed
+import FileTreeCard, { type FileTreeCardProps } from './FileTreeCard' // Adjust the import path as needed
 
-function FileTreeCardWithProvider(props) {
+function FileTreeCardWithProvider(props: FileTreeCardProps) {
   return (
     <ReactFlowProvider>
       <FileTreeCard {...props} />

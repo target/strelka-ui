@@ -1,10 +1,10 @@
-import { Collapse, Typography, Flex, Tag } from 'antd'
+import { Collapse, Flex, Tag, Typography } from 'antd'
 import type { ReactNode } from 'react'
 const { Text } = Typography
 
 interface TagData {
   label: string
-  color: string
+  color?: string
 }
 interface CollapseCardProps {
   label: string

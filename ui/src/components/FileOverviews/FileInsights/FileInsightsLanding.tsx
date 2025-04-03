@@ -1,8 +1,9 @@
-import React from 'react'
-import InsightsCard from './FileInsightsOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
+import InsightsCard from './FileInsightsOverviewCard'
 
-const InsightsLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const InsightsLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   const insightsData = selectedNodeData?.insights || []
 
   const label = 'Insights'

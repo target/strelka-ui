@@ -1,3 +1,5 @@
+import type { StrelkaResponse } from '../services/api.types'
+
 // Constants for index colors
 const COLORS = {
   STRELKA: '#9c27b0',
@@ -20,7 +22,7 @@ export const indexColorThemes = (index) => {
   }
 }
 
-export interface NodeData {
+export interface StrelkaNodeData {
   nodeDatatype: string
   nodeVirustotal: string
   nodeInsights: number
@@ -43,6 +45,7 @@ export interface NodeData {
   nodeMetricLabel?: string
   nodeQrData?: string
   color?: string
+  record?: StrelkaResponse
 }
 
 /**
@@ -54,7 +57,7 @@ export interface NodeData {
  * @returns A structured nodeData object.
  */
 export const indexDataType = (index, data) => {
-  const nodeData: NodeData = {
+  const nodeData: StrelkaNodeData = {
     nodeDatatype: 'strelka',
     nodeVirustotal: 'Not Found',
     nodeInsights: 0,

@@ -1,12 +1,14 @@
-import FileOverviewCard from './FileOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
+import FileOverviewCard from './FileOverviewCard'
 
-const FileOverviewLanding = ({
-  selectedNodeData,
-  onOpenVT,
-  expanded,
-  onExpandChange,
-}) => {
+export interface FileOverviewLandingProps extends OverviewLandingProps {
+  onOpenVT: (vt: string) => void
+}
+
+const FileOverviewLanding = (props: FileOverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange, onOpenVT } = props
+
   if (!selectedNodeData) {
     return null
   }
