@@ -19,15 +19,12 @@ services:
       DATABASE_NAME: strelka_ui
       DATABASE_PASSWORD: postgres
       DATABASE_USERNAME: postgres
-      STRELKA_HOST: docker.host.internal # defaults to strelka hosted on same machine
-      STRELKA_PORT: 8443
-      ENV: dev
     env_file:
       # Add/override environment variables in this file 
       # See ./app/strelka_ui/.env.example for reference
       - path: ./app/strelka_ui/.env
         required: false
-
+      
     volumes:
       - ./certs:/certs
 
