@@ -115,6 +115,11 @@ Supported modification fields in `./ui/src/config.js`:
 | SEARCH_NAME | Search name for the external application | Ex: Splunk |
 | DEFAULT_EXCLUDED_SUBMITTERS | Default users to be exluded from Submission table view. Useful for hiding automations by default. | Ex: SearchBot |
 
+#### Providing CA certificates
+If you need to provide a custom CA bundle due to your network environment, you can do so by setting the `REQUESTS_CA_BUNDLE` environment variable.
+
+When running via docker compose, the `certs` directory at the root of the project will be mounted to `/certs` in the container. Place your CA bundle in that directory and set the `REQUESTS_CA_BUNDLE` environment variable to point to it.
+
 ## API
 
 The Strelka UI also provides API routes for user script based access. Please reference the below routes for details:
