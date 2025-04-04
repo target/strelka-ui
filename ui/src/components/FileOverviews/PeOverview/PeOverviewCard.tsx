@@ -1,6 +1,6 @@
 import { CheckCircleOutlined, WarningOutlined } from '@ant-design/icons'
 import { Descriptions, Divider, List, Table, Typography } from 'antd'
-import React from 'react'
+import type { OverviewCardProps } from '../types'
 
 import '../../../styles/PeOverviewCard.css'
 
@@ -17,7 +17,7 @@ const descriptionStyle = {
   },
 }
 
-const PeOverviewCard = ({ data }) => {
+const PeOverviewCard = ({ data }: OverviewCardProps) => {
   const sectionColumns = [
     {
       title: 'Name',
@@ -86,8 +86,11 @@ const PeOverviewCard = ({ data }) => {
     md5: section.md5,
   }))
 
+  const importedSymbols = data.scan.pe?.symbols?.imported || []
+  const exportedSymbols = data.scan.pe?.symbols?.exported || []
+
   return (
-    <div span={2} className="pe-overview-card">
+    <div className="pe-overview-card">
       <div style={{ padding: '5px', paddingBottom: '20px' }}>
         <Divider style={{ padding: '2px', margin: '2px' }} />
         <Text strong style={{ fontSize: '12px' }}>
@@ -252,7 +255,7 @@ const PeOverviewCard = ({ data }) => {
 
       <List
         size="small"
-        dataSource={data.scan.pe?.symbols?.imported}
+        dataSource={importedSymbols}
         renderItem={(item) => (
           <List.Item>
             <Text style={{ fontSize: '12px' }} code>
@@ -271,7 +274,7 @@ const PeOverviewCard = ({ data }) => {
 
       <List
         size="small"
-        dataSource={data.scan.pe?.symbols?.exported}
+        dataSource={exportedSymbols}
         renderItem={(item) => (
           <List.Item>
             <Text style={{ fontSize: '12px' }} code>

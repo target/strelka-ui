@@ -1,13 +1,17 @@
-import React from 'react'
+import { Select, Flex } from 'antd'
 
-import { Select, Typography, Flex } from 'antd'
-const { Text } = Typography
+interface JsonThemeSelectProps {
+  jsonTheme: string
+  setJsonTheme: (theme: string) => void
+}
 
-const JsonThemeSelect = ({ jsonTheme, setJsonTheme }) => {
+const JsonThemeSelect = (props: JsonThemeSelectProps) => {
+  const { jsonTheme, setJsonTheme } = props
   return (
     <Flex vertical>
       <Select
         popupMatchSelectWidth={false}
+        variant="borderless"
         size="small"
         style={{
           minWidth: '100px',
@@ -18,7 +22,7 @@ const JsonThemeSelect = ({ jsonTheme, setJsonTheme }) => {
           label: <span>{theme}</span>,
         }))}
         value={jsonTheme}
-        onChange={setJsonTheme}
+        onChange={(value) => setJsonTheme(value)}
       />
     </Flex>
   )
@@ -26,7 +30,7 @@ const JsonThemeSelect = ({ jsonTheme, setJsonTheme }) => {
 
 export default JsonThemeSelect
 
-const themes = [
+const themes: string[] = [
   'apathy',
   'apathy:inverted',
   'ashes',

@@ -1,12 +1,9 @@
-import React from 'react'
 import FileHeaderFooterCard from './HeaderFooterCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const HeaderFooterLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const HeaderFooterLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   const header = selectedNodeData?.scan?.header
   const footer = selectedNodeData?.scan?.footer
 

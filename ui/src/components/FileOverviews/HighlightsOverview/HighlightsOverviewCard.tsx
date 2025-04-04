@@ -5,13 +5,19 @@ import {
   WarningOutlined,
 } from '@ant-design/icons'
 import { Tag, Tooltip, Typography } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import { getIconConfig } from '../../../utils/iconMappingTable'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
-const FileHighlightsOverviewCard = ({ data, onFileNameSelect }) => {
+interface HighlightsOverviewCardProps extends OverviewCardProps {
+  onFileNameSelect: (fileName: string) => void
+}
+
+const FileHighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
+  const { data, onFileNameSelect } = props
   const [expandedNodes, setExpandedNodes] = useState(new Set())
   const [selectedNodeId, setSelectedNodeId] = useState(null)
   const [visibleNodeCount, setVisibleNodeCount] = useState(20) // start with 20 nodes visible

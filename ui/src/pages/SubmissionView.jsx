@@ -7,7 +7,7 @@ import PageWrapper from '../components/PageWrapper'
 import FileIocsOverviewLanding from '../components/FileOverviews/FileIocsOverview/FileIocsOverviewLanding'
 import FileTypeOverviewLanding from '../components/FileOverviews/FileTypeOverview/FileTypeOverviewLanding'
 import FileHeaderLanding from '../components/FileOverviews/HeaderOverview/HeaderLanding'
-import FileHighlightsOverviewLanding from '../components/FileOverviews/HighlightsOverview/HighlightsOverviewLanding'
+import HighlightsOverviewLanding from '../components/FileOverviews/HighlightsOverview/HighlightsOverviewLanding'
 import JsonViewLanding from '../components/FileOverviews/JsonView/JsonViewLanding'
 import FileYaraOverviewLanding from '../components/FileOverviews/YaraOverview/YaraOverviewLanding'
 
@@ -226,7 +226,7 @@ const SubmissionsPage = (props) => {
         {/* Left Side Components */}
         <Col className="gutter-row" xs={6} sm={6} md={6} lg={6}>
           {/* Component Card - File Highlights */}
-          <FileHighlightsOverviewLanding
+          <HighlightsOverviewLanding
             data={data}
             onFileNameSelect={handleFileNameSelect}
           />

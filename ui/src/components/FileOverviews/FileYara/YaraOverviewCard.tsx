@@ -1,10 +1,11 @@
 import { Col, Input, List, Row, Tag, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
+import type { OverviewCardProps } from '../types'
 
 const { Text, Paragraph } = Typography
 
-const YaraOverviewCard = ({ data }) => {
-  const [filter, setFilter] = useState('')
+const YaraOverviewCard = ({ data }: OverviewCardProps) => {
+  const [filter, setFilter] = useState<string>('')
 
   const antColors = [
     'magenta',
@@ -21,25 +22,22 @@ const YaraOverviewCard = ({ data }) => {
     'grey',
   ]
 
-  // Function to randomly get a color for a given prefix
-  const getColorForPrefix = (prefix) => {
+  const getColorForPrefix = (_prefix: string): string => {
     const randomIndex = Math.floor(Math.random() * antColors.length)
     return antColors[randomIndex]
   }
 
-  // Keep track of assigned colors for each prefix
-  const prefixColorMap = {}
+  const prefixColorMap: Record<string, string> = {}
 
-  // Function to get a consistent color for a given prefix
-  const getConsistentColorForPrefix = (prefix) => {
+  const getConsistentColorForPrefix = (prefix: string): string => {
     if (!prefixColorMap[prefix]) {
       prefixColorMap[prefix] = getColorForPrefix(prefix)
     }
     return prefixColorMap[prefix]
   }
 
-  const mapDescriptions = () => {
-    const descriptionMap = new Map()
+  const mapDescriptions = (): Map<string, string> => {
+    const descriptionMap = new Map<string, string>()
     if (data?.scan?.yara && Array.isArray(data.scan.yara.meta)) {
       for (const meta of data.scan.yara.meta) {
         if (meta.identifier === 'description') {
@@ -54,21 +52,21 @@ const YaraOverviewCard = ({ data }) => {
     const descriptionMap = mapDescriptions()
     if (data?.scan?.yara && Array.isArray(data.scan.yara.matches)) {
       return data.scan.yara.matches
-        .map((rule) => {
+        .map((match: string) => {
+          const rule = match
           return {
-            rule: rule,
+            rule,
             description:
               descriptionMap.get(rule) || 'No description available.',
             color: getConsistentColorForPrefix(rule.split('_')[0]),
           }
         })
-        .sort((a, b) => a.rule.localeCompare(b.rule)) // Sort alphabetically by rule name
+        .sort((a, b) => a.rule.localeCompare(b.rule))
     }
 
-    return [] // Return an empty array if the data is not in the expected format
+    return []
   }
 
-  // Function to filter YARA data
   const processYaraData = () => {
     return compileRulesList().filter(({ rule, description }) => {
       const searchTerm = filter.toLowerCase()

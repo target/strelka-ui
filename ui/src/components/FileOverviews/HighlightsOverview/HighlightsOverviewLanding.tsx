@@ -1,9 +1,15 @@
 import { Collapse, Tag, Typography, theme } from 'antd'
-import React, { useState } from 'react'
-import FileHighlightsOverviewCard from './HighlightsOverviewCard'
-
+import { useState } from 'react'
+import FileHighlightsOverviewCard from './HighlightsOverviewCard.tsx'
+import type { OverviewCardProps } from '../types'
 const { Text } = Typography
-const FileHighlightsOverviewLanding = ({ data, onFileNameSelect }) => {
+
+interface HighlightsOverviewLandingProps extends OverviewCardProps {
+  onFileNameSelect: (fileName: string) => void
+}
+
+const HighlightsOverviewLanding = (props: HighlightsOverviewLandingProps) => {
+  const { data, onFileNameSelect } = props
   const { useToken } = theme
   const tokenData = useToken()
   const BLUE = tokenData.token.blue
@@ -62,4 +68,4 @@ const FileHighlightsOverviewLanding = ({ data, onFileNameSelect }) => {
   )
 }
 
-export default FileHighlightsOverviewLanding
+export default HighlightsOverviewLanding

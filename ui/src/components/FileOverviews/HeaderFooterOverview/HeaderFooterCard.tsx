@@ -1,12 +1,18 @@
 import { Col, Row, Typography } from 'antd'
-import React from 'react'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
-const FileHeaderFooterCard = ({ data }) => {
+const FileHeaderFooterCard = (props: OverviewCardProps) => {
+  const { data } = props
   // Helper function to format the text row for display.
   // Only render the row if the content is not undefined or null.
-  const renderTextRow = (label, content, isCode = false, copyable = false) => {
+  const renderTextRow = (
+    label: string,
+    content: string | undefined | null,
+    isCode = false,
+    copyable = false,
+  ) => {
     if (content === undefined || content === null) {
       return null
     }

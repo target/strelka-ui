@@ -76,6 +76,7 @@ export interface StrelkaResponse {
   scan: ScanDetails
   enrichment?: Enrichment
   iocs?: Ioc[]
+  strelka_response?: StrelkaResponse[]
 }
 
 interface Enrichment {
@@ -141,10 +142,75 @@ interface ScanDetails {
   footer?: Footer
   hash?: Hash
   header?: Header
+  javascript?: {
+    script_length_bytes?: number
+  }
   ocr?: Ocr
   pdf?: Pdf
+  pe?: Pe
+  qr?: {
+    data: string[]
+    image: string
+  }
+  rar?: {
+    compression_rate: number
+    host_os: string
+    elapsed: number
+    flags?: string[]
+    files: {
+      file_name: string
+      file_size: number
+      compression_rate: number
+      encrypted: boolean
+    }[]
+    total: {
+      files: number
+      extracted: number
+    }
+  }
   tlsh?: Tlsh
   yara?: Yara
+}
+
+interface Pe {
+  address_of_entry_point: number
+  compile_time: string
+  file_info: FileInfo
+  sections: Section[]
+  security: boolean
+  symbols: {
+    imported: string[]
+    exported: string[]
+  }
+  header: {
+    machine: {
+      type: string
+      description: string
+    }
+  }
+}
+
+interface FileInfo {
+  file_type: string
+  file_type_extension: string
+  product_name: string
+  legal_copyright: string
+  file_description: string
+  original_filename: string
+  file_version: string
+}
+
+interface Section {
+  address: Address
+  entropy: number
+  md5: string
+  name: string
+  size: number
+}
+
+interface Address {
+  physical: number
+  virtual: number
 }
 
 interface Entropy {
@@ -188,6 +254,8 @@ interface Footer {
   backslash: string
   elapsed: number
   footer: string
+  hex?: string
+  raw?: string
 }
 
 interface Hash {
@@ -203,13 +271,15 @@ interface Header {
   backslash: string
   elapsed: number
   header: string
+  hex?: string
+  raw?: string
 }
 
 interface Ocr {
   base64_thumbnail: string
   elapsed: number
   render: Render
-  text: string[]
+  text: string[] | string
 }
 
 interface Render {
@@ -263,6 +333,11 @@ interface Yara {
   matches: string[]
   rules_loaded: number
   tags: string[]
+  meta: {
+    identifier: string
+    rule: string
+    value: string
+  }
 }
 
 interface User {

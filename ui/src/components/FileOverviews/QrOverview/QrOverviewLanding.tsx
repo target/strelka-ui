@@ -1,8 +1,9 @@
-import React from 'react'
 import QrOverviewCard from './QrOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const QrOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const QrOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.qr?.data) {
     return null
   }

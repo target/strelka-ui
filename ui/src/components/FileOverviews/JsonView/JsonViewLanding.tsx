@@ -1,8 +1,9 @@
-import React from 'react'
 import JsonViewCard from './JsonViewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const JsonViewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const JsonViewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   return (
     <CollapseCard
       onExpandChange={onExpandChange}
@@ -10,7 +11,7 @@ const JsonViewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
       description="Raw Strelka data, including scanners not yet available in Card view."
       expanded={expanded}
     >
-      <JsonViewCard json={selectedNodeData} />
+      <JsonViewCard data={selectedNodeData} />
     </CollapseCard>
   )
 }
