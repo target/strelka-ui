@@ -1,18 +1,21 @@
 import { MessageOutlined, NumberOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography, message } from 'antd'
-import React, { useState } from 'react'
+import { Button, Form, Input } from 'antd'
+import { useCallback, useState } from 'react'
 import { APP_CONFIG } from '../../config'
 import { useMessageApi } from '../../providers/MessageProvider'
 import { fetchWithTimeout } from '../../util'
 
-const { Text } = Typography
+interface VirusTotalUploaderProps {
+  onUploadSuccess: () => void
+}
 
-const VirusTotalUploader = ({ onUploadSuccess }) => {
+const VirusTotalUploader = (props: VirusTotalUploaderProps) => {
+  const { onUploadSuccess } = props
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const message = useMessageApi()
 
-  const handleSubmitVtHash = () => {
+  const handleSubmitVtHash = useCallback(() => {
     form
       .validateFields()
       .then((values) => {
@@ -22,6 +25,7 @@ const VirusTotalUploader = ({ onUploadSuccess }) => {
           hash: values.hash,
         }
 
+        // TODO: move this to a service
         fetchWithTimeout(`${APP_CONFIG.BACKEND_URL}/strelka/upload`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -40,7 +44,7 @@ const VirusTotalUploader = ({ onUploadSuccess }) => {
             }
             return response.json()
           })
-          .then((data) => {
+          .then(() => {
             onUploadSuccess() // Trigger table refresh
             form.resetFields() // Reset fields
             message.success(
@@ -53,13 +57,13 @@ const VirusTotalUploader = ({ onUploadSuccess }) => {
             setLoading(false) // Stop loading
           })
       })
-      .catch((errorInfo) => {
+      .catch((_errorInfo) => {
         // Handle form validation error
         message.error(
           'Error submitting hash: Hash must be a valid MD5 (32), SHA1 (40), or SHA256 (64) characters long',
         )
       })
-  }
+  }, [form, message, onUploadSuccess])
 
   return (
     <Form form={form} layout="vertical">

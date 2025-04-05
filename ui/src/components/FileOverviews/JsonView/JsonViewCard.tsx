@@ -68,7 +68,6 @@ const JsonViewCard = (props: OverviewCardProps) => {
         src={filteredJsonData || {}}
         collapsed={3}
         shouldCollapse={(field) => {
-          console.log('!!!field')
           if (field.name === 'scan') {
             return false
           }

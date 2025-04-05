@@ -1,3 +1,5 @@
+import { PresetColors } from 'antd/lib/theme/interface/presetColors'
+
 export const antdColors = {
   blue: '#1890ff',
   purple: '#722ed1',
@@ -31,4 +33,24 @@ export const antdColors = {
   olive: '#808000',
   darkRed: '#8b0000',
   darkBlue: '#00008b',
+}
+
+export const antdColorNames = PresetColors
+
+/**
+ * Get an Ant Design color name for a given string in a deterministic way.
+ * @param string
+ * @returns string
+ * @description This function generates a hash from the input string and maps it to one of the predefined Ant Design color names.
+ */
+export const getColorForString = (string: string): string => {
+  if (!string) {
+    return antdColors.darkGray
+  }
+  let hash = 0
+  for (let i = 0; i < string.length; i++) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % antdColorNames.length
+  return `${antdColorNames[index]}`
 }

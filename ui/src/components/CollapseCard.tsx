@@ -18,7 +18,7 @@ interface CollapseCardProps {
 
 const LABELKEY = '1'
 
-export const CollapseCard: React.FC<CollapseCardProps> = (props) => {
+export function CollapseCard(props: CollapseCardProps) {
   const {
     label,
     description,
@@ -59,7 +59,7 @@ export const CollapseCard: React.FC<CollapseCardProps> = (props) => {
     <Collapse
       defaultActiveKey={startExpanded ? [LABELKEY] : []}
       activeKey={expanded ? [LABELKEY] : []}
-      onChange={(val) => onExpandChange(val.length > 0)}
+      onChange={(val) => onExpandChange?.(val.length > 0)}
       style={{ width: '100%', marginBottom: '10px' }}
       items={[
         {

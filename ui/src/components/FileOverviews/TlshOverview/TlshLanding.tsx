@@ -1,6 +1,6 @@
-import React from 'react'
 import TlshOverviewCard from './TlshOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
 const getTlshRating = (score) => {
   if (score <= 30) return { label: 'Very Similar', color: 'red' }
@@ -10,7 +10,8 @@ const getTlshRating = (score) => {
   return { label: 'Very Different', color: 'green' }
 }
 
-const FileTlshLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const FileTlshLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   const tlshData = selectedNodeData?.scan?.tlsh?.match
   if (!tlshData) {
     return null

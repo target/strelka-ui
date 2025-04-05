@@ -1,10 +1,12 @@
 import { Input, Table, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import '../../../styles/IocOverviewCard.css'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
-const IocOverviewCard = ({ data }) => {
+const IocOverviewCard = (props: OverviewCardProps) => {
+  const { data } = props
   const [filter, setFilter] = useState('')
   const [pageSize, setPageSize] = useState(10)
 

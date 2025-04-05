@@ -1,10 +1,10 @@
 import { Collapse, Tag, Typography, theme } from 'antd'
 import { useState } from 'react'
-import FileHighlightsOverviewCard from './HighlightsOverviewCard.tsx'
-import type { OverviewCardProps } from '../types'
+import HighlightsOverviewCard from './HighlightsOverviewCard.tsx'
+import type { ScanData } from '../types'
 const { Text } = Typography
 
-interface HighlightsOverviewLandingProps extends OverviewCardProps {
+interface HighlightsOverviewLandingProps extends ScanData {
   onFileNameSelect: (fileName: string) => void
 }
 
@@ -57,7 +57,7 @@ const HighlightsOverviewLanding = (props: HighlightsOverviewLandingProps) => {
             </div>
           ),
           children: (
-            <FileHighlightsOverviewCard
+            <HighlightsOverviewCard
               data={data}
               onFileNameSelect={handleFileNameSelect}
             />

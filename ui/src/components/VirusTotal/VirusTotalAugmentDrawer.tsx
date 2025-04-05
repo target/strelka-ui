@@ -1,12 +1,19 @@
-import { Drawer, message } from 'antd'
-import React, { useState, useEffect } from 'react'
+import { Drawer } from 'antd'
+import { useState, useEffect } from 'react'
 import { APP_CONFIG } from '../../config'
 import { useMessageApi } from '../../providers/MessageProvider'
 import { fetchWithTimeout } from '../../util'
 
-const VirusTotalAugmentDrawer = ({ resource, onClose, open }) => {
-  const [widgetUrl, setWidgetUrl] = useState(null)
+interface VirusTotalAugmentDrawerProps {
+  resource: string
+  onClose: () => void
+  open: boolean
+}
 
+const VirusTotalAugmentDrawer = (props: VirusTotalAugmentDrawerProps) => {
+  const { resource, onClose, open } = props
+
+  const [widgetUrl, setWidgetUrl] = useState(null)
   const message = useMessageApi()
 
   useEffect(() => {
