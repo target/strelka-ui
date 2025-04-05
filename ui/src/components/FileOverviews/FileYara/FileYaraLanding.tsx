@@ -1,12 +1,9 @@
-import React from 'react'
 import YaraOverviewCard from './YaraOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const YaraOverviewLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const YaraOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   const yaraMatches = selectedNodeData?.scan?.yara?.matches || []
 
   const label = 'YARA Signatures'

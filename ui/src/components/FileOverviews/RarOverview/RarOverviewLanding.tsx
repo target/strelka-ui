@@ -1,8 +1,9 @@
-import React from 'react'
 import RarOverviewCard from './RarOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const RarOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const RarOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.rar) {
     return null
   }

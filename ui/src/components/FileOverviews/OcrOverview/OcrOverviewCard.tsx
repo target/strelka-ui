@@ -1,17 +1,6 @@
-import {
-  Button,
-  Checkbox,
-  Col,
-  Input,
-  Modal,
-  Row,
-  Tooltip,
-  Typography,
-} from 'antd'
-import React, { useState } from 'react'
+import { Button, Checkbox, Col, Input, Modal, Row, Tooltip } from 'antd'
+import { useState } from 'react'
 import '../../../styles/OcrOverviewCard.css'
-
-const { Text } = Typography
 
 const OcrOverviewCard = ({ data }) => {
   const [isModalVisible, setIsModalVisible] = useState(false)

@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Input, Flex } from 'antd'
 import { useDarkModeSetting } from '../../../hooks/useDarkModeSetting'
 import ReactJson from '@microlink/react-json-view'
 import JsonThemeSelect from './JsonThemeSelect'
 import { useLocalStorage } from '../../../hooks/useLocalStorage'
 
+import type { OverviewCardProps } from '../types'
+
 import { useQuery } from '@tanstack/react-query'
 
-const JsonViewCard = ({ json }) => {
+const JsonViewCard = (props: OverviewCardProps) => {
+  const { data: json } = props
+
   const { isDarkMode } = useDarkModeSetting()
 
   const { data: jsonTheme, mutate } = useLocalStorage(
@@ -51,11 +55,7 @@ const JsonViewCard = ({ json }) => {
           zIndex: 100,
         }}
       >
-        <JsonThemeSelect
-          jsonTheme={jsonTheme}
-          setJsonTheme={mutate}
-          variant="borderless"
-        />
+        <JsonThemeSelect jsonTheme={jsonTheme} setJsonTheme={mutate} />
       </div>
 
       <ReactJson
@@ -68,13 +68,14 @@ const JsonViewCard = ({ json }) => {
         src={filteredJsonData || {}}
         collapsed={3}
         shouldCollapse={(field) => {
+          console.log('!!!field')
           if (field.name === 'scan') {
             return false
           }
           if (typeof field.src !== 'object' || Array.isArray(field.src)) {
             return false
           }
-          return field.level > 2
+          return field.namespace.length > 2
         }}
       />
     </Flex>

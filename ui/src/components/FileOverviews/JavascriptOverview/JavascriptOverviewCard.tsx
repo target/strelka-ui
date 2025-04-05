@@ -1,10 +1,12 @@
 import { Checkbox, Col, Input, Row, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import '../../../styles/ExiftoolOverviewCard.css'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
-const JavascriptOverviewCard = ({ data }) => {
+const JavascriptOverviewCard = (props: OverviewCardProps) => {
+  const { data } = props
   const [filter, setFilter] = useState('')
   const [wrapText, setWrapText] = useState(false)
   const [trimText, setTrimText] = useState(true)
@@ -31,7 +33,7 @@ const JavascriptOverviewCard = ({ data }) => {
       })
   }
 
-  const renderJavascriptSection = (title, key) => {
+  const renderJavascriptSection = (title: string, key: string) => {
     if (!data.scan.javascript || !data.scan.javascript[key]) {
       return null // Return null or handle the case where key doesn't exist
     }
@@ -45,7 +47,7 @@ const JavascriptOverviewCard = ({ data }) => {
         <Text strong style={{ fontSize: '14px', marginBottom: '10px' }}>
           {title}
         </Text>
-        {javascriptData.map(({ line, label, value }) => (
+        {javascriptData.map(({ line, value }) => (
           <Row key={line} className="exif-data-row">
             <Col span={1} className="line-number">
               <div style={{ fontSize: '12px' }}>{line}</div>

@@ -1,12 +1,9 @@
-import React from 'react'
 import JavascriptOverviewCard from './JavascriptOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const JavascriptOverviewLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const JavascriptOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.javascript) {
     return null
   }

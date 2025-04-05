@@ -1,8 +1,9 @@
-import React from 'react'
 import PeOverviewCard from './PeOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const PeOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const PeOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.pe) {
     return null
   }

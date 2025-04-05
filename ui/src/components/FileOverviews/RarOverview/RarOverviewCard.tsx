@@ -9,8 +9,9 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
@@ -37,7 +38,8 @@ const getExtractionColor = (extracted, total) => {
   return { color: antdColors.red }
 }
 
-const RarOverviewCard = ({ data }) => {
+const RarOverviewCard = (props: OverviewCardProps) => {
+  const { data } = props
   const [filter, setFilter] = useState('')
 
   // Check if files exist and filter based on user input
@@ -56,7 +58,7 @@ const RarOverviewCard = ({ data }) => {
       key: 'file_name',
       render: (text) => <Text style={{ fontSize: '12px' }}>{text}</Text>,
       sorter: (a, b) => a.file_name.localeCompare(b.file_name),
-      defaultSortOrder: 'ascend',
+      defaultSortOrder: 'ascend' as const,
       width: 300,
     },
     {
@@ -104,7 +106,7 @@ const RarOverviewCard = ({ data }) => {
       ),
       sorter: (a, b) => a.encrypted - b.encrypted,
       width: 120,
-      align: 'center',
+      align: 'center' as const,
     },
     {
       title: <div style={{ textAlign: 'right' }}>Extracted</div>,
@@ -126,7 +128,7 @@ const RarOverviewCard = ({ data }) => {
       ),
       sorter: (a, b) => a.extracted - b.extracted,
       width: 120,
-      align: 'center',
+      align: 'center' as const,
     },
     {
       title: <div style={{ textAlign: 'right' }}>Last Modified</div>,
@@ -135,7 +137,8 @@ const RarOverviewCard = ({ data }) => {
       render: (datetime) => (
         <Text style={{ float: 'right', fontSize: '12px' }}>{datetime}</Text>
       ),
-      sorter: (a, b) => new Date(a.datetime) - new Date(b.datetime),
+      sorter: (a, b) =>
+        new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
       width: 200,
     },
   ]

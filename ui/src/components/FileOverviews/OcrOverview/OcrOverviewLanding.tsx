@@ -1,7 +1,9 @@
 import OcrOverviewCard from './OcrOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const OcrOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const OcrOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.ocr) {
     return null
   }
