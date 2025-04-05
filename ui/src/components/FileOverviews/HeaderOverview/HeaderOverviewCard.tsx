@@ -1,10 +1,13 @@
 import { Button, Card, Row, Tag, Tooltip, Typography } from 'antd'
-import React from 'react'
+import { useCallback } from 'react'
 import { getIconConfig } from '../../../utils/iconMappingTable'
 
 import styled from 'styled-components'
 import { APP_CONFIG } from '../../../config'
 import { useVirusTotalApiKey } from '../../../hooks/useVirusTotalApiKey'
+import { getColorForString } from '../../../utils/colors'
+import type { ScanData } from '../types'
+import type { Scan } from '../../../services/api.types'
 
 const { Text } = Typography
 
@@ -27,7 +30,7 @@ const VirusTotalTag = styled(Tag)`
   maxWidth: "75px",
 `
 
-const LeftWrapper = styled.div`
+const LeftWrapper = styled.div<{ $bgColor?: string }>`
   margin-right: 15px;
   width: 44px;
   height: 44px;
@@ -95,7 +98,7 @@ const getVirusTotalTagProps = (positives) => {
   return 'default' // Default for not available or not applicable cases
 }
 
-const getDisposition = (data) => {
+const getDisposition = (data: Scan) => {
   let text = 'Not Found on VirusTotal' // Default text
   let color = 'default' // Default color
 
@@ -125,37 +128,24 @@ const getDisposition = (data) => {
   )
 }
 
-const getRandomColor = () => {
-  const colors = [
-    'red',
-    'gold',
-    'green',
-    'geekblue',
-    'orange',
-    'purple',
-    'magenta',
-    'cyan',
-    'lime',
-    'yellow',
-  ]
-  const randomIndex = Math.floor(Math.random() * colors.length)
-  return colors[randomIndex]
+interface HeaderOverviewCardProps extends ScanData {
+  onOpenVT: (sha256Hash: string) => void
 }
 
-const getColorForMimetypes = () => getRandomColor()
-
-const FileHeaderOverviewCard = ({ data, onOpenVT }) => {
+const HeaderOverviewCard = (props: HeaderOverviewCardProps) => {
+  const { data, onOpenVT } = props
   const sortedScannersRun = [...(data?.scanners_run || [])].sort()
   const virustotalData = data.strelka_response[0]?.enrichment?.virustotal
   const vtColor = getVirusTotalTagProps(virustotalData)
   const { isApiKeyAvailable } = useVirusTotalApiKey()
+  const getColorForMimetypes = useCallback((str) => getColorForString(str), [])
 
   const mappingEntry = getIconConfig(
     'strelka',
     data.strelka_response[0].file.flavors.mime[0].toLowerCase(),
   )
   const IconComponent = mappingEntry?.icon
-  const color = mappingEntry?.color || data.color
+  const color = mappingEntry?.color || 'default'
 
   const handleVirusTotalClick = () => {
     if (isApiKeyAvailable) {
@@ -238,8 +228,7 @@ const FileHeaderOverviewCard = ({ data, onOpenVT }) => {
                           fontWeight: '500',
                           fontSize: '11px',
                         }}
-                        count={type}
-                        color={getColorForMimetypes()}
+                        color={getColorForMimetypes(type)}
                       >
                         {type}
                       </Tag>
@@ -269,7 +258,9 @@ const FileHeaderOverviewCard = ({ data, onOpenVT }) => {
                         marginLeft: '30px',
                         fontSize: '12px',
                       }}
-                      color={getColorForMimetypes()}
+                      color={getColorForMimetypes(
+                        data?.strelka_response[0]?.file?.flavors?.mime,
+                      )}
                     >{`... and ${
                       Array.from(
                         new Set(
@@ -417,4 +408,4 @@ const FileHeaderOverviewCard = ({ data, onOpenVT }) => {
   )
 }
 
-export default FileHeaderOverviewCard
+export default HeaderOverviewCard

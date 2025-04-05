@@ -41,6 +41,7 @@ export interface SearchScanResponse {
 }
 
 export interface Scan {
+  file: string
   file_id: string
   file_name: string
   file_size: number
@@ -61,6 +62,25 @@ export interface Scan {
   submitted_type: string
   user: User
   yara_hits: string[]
+  request: ScanRequest
+  scan: StrelkaResponse
+}
+
+export interface ScanRequest {
+  time: number
+  client: string
+  id: string
+  attributes: {
+    filename: string
+    metadata: {
+      client_environment: string
+      client_hostname: string
+      client_name: string
+      client_user_name: string
+      client_version: string
+      user_name: string
+    }
+  }
 }
 
 interface Ioc {
@@ -76,6 +96,7 @@ export interface StrelkaResponse {
   scan: ScanDetails
   enrichment?: Enrichment
   iocs?: Ioc[]
+
   strelka_response?: StrelkaResponse[]
 }
 
@@ -135,44 +156,101 @@ interface Metadata {
 }
 
 interface ScanDetails {
-  email?: Email
-  encrypted_zip?: EncryptedZip
+  email?: ScanEmail
+  encrypted_zip?: ScanEncryptedZip
   entropy?: Entropy
   exiftool?: Exiftool
   footer?: Footer
   hash?: Hash
   header?: Header
-  javascript?: {
-    script_length_bytes?: number
-  }
-  ocr?: Ocr
-  pdf?: Pdf
-  pe?: Pe
-  qr?: {
-    data: string[]
-    image: string
-  }
-  rar?: {
-    compression_rate: number
-    host_os: string
-    elapsed: number
-    flags?: string[]
-    files: {
-      file_name: string
-      file_size: number
-      compression_rate: number
-      encrypted: boolean
-    }[]
-    total: {
-      files: number
-      extracted: number
-    }
-  }
-  tlsh?: Tlsh
-  yara?: Yara
+  javascript?: ScanJavascript
+  ocr?: ScanOcr
+  pdf?: ScanPdf
+  pe?: ScanPe
+  qr?: ScanQr
+  rar?: ScanRar
+  seven_zip?: ScanSevenZip
+  tlsh?: ScanTlsh
+  vb: ScanVb
+  xml?: ScanXml
+  yara?: ScanYara
+  zip?: ScanZip
 }
 
-interface Pe {
+type ScanZip = {
+  compression_rate: number
+  elapsed: number
+  total: {
+    files: number
+    extracted: number
+  }
+  files: {
+    file_name: string
+    file_size: number
+    file_type: string
+  }[]
+}
+
+interface ScanXml {
+  emitted_content: string[]
+  doc_type: string
+  namespaces: string[]
+  tags: string[]
+  tag_data: {
+    tag: string
+    content: string
+  }[]
+  total: {
+    tags: number
+    extracted: number
+  }
+  version: string
+}
+
+interface ScanVb {
+  script_length_bytes?: number
+}
+
+interface ScanJavascript {
+  script_length_bytes?: number
+}
+
+interface ScanQr {
+  data: string[]
+}
+
+interface ScanRar {
+  compression_rate: number
+  host_os: string
+  elapsed: number
+  flags?: string[]
+  files: ScanFiles[]
+  total: {
+    files: number
+    extracted: number
+  }
+}
+
+interface ScanFiles {
+  file_name: string
+  file_size: number
+  compression_rate: number
+  encrypted: boolean
+}
+
+interface ScanSevenZip {
+  compression_rate: number
+  host_os: string
+  elapsed: number
+  flags?: string[]
+  files: ScanFiles[]
+  total: {
+    files: number
+    extracted: number
+  }
+}
+
+interface ScanPe {
   address_of_entry_point: number
   compile_time: string
   file_info: FileInfo
@@ -192,7 +270,6 @@ interface Pe {
 
 interface FileInfo {
   file_type: string
-  file_type_extension: string
   product_name: string
   legal_copyright: string
   file_description: string
@@ -275,7 +352,7 @@ interface Header {
   raw?: string
 }
 
-interface Ocr {
+interface ScanOcr {
   base64_thumbnail: string
   elapsed: number
   render: Render
@@ -290,7 +367,7 @@ interface Render {
   width: number
 }
 
-interface Pdf {
+interface ScanPdf {
   author: string
   creation_date: string
   creator: string
@@ -323,11 +400,20 @@ interface Objects {
   xobject: number
 }
 
-interface Tlsh {
+interface ScanTlsh {
   elapsed: number
+  match: TlshMatch
 }
 
-interface Yara {
+interface TlshMatch {
+  hash: string
+  score: number
+  type: string
+  family: string
+  tlsh: string
+}
+
+interface ScanYara {
   elapsed: number
   information: string[]
   matches: string[]
@@ -350,7 +436,7 @@ interface User {
   user_cn: string
 }
 
-interface EncryptedZip {
+interface ScanEncryptedZip {
   total: {
     files: number
     extracted: number
@@ -363,15 +449,11 @@ interface EncryptedZip {
       file_name: string
       file_size: number
       file_type: string
-      file_type_extension: string
-      is_encrypted: boolean
-      is_encrypted_password_protected: boolean
-      password_protected: boolean
     }
   }
 }
 
-interface Email {
+interface ScanEmail {
   subject: string
   base64_thumbnail: string
   total: {

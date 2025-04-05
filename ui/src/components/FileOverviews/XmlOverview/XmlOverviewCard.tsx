@@ -1,10 +1,14 @@
 import { Col, Descriptions, Input, List, Row, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import '../../../styles/ExiftoolOverviewCard.css'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
-const XmlOverviewCard = ({ xmlData }) => {
+const XmlOverviewCard = (props: OverviewCardProps) => {
+  const { data } = props
+  const xmlData = data.scan.xml
+
   const [filter, setFilter] = useState('')
 
   // Handles filtering and processing of list items (objects or strings)
@@ -21,7 +25,7 @@ const XmlOverviewCard = ({ xmlData }) => {
     if (typeof item === 'object') {
       return (
         <div>
-          {Object.entries(item).map(([key, value], index) => {
+          {Object.entries(item).map(([key, value]) => {
             // Exclude standalone "Type" entries from being displayed
             if (
               key.toLowerCase() === 'type' &&

@@ -6,10 +6,10 @@ import PageWrapper from '../components/PageWrapper'
 
 import FileIocsOverviewLanding from '../components/FileOverviews/FileIocsOverview/FileIocsOverviewLanding'
 import FileTypeOverviewLanding from '../components/FileOverviews/FileTypeOverview/FileTypeOverviewLanding'
-import FileHeaderLanding from '../components/FileOverviews/HeaderOverview/HeaderLanding'
+import HeaderLanding from '../components/FileOverviews/HeaderOverview/HeaderLanding'
 import HighlightsOverviewLanding from '../components/FileOverviews/HighlightsOverview/HighlightsOverviewLanding'
 import JsonViewLanding from '../components/FileOverviews/JsonView/JsonViewLanding'
-import FileYaraOverviewLanding from '../components/FileOverviews/YaraOverview/YaraOverviewLanding'
+import YaraOverviewLanding from '../components/FileOverviews/YaraOverview/YaraOverviewLanding'
 
 import FileTreeCardWithProvider from '../components/FileFlow/FileTreeCardWithProvider'
 
@@ -219,7 +219,7 @@ const SubmissionsPage = (props) => {
       />
 
       {/* Component Card - File Header Overview */}
-      <FileHeaderLanding data={data} onOpenVT={handleVirusTotalClick} />
+      <HeaderLanding data={data} onOpenVT={handleVirusTotalClick} />
 
       {/* Main Components */}
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
@@ -244,7 +244,7 @@ const SubmissionsPage = (props) => {
           />
 
           {/* Component Card - File YARAs */}
-          <FileYaraOverviewLanding
+          <YaraOverviewLanding
             data={data}
             onFileYaraSelect={handleFileYaraSelect}
           />

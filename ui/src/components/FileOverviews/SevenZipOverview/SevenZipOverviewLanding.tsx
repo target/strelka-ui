@@ -1,12 +1,10 @@
-import React from 'react'
 import SevenZipOverviewCard from './SevenZipOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const SevenZipOverviewLanding = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const SevenZipOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
+
   if (!selectedNodeData?.scan?.seven_zip) {
     return null
   }
@@ -14,11 +12,6 @@ const SevenZipOverviewLanding = ({
   const sevenZipData = selectedNodeData.scan.seven_zip
   const fileCount = sevenZipData.total.files || 0
   const wasExtracted = Boolean(sevenZipData.total.extracted || 0)
-
-  let extractionStatus = 'Could Not Extract Files'
-  if (wasExtracted) {
-    extractionStatus = 'Extracted Files'
-  }
 
   const label = '7-Zip Overview'
   const description = `Total Files: ${fileCount}`

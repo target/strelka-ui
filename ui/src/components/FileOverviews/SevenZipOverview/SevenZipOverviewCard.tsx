@@ -9,7 +9,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 
 const { Text } = Typography
@@ -55,8 +55,7 @@ const SevenZipOverviewCard = ({ data }) => {
       dataIndex: 'filename',
       key: 'filename',
       render: (text) => <Text style={{ fontSize: '12px' }}>{text}</Text>,
-      sorter: (a, b) => a.filename.localeCompare(b.filename),
-      defaultSortOrder: 'ascend',
+      defaultSortOrder: 'ascend' as const,
       width: 300,
     },
     {
@@ -78,7 +77,8 @@ const SevenZipOverviewCard = ({ data }) => {
       render: (datetime) => (
         <Text style={{ float: 'right', fontSize: '12px' }}>{datetime}</Text>
       ),
-      sorter: (a, b) => new Date(a.datetime) - new Date(b.datetime),
+      sorter: (a, b) =>
+        new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
       width: 200,
     },
   ]
