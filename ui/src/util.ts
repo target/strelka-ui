@@ -1,4 +1,9 @@
-const fetchWithTimeout = async (resource, options) => {
+type FetchOptions = RequestInit & { timeout?: number }
+
+const fetchWithTimeout = async (
+  resource: string,
+  options: FetchOptions,
+): Promise<Response> => {
   const { timeout = 8000 } = options
 
   const controller = new AbortController()

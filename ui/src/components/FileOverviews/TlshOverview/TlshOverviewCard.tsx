@@ -1,11 +1,17 @@
 import { Tag, Typography } from 'antd'
-import React from 'react'
 import { antdColors } from '../../../utils/colors'
 import '../../../styles/TlshOverviewCard.css'
+import type { OverviewCardProps } from '../types'
+import type { CSSProperties } from 'react'
 
 const { Text } = Typography
 
-const TlshOverviewCard = ({ data }) => {
+interface TlshCustomCss extends CSSProperties {
+  '--box-glow-color': string
+}
+
+const TlshOverviewCard = (props: OverviewCardProps) => {
+  const { data } = props
   const { match } = data.scan.tlsh
   const score = match.score
   const family = match.family
@@ -107,6 +113,7 @@ const TlshOverviewCard = ({ data }) => {
     if (index === numberOfParts - 1 && score >= maxScore) {
       return antdColors.green
     }
+
     return index <= scoreIndex
       ? colorGradient[
           Math.floor((colorGradient.length - 1) * (index / (numberOfParts - 1)))
@@ -138,10 +145,14 @@ const TlshOverviewCard = ({ data }) => {
               // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Fix this
               key={index}
               className={boxClass}
-              style={{
-                backgroundColor,
-                '--box-glow-color': isActive ? backgroundColor : 'transparent',
-              }}
+              style={
+                {
+                  backgroundColor,
+                  '--box-glow-color': isActive
+                    ? backgroundColor
+                    : 'transparent',
+                } as TlshCustomCss
+              }
             >
               {/* Render the actual score inside the box where it resides */}
               {index === scoreIndex && (

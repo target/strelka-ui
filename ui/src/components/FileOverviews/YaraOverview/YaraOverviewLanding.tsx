@@ -1,11 +1,17 @@
 import { Collapse, Tag, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import YaraTypeOverviewCard from './YaraTypeOverviewCard'
+import type { ScanData } from '../types'
 
 const { Text } = Typography
 
-const FileYaraOverviewLanding = ({ data, onFileYaraSelect }) => {
+interface YaraOverviewLandingProps extends ScanData {
+  onFileYaraSelect: (fileYara: string | null) => void
+}
+
+const YaraOverviewLanding = (props: YaraOverviewLandingProps) => {
+  const { data, onFileYaraSelect } = props
   const [filterApplied, setFilterApplied] = useState(false)
 
   const handleYaraSelect = (selectedYara) => {
@@ -68,4 +74,4 @@ const FileYaraOverviewLanding = ({ data, onFileYaraSelect }) => {
   )
 }
 
-export default FileYaraOverviewLanding
+export default YaraOverviewLanding

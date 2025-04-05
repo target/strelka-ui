@@ -8,15 +8,15 @@ import { Tag, Tooltip, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { antdColors } from '../../../utils/colors'
 import { getIconConfig } from '../../../utils/iconMappingTable'
-import type { OverviewCardProps } from '../types'
+import type { ScanData } from '../types'
 
 const { Text } = Typography
 
-interface HighlightsOverviewCardProps extends OverviewCardProps {
+interface HighlightsOverviewCardProps extends ScanData {
   onFileNameSelect: (fileName: string) => void
 }
 
-const FileHighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
+const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
   const { data, onFileNameSelect } = props
   const [expandedNodes, setExpandedNodes] = useState(new Set())
   const [selectedNodeId, setSelectedNodeId] = useState(null)
@@ -320,4 +320,4 @@ const FileHighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
   )
 }
 
-export default FileHighlightsOverviewCard
+export default HighlightsOverviewCard

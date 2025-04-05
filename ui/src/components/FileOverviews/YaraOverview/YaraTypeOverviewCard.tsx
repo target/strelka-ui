@@ -1,15 +1,20 @@
 import { BookOutlined, WarningOutlined } from '@ant-design/icons'
 import { Row, Tag, Tooltip, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
+import type { ScanData } from '../types'
 
 const { Text } = Typography
 
+interface YaraTypeOverviewCardProps extends ScanData {
+  onFileYaraSelect: (selectedYara: string | null) => void
+}
+
 /**
  * Displays an overview of YARA matches for files, categorized into suspicious and classifiers.
- * @param {{ data: Object, onFileYaraSelect: Function }} props
  */
-const YaraTypeOverviewCard = ({ data, onFileYaraSelect }) => {
+const YaraTypeOverviewCard = (props: YaraTypeOverviewCardProps) => {
+  const { data, onFileYaraSelect } = props
   const [selectedYara, setSelectedYara] = useState(null)
   const [showMoreSuspicious, setShowMoreSuspicious] = useState(false)
   const [showMoreClassifiers, setShowMoreClassifiers] = useState(false)
@@ -41,7 +46,14 @@ const YaraTypeOverviewCard = ({ data, onFileYaraSelect }) => {
     onFileYaraSelect(newSelectedYara)
   }
 
-  const yaraCounts = {}
+  interface YaraCounts {
+    [yara: string]: {
+      count: number
+      files: string[]
+    }
+  }
+
+  const yaraCounts: YaraCounts = {}
 
   for (const response of data.strelka_response) {
     const yaraMatches = response.scan?.yara?.matches || []

@@ -1,12 +1,9 @@
-import React from 'react'
 import IocOverviewCard from './SubmissionIocOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const FilePotentialIocsOverview = ({
-  selectedNodeData,
-  expanded,
-  onExpandChange,
-}) => {
+const SubmissionIocsLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   const iocs = selectedNodeData?.iocs
 
   if (!iocs || iocs.length === 0) {
@@ -37,4 +34,4 @@ const FilePotentialIocsOverview = ({
   )
 }
 
-export default FilePotentialIocsOverview
+export default SubmissionIocsLanding

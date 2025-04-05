@@ -107,7 +107,6 @@ const FileTreeCard = (props: FileTreeCardProps) => {
   )
 
   const filteredNodes = useMemo(() => {
-    console.log('Filtering nodes', nodes)
     let nodesToFilter = fileTypeFilter
       ? nodes.filter((node) =>
           (node.data as unknown as StrelkaNodeData).nodeMain.includes(

@@ -9,8 +9,9 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 
@@ -46,7 +47,8 @@ const getExtractionColor = (extracted, total) => {
   return { color: antdColors.red }
 }
 
-const ZipOverviewCard = ({ data }) => {
+const ZipOverviewCard = (props: OverviewCardProps) => {
+  const { data } = props
   const [filter, setFilter] = useState('')
 
   // Filter files based on user input
@@ -63,8 +65,7 @@ const ZipOverviewCard = ({ data }) => {
       dataIndex: 'file_name',
       key: 'file_name',
       render: (text) => <Text style={{ fontSize: '12px' }}>{text}</Text>,
-      sorter: (a, b) => a.file_name.localeCompare(b.file_name),
-      defaultSortOrder: 'ascend',
+      defaultSortOrder: 'ascend' as const,
       width: 200,
     },
     {
@@ -129,7 +130,7 @@ const ZipOverviewCard = ({ data }) => {
       ),
       sorter: (a, b) => a.extracted - b.extracted,
       width: 120,
-      align: 'center',
+      align: 'center' as const,
     },
     {
       title: <div style={{ textAlign: 'center' }}>Encrypted</div>,
@@ -151,7 +152,7 @@ const ZipOverviewCard = ({ data }) => {
       ),
       sorter: (a, b) => a.encrypted - b.encrypted,
       width: 120,
-      align: 'center',
+      align: 'center' as const,
     },
   ]
 

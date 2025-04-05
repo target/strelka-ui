@@ -17,10 +17,10 @@ import SubmissionIocsLanding from './FileOverviews/SubmissionIocs/SubmissionIocs
 import FileTlshLanding from './FileOverviews/TlshOverview/TlshLanding'
 import VbOverviewLanding from './FileOverviews/VbOverview/VbOverviewLanding'
 import XmlOverviewLanding from './FileOverviews/XmlOverview/XmlOverviewLanding'
-import ZipOverviewLanding from './FileOverviews/ZipOverview/ZipOverviewLanding'
 
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, Flex, Typography } from 'antd'
+import ZipOverviewLanding from './FileOverviews/ZipOverview/ZipOverviewLanding'
 const { Text } = Typography
 
 export const NodeDetailsDrawer = ({
@@ -32,35 +32,33 @@ export const NodeDetailsDrawer = ({
   handleVirusTotalClick,
 }) => {
   const allSections = [
-    [
-      FileOverviewLanding,
-      {
-        additionalProps: { onOpenVT: handleVirusTotalClick },
-        startExpanded: true,
-      },
-    ],
-    [FileInsightsLanding],
-    [FileYaraLanding],
-    [SubmissionIocsLanding],
-    [ZipOverviewLanding],
-    [SevenZipOverviewLanding],
-    [RarOverviewLanding],
-    [EncryptedZipOverviewLanding],
-    [HeaderFooterLanding],
-    [FileTlshLanding],
-    [OcrOverviewLanding],
-    [QrOverviewLanding],
-    [EmailOverviewLanding],
-    [VbOverviewLanding],
-    [XmlOverviewLanding],
-    [JavascriptOverviewLanding],
-    [ExiftoolOverviewLanding],
-    [PeOverviewLanding],
-    [JsonViewLanding],
+    {
+      component: FileOverviewLanding,
+      additionalProps: { onOpenVT: handleVirusTotalClick },
+      startExpanded: true,
+    },
+    { component: FileInsightsLanding },
+    { component: FileYaraLanding },
+    { component: SubmissionIocsLanding },
+    { component: ZipOverviewLanding },
+    { component: SevenZipOverviewLanding },
+    { component: RarOverviewLanding },
+    { component: EncryptedZipOverviewLanding },
+    { component: HeaderFooterLanding },
+    { component: FileTlshLanding },
+    { component: OcrOverviewLanding },
+    { component: QrOverviewLanding },
+    { component: EmailOverviewLanding },
+    { component: VbOverviewLanding },
+    { component: XmlOverviewLanding },
+    { component: JavascriptOverviewLanding },
+    { component: ExiftoolOverviewLanding },
+    { component: PeOverviewLanding },
+    { component: JsonViewLanding },
   ]
 
   const [expandedSections, setExpandedSections] = useState(
-    allSections.map(([_, opts]) => !!opts?.startExpanded),
+    allSections.map((section) => section.startExpanded || false),
   )
 
   const expandAll = () => {
@@ -81,10 +79,10 @@ export const NodeDetailsDrawer = ({
     doSetExpanded(index, expanded)
   }
 
-  const sections = allSections.map(([Section, opts], index) => (
-    <Section
-      key={Section.name}
-      {...opts?.additionalProps}
+  const sections = allSections.map((Section, index) => (
+    <Section.component
+      key={Section.component.name}
+      {...Section.additionalProps}
       selectedNodeData={selectedNodeData}
       expanded={expandedSections[index]}
       onExpandChange={(expanded) => doExpandChange(index, expanded)}

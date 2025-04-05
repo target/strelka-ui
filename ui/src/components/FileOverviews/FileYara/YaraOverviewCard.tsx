@@ -1,84 +1,56 @@
 import { Col, Input, List, Row, Tag, Typography } from 'antd'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { OverviewCardProps } from '../types'
+import { getColorForString } from '../../../utils/colors'
+import type { StrelkaResponse } from '../../../services/api.types'
 
 const { Text, Paragraph } = Typography
+
+const mapDescriptions = (data: StrelkaResponse): Map<string, string> => {
+  const descriptionMap = new Map<string, string>()
+  if (data?.scan?.yara && Array.isArray(data.scan.yara.meta)) {
+    for (const meta of data.scan.yara.meta) {
+      if (meta.identifier === 'description') {
+        descriptionMap.set(meta.rule, meta.value)
+      }
+    }
+  }
+  return descriptionMap
+}
+
+const processYaraData = (data: StrelkaResponse, filter: string) => {
+  return compileRulesList(data).filter(({ rule, description }) => {
+    const searchTerm = filter.toLowerCase()
+    return (
+      !filter ||
+      rule.toLowerCase().includes(searchTerm) ||
+      description.toLowerCase().includes(searchTerm)
+    )
+  })
+}
+
+const compileRulesList = (data: StrelkaResponse) => {
+  const descriptionMap = mapDescriptions(data)
+  if (data?.scan?.yara && Array.isArray(data.scan.yara.matches)) {
+    return data.scan.yara.matches
+      .map((match: string) => {
+        const rule = match
+        return {
+          rule,
+          description: descriptionMap.get(rule) || 'No description available.',
+          color: getColorForString(rule.split('_')[0]),
+        }
+      })
+      .sort((a, b) => a.rule.localeCompare(b.rule))
+  }
+
+  return []
+}
 
 const YaraOverviewCard = ({ data }: OverviewCardProps) => {
   const [filter, setFilter] = useState<string>('')
 
-  const antColors = [
-    'magenta',
-    'red',
-    'volcano',
-    'orange',
-    'gold',
-    'lime',
-    'green',
-    'cyan',
-    'blue',
-    'geekblue',
-    'purple',
-    'grey',
-  ]
-
-  const getColorForPrefix = (_prefix: string): string => {
-    const randomIndex = Math.floor(Math.random() * antColors.length)
-    return antColors[randomIndex]
-  }
-
-  const prefixColorMap: Record<string, string> = {}
-
-  const getConsistentColorForPrefix = (prefix: string): string => {
-    if (!prefixColorMap[prefix]) {
-      prefixColorMap[prefix] = getColorForPrefix(prefix)
-    }
-    return prefixColorMap[prefix]
-  }
-
-  const mapDescriptions = (): Map<string, string> => {
-    const descriptionMap = new Map<string, string>()
-    if (data?.scan?.yara && Array.isArray(data.scan.yara.meta)) {
-      for (const meta of data.scan.yara.meta) {
-        if (meta.identifier === 'description') {
-          descriptionMap.set(meta.rule, meta.value)
-        }
-      }
-    }
-    return descriptionMap
-  }
-
-  const compileRulesList = () => {
-    const descriptionMap = mapDescriptions()
-    if (data?.scan?.yara && Array.isArray(data.scan.yara.matches)) {
-      return data.scan.yara.matches
-        .map((match: string) => {
-          const rule = match
-          return {
-            rule,
-            description:
-              descriptionMap.get(rule) || 'No description available.',
-            color: getConsistentColorForPrefix(rule.split('_')[0]),
-          }
-        })
-        .sort((a, b) => a.rule.localeCompare(b.rule))
-    }
-
-    return []
-  }
-
-  const processYaraData = () => {
-    return compileRulesList().filter(({ rule, description }) => {
-      const searchTerm = filter.toLowerCase()
-      return (
-        !filter ||
-        rule.toLowerCase().includes(searchTerm) ||
-        description.toLowerCase().includes(searchTerm)
-      )
-    })
-  }
-
-  const yaraData = processYaraData()
+  const yaraData = useMemo(() => processYaraData(data, filter), [data, filter])
 
   return (
     <div>

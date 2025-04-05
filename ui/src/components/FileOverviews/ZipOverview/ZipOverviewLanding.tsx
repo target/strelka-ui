@@ -1,8 +1,9 @@
-import React from 'react'
 import ZipOverviewCard from './ZipOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const ZipOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const ZipOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
   if (!selectedNodeData?.scan?.zip) {
     return null
   }

@@ -1,14 +1,16 @@
-import React from 'react'
 import XmlOverviewCard from './XmlOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
+import type { OverviewLandingProps } from '../types'
 
-const XmlOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
+const XmlOverviewLanding = (props: OverviewLandingProps) => {
+  const { selectedNodeData, expanded, onExpandChange } = props
+
   if (!selectedNodeData?.scan?.xml) {
     return null
   }
 
-  const xmlData = selectedNodeData.scan.xml
-  const emittedContentCount = xmlData?.emitted_content?.length || 0
+  const emittedContentCount =
+    selectedNodeData.scan.xml?.emitted_content?.length || 0
 
   const label = 'XML'
   const description = `Emitted Content Count: ${emittedContentCount}`
@@ -20,7 +22,7 @@ const XmlOverviewLanding = ({ selectedNodeData, expanded, onExpandChange }) => {
       description={description}
       expanded={expanded}
     >
-      <XmlOverviewCard xmlData={xmlData} />
+      <XmlOverviewCard data={selectedNodeData} />
     </CollapseCard>
   )
 }
