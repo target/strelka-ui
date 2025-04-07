@@ -1,5 +1,5 @@
-import { fetchAuthApiKey } from '../services/api'
 import { useQuery } from '@tanstack/react-query'
+import { fetchAuthApiKey } from '../services/api'
 
 /**
  * Fetches the user's API key.

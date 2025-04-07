@@ -1,5 +1,5 @@
-import { Input } from 'antd'
 import { Panel } from '@xyflow/react'
+import { Input } from 'antd'
 
 interface NodeSearchPanelProps {
   onSearchChange: (searchValue: string) => void

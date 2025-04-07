@@ -1,3 +1,4 @@
+import { Flex, Spin } from 'antd'
 import chroma from 'chroma-js'
 import {
   Bar,
@@ -11,7 +12,6 @@ import {
 } from 'recharts'
 import { useMimeTypeStats } from '../../hooks/useMimeTypeStats'
 import { getIconConfig } from '../../utils/iconMappingTable'
-import { Spin, Flex } from 'antd'
 
 interface MimeTypeBarChartProps {
   height: number

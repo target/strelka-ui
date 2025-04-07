@@ -1,8 +1,8 @@
 import { Collapse, Tag, Typography } from 'antd'
-import { antdColors } from '../../../utils/colors'
-import FileIocsOverviewCard from './FileIocsOverviewCard'
 import { useState } from 'react'
+import { antdColors } from '../../../utils/colors'
 import type { FileIocsOverviewProps } from '../types'
+import FileIocsOverviewCard from './FileIocsOverviewCard'
 
 const { Text } = Typography
 

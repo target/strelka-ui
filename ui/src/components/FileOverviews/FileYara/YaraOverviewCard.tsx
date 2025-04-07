@@ -1,8 +1,8 @@
 import { Col, Input, List, Row, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
-import type { OverviewCardProps } from '../types'
-import { getColorForString } from '../../../utils/colors'
 import type { StrelkaResponse } from '../../../services/api.types'
+import { getColorForString } from '../../../utils/colors'
+import type { OverviewCardProps } from '../types'
 
 const { Text, Paragraph } = Typography
 

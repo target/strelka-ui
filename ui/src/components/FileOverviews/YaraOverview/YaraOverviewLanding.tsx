@@ -1,8 +1,8 @@
 import { Collapse, Tag, Typography } from 'antd'
 import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
-import YaraTypeOverviewCard from './YaraTypeOverviewCard'
 import type { ScanData } from '../types'
+import YaraTypeOverviewCard from './YaraTypeOverviewCard'
 
 const { Text } = Typography
 

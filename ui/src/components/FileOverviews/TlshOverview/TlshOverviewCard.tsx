@@ -1,8 +1,8 @@
 import { Tag, Typography } from 'antd'
 import { antdColors } from '../../../utils/colors'
 import '../../../styles/TlshOverviewCard.css'
-import type { OverviewCardProps } from '../types'
 import type { CSSProperties } from 'react'
+import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
 

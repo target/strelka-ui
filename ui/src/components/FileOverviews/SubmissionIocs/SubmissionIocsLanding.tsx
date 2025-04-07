@@ -1,6 +1,6 @@
-import IocOverviewCard from './SubmissionIocOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import IocOverviewCard from './SubmissionIocOverviewCard'
 
 const SubmissionIocsLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

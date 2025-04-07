@@ -1,6 +1,6 @@
-import JsonViewCard from './JsonViewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import JsonViewCard from './JsonViewCard'
 
 const JsonViewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

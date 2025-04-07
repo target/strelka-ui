@@ -1,4 +1,4 @@
-import { Typography, Card, theme } from 'antd'
+import { Card, Typography, theme } from 'antd'
 const { Text, Paragraph } = Typography
 
 const ClickGuide = () => {

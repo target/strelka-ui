@@ -1,6 +1,6 @@
-import RarOverviewCard from './RarOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import RarOverviewCard from './RarOverviewCard'
 
 const RarOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

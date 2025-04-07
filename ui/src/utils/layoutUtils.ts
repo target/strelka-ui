@@ -1,11 +1,11 @@
+import type { Edge, Node } from '@xyflow/react'
 import type { StrelkaResponse } from '../services/api.types'
 import { getIconConfig } from './iconMappingTable'
 import {
+  type StrelkaNodeData,
   indexDataType,
   indexNodeType,
-  type StrelkaNodeData,
 } from './indexDataUtils'
-import type { Edge, Node } from '@xyflow/react'
 
 // Recursive function to count all descendants of a node under the same INDEX
 function countDescendants(nodeId, nodeIndex, nodes, edges) {

@@ -1,36 +1,36 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ReactFlow,
   Background,
+  Controls,
+  type Edge,
+  MiniMap,
+  type Node,
+  ReactFlow,
+  applyEdgeChanges,
+  applyNodeChanges,
   isNode,
   useEdgesState,
   useNodesState,
-  applyNodeChanges,
-  applyEdgeChanges,
-  Controls,
-  MiniMap,
   useReactFlow,
-  type Edge,
-  type Node,
 } from '@xyflow/react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IndexConnectEdge } from './EdgeTypes/IndexConnectEdge'
 import EventNode from './NodeTypes/EventNode'
 import '@xyflow/react/dist/style.css'
 import ClickGuide from '../../utils/ClickGuide'
+import DownloadImage from '../../utils/DownloadImage'
 import ExceededGuide from '../../utils/ExceededGuide'
 import NodeSearchPanel from '../../utils/NodeSearchPanel'
 import ShowFileListing from '../../utils/ShowFileListing'
 import { antdColors } from '../../utils/colors'
 import { getDagreLayout } from '../../utils/dagreLayout'
-import DownloadImage from '../../utils/DownloadImage'
 import {
   toggleChildrenVisibility,
   transformElasticSearchDataToElements,
 } from '../../utils/layoutUtils.js'
 
 import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
-import type { StrelkaNodeData } from '../../utils/indexDataUtils'
 import type { StrelkaResponse } from '../../services/api.types'
+import type { StrelkaNodeData } from '../../utils/indexDataUtils'
 
 const nodeTypes = {
   event: EventNode,

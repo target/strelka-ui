@@ -1,6 +1,6 @@
-import OcrOverviewCard from './OcrOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import OcrOverviewCard from './OcrOverviewCard'
 
 const OcrOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

@@ -1,6 +1,6 @@
-import VbOverviewCard from './VbOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import VbOverviewCard from './VbOverviewCard'
 
 const VbOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

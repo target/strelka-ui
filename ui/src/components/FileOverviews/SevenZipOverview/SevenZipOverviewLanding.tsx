@@ -1,6 +1,6 @@
-import SevenZipOverviewCard from './SevenZipOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import SevenZipOverviewCard from './SevenZipOverviewCard'
 
 const SevenZipOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

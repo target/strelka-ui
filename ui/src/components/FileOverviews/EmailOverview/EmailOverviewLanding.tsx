@@ -1,6 +1,6 @@
 import { CollapseCard } from '../../CollapseCard'
-import EmailOverviewCard from './EmailOverviewCard'
 import type { OverviewLandingProps } from '../types'
+import EmailOverviewCard from './EmailOverviewCard'
 
 const EmailOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

@@ -7,15 +7,15 @@ import {
 import { Layout, Menu, Switch } from 'antd'
 import { useState } from 'react'
 
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router'
 import { DatabaseStatus } from '../components/DatabaseStatus'
 import SystemStatus from '../components/SystemStatus'
 import { useAuthServices } from '../hooks/useAuthServices'
-import { InternalRouter } from '../routes/InternalRouter'
 import { useDarkModeSetting } from '../hooks/useDarkModeSetting'
-import React from 'react'
+import { InternalRouter } from '../routes/InternalRouter'
 
-const ApiKeyModalLazyLoad = React.lazy(() =>
+const ApiKeyModalLazyLoad = lazy(() =>
   import('../components/ApiKeyModal').then((d) => ({
     default: d.ApiKeyModal,
   })),
@@ -113,12 +113,12 @@ const AppLayout = () => {
         }}
       />
       {isKeyModalVisible && (
-        <React.Suspense fallback={null}>
+        <Suspense fallback={null}>
           <ApiKeyModalLazyLoad
             open={isKeyModalVisible}
             onCancel={handleKeyModalCancel}
           />
-        </React.Suspense>
+        </Suspense>
       )}
 
       <div className="main-content">

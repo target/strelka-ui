@@ -1,7 +1,7 @@
 import { UnorderedListOutlined } from '@ant-design/icons'
+import { Panel } from '@xyflow/react'
 import { Button, Drawer } from 'antd'
 import { useState } from 'react'
-import { Panel } from '@xyflow/react'
 import FileListingSidebar from './FileListingSidebar'
 
 function ShowFileListing({ nodes }) {

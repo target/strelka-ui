@@ -1,6 +1,6 @@
-import YaraOverviewCard from './YaraOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import YaraOverviewCard from './YaraOverviewCard'
 
 const YaraOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

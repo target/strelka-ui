@@ -5,9 +5,9 @@ import { getIconConfig } from '../../../utils/iconMappingTable'
 import styled from 'styled-components'
 import { APP_CONFIG } from '../../../config'
 import { useVirusTotalApiKey } from '../../../hooks/useVirusTotalApiKey'
+import type { Scan } from '../../../services/api.types'
 import { getColorForString } from '../../../utils/colors'
 import type { ScanData } from '../types'
-import type { Scan } from '../../../services/api.types'
 
 const { Text } = Typography
 
