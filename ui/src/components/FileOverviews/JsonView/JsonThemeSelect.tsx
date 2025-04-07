@@ -1,4 +1,4 @@
-import { Select, Flex } from 'antd'
+import { Flex, Select } from 'antd'
 
 interface JsonThemeSelectProps {
   jsonTheme: string

@@ -1,6 +1,6 @@
-import XmlOverviewCard from './XmlOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import XmlOverviewCard from './XmlOverviewCard'
 
 const XmlOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

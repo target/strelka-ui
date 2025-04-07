@@ -22,12 +22,12 @@ export interface MimeTypeStatsResponse {
 }
 
 export interface SearchScanOptions {
-  searchQuery: string
+  excludeSubmitters: string[]
   page: number
   pageSize: number
+  searchQuery: string
   sortField: string
   sortOrder: string
-  excludeSubmitters: string[]
 }
 
 export interface SearchScanResponse {
@@ -41,10 +41,10 @@ export interface SearchScanResponse {
 }
 
 export interface Scan {
-  file: string
   file_id: string
   file_name: string
   file_size: number
+  file: string
   files_seen: number
   hashes: [string, string][]
   id: number
@@ -52,6 +52,8 @@ export interface Scan {
   iocs: Ioc[]
   mime_types: string[]
   processed_at: string
+  request: ScanRequest
+  scan: StrelkaResponse
   scanners_run: string[]
   strelka_response: StrelkaResponse[]
   submitted_at: string
@@ -62,14 +64,9 @@ export interface Scan {
   submitted_type: string
   user: User
   yara_hits: string[]
-  request: ScanRequest
-  scan: StrelkaResponse
 }
 
 export interface ScanRequest {
-  time: number
-  client: string
-  id: string
   attributes: {
     filename: string
     metadata: {
@@ -81,22 +78,25 @@ export interface ScanRequest {
       user_name: string
     }
   }
+  client: string
+  id: string
+  time: number
 }
 
 interface Ioc {
-  ioc: string
   ioc_type: string
+  ioc: string
   scanner: string
 }
 
 export interface StrelkaResponse {
+  enrichment?: Enrichment
   file: FileDetails
+  index?: string
   insights: string[]
+  iocs?: Ioc[]
   request: RequestDetails
   scan: ScanDetails
-  enrichment?: Enrichment
-  iocs?: Ioc[]
-
   strelka_response?: StrelkaResponse[]
 }
 
@@ -108,11 +108,11 @@ interface FileDetails {
   depth: number
   flavors: Flavors
   name: string
+  scan: FileScanDetails
   scanners: string[]
   size: number
   source?: string
   tree: Tree
-  scan: FileScanDetails
 }
 
 interface FileScanDetails {
@@ -130,8 +130,8 @@ interface Flavors {
 
 interface Tree {
   node: string
-  root: string
   parent?: string
+  root: string
 }
 
 interface RequestDetails {
@@ -180,15 +180,15 @@ interface ScanDetails {
 type ScanZip = {
   compression_rate: number
   elapsed: number
-  total: {
-    files: number
-    extracted: number
-  }
   files: {
     file_name: string
     file_size: number
     file_type: string
   }[]
+  total: {
+    files: number
+    extracted: number
+  }
 }
 
 interface ScanXml {
@@ -232,18 +232,18 @@ interface ScanRar {
 }
 
 interface ScanFiles {
-  file_name: string
-  file_size: number
   compression_rate: number
   encrypted: boolean
+  file_name: string
+  file_size: number
 }
 
 interface ScanSevenZip {
   compression_rate: number
-  host_os: string
   elapsed: number
-  flags?: string[]
   files: ScanFiles[]
+  flags?: string[]
+  host_os: string
   total: {
     files: number
     extracted: number
@@ -254,27 +254,27 @@ interface ScanPe {
   address_of_entry_point: number
   compile_time: string
   file_info: FileInfo
-  sections: Section[]
-  security: boolean
-  symbols: {
-    imported: string[]
-    exported: string[]
-  }
   header: {
     machine: {
       type: string
       description: string
     }
   }
+  sections: Section[]
+  security: boolean
+  symbols: {
+    imported: string[]
+    exported: string[]
+  }
 }
 
 interface FileInfo {
-  file_type: string
-  product_name: string
-  legal_copyright: string
   file_description: string
-  original_filename: string
+  file_type: string
   file_version: string
+  legal_copyright: string
+  original_filename: string
+  product_name: string
 }
 
 interface Section {
@@ -406,24 +406,24 @@ interface ScanTlsh {
 }
 
 interface TlshMatch {
+  family: string
   hash: string
   score: number
-  type: string
-  family: string
   tlsh: string
+  type: string
 }
 
 interface ScanYara {
   elapsed: number
   information: string[]
   matches: string[]
-  rules_loaded: number
-  tags: string[]
   meta: {
     identifier: string
     rule: string
     value: string
   }
+  rules_loaded: number
+  tags: string[]
 }
 
 interface User {
@@ -437,10 +437,6 @@ interface User {
 }
 
 interface ScanEncryptedZip {
-  total: {
-    files: number
-    extracted: number
-  }
   cracked_password: boolean
   elapsed: number
   flags?: string[]
@@ -451,21 +447,25 @@ interface ScanEncryptedZip {
       file_type: string
     }
   }
+  total: {
+    files: number
+    extracted: number
+  }
 }
 
 interface ScanEmail {
-  subject: string
-  base64_thumbnail: string
-  total: {
-    attachments: number
-  }
   attachments: {
     filenames: string[]
   }
+  base64_thumbnail: string
+  body: string
+  date_utc: string
   from: string
   to: string[]
-  date_utc: string
   message_id: string
   received_domain: string[]
-  body: string
+  subject: string
+  total: {
+    attachments: number
+  }
 }

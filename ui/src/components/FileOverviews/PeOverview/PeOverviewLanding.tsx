@@ -1,6 +1,6 @@
-import PeOverviewCard from './PeOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import PeOverviewCard from './PeOverviewCard'
 
 const PeOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

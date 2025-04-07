@@ -22,7 +22,7 @@ export const indexColorThemes = (index) => {
   }
 }
 
-export interface StrelkaNodeData {
+export interface StrelkaNodeData extends Record<string, unknown> {
   nodeDatatype: string
   nodeVirustotal: string
   nodeInsights: number
@@ -31,7 +31,7 @@ export interface StrelkaNodeData {
   nodeDisposition: string
   nodeMain: string[]
   nodeSub: string
-  nodeTlsh: string
+  nodeTlsh?: string
   nodeLabel: string
   nodeYaraList: string[]
   nodeIocList: string

@@ -1,9 +1,9 @@
 import type { Scan, StrelkaResponse } from '../../services/api.types'
 
 export interface OverviewLandingProps {
-  selectedNodeData: StrelkaResponse
   expanded: boolean
   onExpandChange: (expanded: boolean) => void
+  selectedNodeData: StrelkaResponse
 }
 
 export interface OverviewCardProps {

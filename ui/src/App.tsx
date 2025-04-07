@@ -1,11 +1,11 @@
 import './App.css'
 
+import { ConfigProvider, theme } from 'antd'
 import { BrowserRouter } from 'react-router'
+import { useDarkModeSetting } from './hooks/useDarkModeSetting'
 import { AuthenticationProvider } from './providers/AuthenticationProvider'
 import { MessageProvider } from './providers/MessageProvider'
 import { MainRouter } from './routes/MainRouter'
-import { ConfigProvider, theme } from 'antd'
-import { useDarkModeSetting } from './hooks/useDarkModeSetting'
 
 import { themeConfig } from './themeConfig'
 

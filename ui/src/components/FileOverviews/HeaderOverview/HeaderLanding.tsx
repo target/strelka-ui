@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd'
+import type { ScanData } from '../types'
 // FileOverviews/FileHeaderOverview/FileHeaderOverviewLanding.js
 import HeaderOverviewCard from './HeaderOverviewCard'
-import type { ScanData } from '../types'
 
 interface HeaderLandingProps extends ScanData {
   onOpenVT: (vtId: string) => void

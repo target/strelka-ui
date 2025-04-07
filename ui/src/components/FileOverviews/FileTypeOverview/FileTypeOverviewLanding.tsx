@@ -1,8 +1,8 @@
 import { Collapse, Tag, Typography } from 'antd'
 import { useState } from 'react'
 import { antdColors } from '../../../utils/colors'
-import FileTypeOverviewCard from './FileTypeOverviewCard'
 import type { ScanData } from '../types'
+import FileTypeOverviewCard from './FileTypeOverviewCard'
 
 const { Text } = Typography
 

@@ -1,9 +1,16 @@
+import type { Node } from '@xyflow/react'
 import React from 'react'
+import type { StrelkaNodeData } from './indexDataUtils'
 
-const FileListingSidebarContent = ({ nodes }) => {
+interface FileListingSidebarContentProps {
+  nodes: Node<StrelkaNodeData>[]
+}
+
+const FileListingSidebarContent = (props: FileListingSidebarContentProps) => {
+  const { nodes } = props
   // Create a map where each key is a mimetype and the value is an array of filenames
   const filesByMimetype = nodes.reduce((acc, node) => {
-    const mimetype = node.data.nodeMain || 'Other'
+    const mimetype = node.data.nodeMain.join(', ') || 'Other'
     const filename = node.data.nodeLabel
 
     if (!acc[mimetype]) {

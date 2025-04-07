@@ -19,7 +19,7 @@ const StyledContent = styled(Content)`
 
 interface PageWrapperProps {
   children?: ReactNode
-  title: string
+  title?: string
   subtitle?: string
 }
 

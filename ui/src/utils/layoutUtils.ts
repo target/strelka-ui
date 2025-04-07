@@ -1,5 +1,11 @@
+import type { Edge, Node } from '@xyflow/react'
+import type { StrelkaResponse } from '../services/api.types'
 import { getIconConfig } from './iconMappingTable'
-import { indexDataType, indexNodeType } from './indexDataUtils.ts'
+import {
+  type StrelkaNodeData,
+  indexDataType,
+  indexNodeType,
+} from './indexDataUtils'
 
 // Recursive function to count all descendants of a node under the same INDEX
 function countDescendants(nodeId, nodeIndex, nodes, edges) {
@@ -68,9 +74,11 @@ export const toggleChildrenVisibility = (
   return { nodesList: nodesList, edgesList: _edgesList }
 }
 
-export function transformElasticSearchDataToElements(results) {
-  const nodes = []
-  const edges = []
+export function transformElasticSearchDataToElements(
+  results: StrelkaResponse[],
+) {
+  const nodes: Node<StrelkaNodeData>[] = []
+  const edges: Edge[] = []
   const rootNodes = new Set()
   const nodeIdsToIndices = new Map()
   let qrDataPresent = false
@@ -100,7 +108,7 @@ export function transformElasticSearchDataToElements(results) {
         nodeInsights: nodeData.nodeInsights,
         nodeIocs: nodeData.nodeIocs,
         nodeImage: nodeData.nodeImage,
-        nodeQrData: qrDataPresent || nodeData.nodeQrData,
+        nodeQrData: qrDataPresent ? nodeData.nodeQrData : undefined,
         nodeDecryptionSuccess: nodeData.nodeDecryptionSuccess,
         nodeMain: nodeData.nodeMain,
         nodeSub: nodeData.nodeSub,
@@ -179,8 +187,7 @@ export function transformElasticSearchDataToElements(results) {
   // Update the edges connected to root nodes without non-root children
   for (const edge of edges) {
     if (rootNodes.has(edge.source) || rootNodes.has(edge.target)) {
-      edge.label = 'false'
-      edge.animated = 'true'
+      edge.animated = true
     }
   }
 

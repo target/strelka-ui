@@ -25,7 +25,7 @@ import {
   TableOutlined,
 } from '@ant-design/icons'
 
-import { antdColors } from '../utils/colors'
+import { antdColors } from './colors'
 
 export const flowIconMappingTable = {
   strelka: {

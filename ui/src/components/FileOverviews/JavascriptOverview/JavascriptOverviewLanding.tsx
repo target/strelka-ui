@@ -1,6 +1,6 @@
-import JavascriptOverviewCard from './JavascriptOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import JavascriptOverviewCard from './JavascriptOverviewCard'
 
 const JavascriptOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props

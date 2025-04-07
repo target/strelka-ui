@@ -13,9 +13,9 @@ import SubmissionTable from '../components/SubmissionTable'
 import VirusTotalUploader from '../components/VirusTotal/VirusTotalUploader'
 import MimeTypeBarChart from '../components/Visualizations/MimeTypeBarChart'
 import { APP_CONFIG } from '../config'
+import { useScanStats } from '../hooks/useScanStats'
 import { useVirusTotalApiKey } from '../hooks/useVirusTotalApiKey'
 import { useMessageApi } from '../providers/MessageProvider'
-import { useScanStats } from '../hooks/useScanStats'
 
 const { Title, Text } = Typography
 

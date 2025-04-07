@@ -1,9 +1,8 @@
 import { UnorderedListOutlined } from '@ant-design/icons'
-import { Button, Drawer } from 'antd'
-// ShowFileListing.jsx
-import React, { useState } from 'react'
 import { Panel } from '@xyflow/react'
-import FileListingSidebar from './FileListingSidebar' // Assuming you have this component
+import { Button, Drawer } from 'antd'
+import { useState } from 'react'
+import FileListingSidebar from './FileListingSidebar'
 
 function ShowFileListing({ nodes }) {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false)

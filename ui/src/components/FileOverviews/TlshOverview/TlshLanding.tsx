@@ -1,6 +1,6 @@
-import TlshOverviewCard from './TlshOverviewCard'
 import { CollapseCard } from '../../CollapseCard'
 import type { OverviewLandingProps } from '../types'
+import TlshOverviewCard from './TlshOverviewCard'
 
 const getTlshRating = (score) => {
   if (score <= 30) return { label: 'Very Similar', color: 'red' }

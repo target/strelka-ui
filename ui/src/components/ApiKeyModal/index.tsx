@@ -1,8 +1,8 @@
 import { CopyOutlined } from '@ant-design/icons'
-import { Modal, Tag, Typography, Spin } from 'antd'
-import { examples } from './examples'
-import { useMessageApi } from '../../providers/MessageProvider'
+import { Modal, Spin, Tag, Typography } from 'antd'
 import { useApiKey } from '../../hooks/useApiKey'
+import { useMessageApi } from '../../providers/MessageProvider'
+import { examples } from './examples'
 
 const { Paragraph, Text } = Typography
 
