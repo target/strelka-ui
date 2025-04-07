@@ -1,8 +1,12 @@
 import { Input } from 'antd'
-import React from 'react'
 import { Panel } from '@xyflow/react'
 
-const NodeSearchPanel = ({ onSearchChange }) => {
+interface NodeSearchPanelProps {
+  onSearchChange: (searchValue: string) => void
+}
+
+const NodeSearchPanel = (props: NodeSearchPanelProps) => {
+  const { onSearchChange } = props
   return (
     <Panel position="top-left">
       <Input.Search

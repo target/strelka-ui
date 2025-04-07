@@ -1,9 +1,11 @@
 import dagre from 'dagre'
+import type { Node, Edge } from '@xyflow/react'
+import type { StrelkaNodeData } from './indexDataUtils'
 
 const dagreGraph = new dagre.graphlib.Graph()
 dagreGraph.setDefaultEdgeLabel(() => ({}))
 
-const getDagreLayout = (nodes, edges) => {
+const getDagreLayout = (nodes: Node<StrelkaNodeData>[], edges: Edge[]) => {
   const graph = new dagre.graphlib.Graph()
   graph.setGraph({ rankdir: 'LR' })
   graph.setDefaultEdgeLabel(() => ({}))
@@ -40,13 +42,14 @@ const getDagreLayout = (nodes, edges) => {
   })
 
   // Prepare the layouted elements with adjusted positions
-  const layoutedElements = positionedNodes.map((node) => ({
-    ...node,
-    position: {
-      x: node.position.x - 550 / 2,
-      y: node.position.y - heightOffset / 2,
-    },
-  }))
+  const layoutedElements: (Node<StrelkaNodeData> | Edge)[] =
+    positionedNodes.map((node) => ({
+      ...node,
+      position: {
+        x: node.position.x - 550 / 2,
+        y: node.position.y - heightOffset / 2,
+      },
+    }))
 
   // Include the edges in the layout
   layoutedElements.push(...edges)

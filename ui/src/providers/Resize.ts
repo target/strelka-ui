@@ -1,22 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function useResize() {
   const hasWindow = typeof window !== 'undefined'
 
-  function getWindowDimensions() {
+  const getWindowDimensions = useCallback(() => {
     const width = hasWindow ? window.innerWidth : null
     const height = hasWindow ? window.innerHeight : null
     return {
       width,
       height,
     }
-  }
+  }, [hasWindow])
 
   const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions(),
   )
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: TODO: Fix this
   useEffect(() => {
     if (hasWindow) {
       function handleResize() {
@@ -26,7 +25,7 @@ export default function useResize() {
       window.addEventListener('resize', handleResize)
       return () => window.removeEventListener('resize', handleResize)
     }
-  }, [hasWindow])
+  }, [hasWindow, getWindowDimensions])
 
   return windowDimensions
 }

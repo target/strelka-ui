@@ -1,5 +1,5 @@
-import { Col, Row, Spin, Tag, Typography } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { Col, Row, Spin, Tag } from 'antd'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 
 import PageWrapper from '../components/PageWrapper'
@@ -17,7 +17,6 @@ import VirusTotalAugmentDrawer from '../components/VirusTotal/VirusTotalAugmentD
 
 import { getIconConfig } from '../utils/iconMappingTable'
 
-import { useAuthServices } from '../hooks/useAuthServices'
 import '../styles/IconContainer.css'
 
 import { useFetchScanById } from '../hooks/useFetchScanById'
@@ -25,20 +24,19 @@ import { useFetchScanById } from '../hooks/useFetchScanById'
 import { NodeDetailsDrawer } from '../components/NodeDetailsDrawer'
 
 import { CollapseCard } from '../components/CollapseCard'
-
-const { Text } = Typography
+import type { StrelkaResponse } from '../services/api.types'
 
 /**
  * SubmissionsPage component to display strelka scan results
  * @returns JSX.Element
  */
-const SubmissionsPage = (props) => {
-  const { handle401 } = useAuthServices()
-
+const SubmissionsPage = () => {
   const { id } = useParams()
-  const { data, isLoading, isError } = useFetchScanById(id)
+  const { data, isLoading } = useFetchScanById(id)
+  // TODO: handle 404
 
-  const [selectedNodeData, setSelectedNodeData] = useState('')
+  const [selectedNodeData, setSelectedNodeData] =
+    useState<StrelkaResponse>(null)
   const [fileTypeFilter, setFileTypeFilter] = useState(null)
   const [fileYaraFilter, setFileYaraFilter] = useState(null)
   const [fileNameFilter, setFileNameFilter] = useState(null)
@@ -94,16 +92,16 @@ const SubmissionsPage = (props) => {
         const nodeData = data.strelka_response.find(
           (response) => response.file.tree.node === fileNameFilter,
         )
-        setSelectedNodeData(nodeData || '') // Set to found node data or reset if not found
+        setSelectedNodeData(nodeData) // Set to found node data or reset if not found
       } else {
         // Reset selectedNodeData when other filters change
-        setSelectedNodeData('')
+        setSelectedNodeData(null)
       }
     }
   }, [data, fileNameFilter])
 
   const getFileIcon = () => {
-    let flavorKey
+    let flavorKey: string
     if (
       selectedNodeData.file.flavors.yara &&
       selectedNodeData.file.flavors.yara.length > 0
@@ -209,7 +207,7 @@ const SubmissionsPage = (props) => {
 
       {/* Overlay - File Details Drawer Overlay */}
       <NodeDetailsDrawer
-        key={selectedNodeData}
+        key={id}
         selectedNodeData={selectedNodeData}
         getFileIcon={getFileIcon}
         getFileDisposition={getFileDisposition}
@@ -272,7 +270,7 @@ const SubmissionsPage = (props) => {
             </CollapseCard>
 
             <JsonViewLanding
-              selectedNodeData={data}
+              selectedNodeData={data.strelka_response[0]}
               expanded={jsonViewExpanded}
               onExpandChange={(expanded) => setJsonViewExpanded(expanded)}
             />

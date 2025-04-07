@@ -1,5 +1,4 @@
 import { Typography, Card, theme } from 'antd'
-import React from 'react'
 const { Text, Paragraph } = Typography
 
 const ClickGuide = () => {
@@ -28,11 +27,6 @@ const ClickGuide = () => {
         Filter in File Highlights or click on a node in the diagram to see file
         details.
       </Paragraph>
-      <style>
-        {`
-      
-        `}
-      </style>
     </Card>
   )
 }

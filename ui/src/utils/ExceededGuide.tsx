@@ -1,5 +1,4 @@
 import { Card, Typography, theme } from 'antd'
-import React, { useEffect } from 'react'
 
 const { Text, Paragraph } = Typography
 

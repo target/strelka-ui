@@ -10,8 +10,9 @@ import {
   Controls,
   MiniMap,
   useReactFlow,
+  type Edge,
+  type Node,
 } from '@xyflow/react'
-import { initialEdges, initialNodes } from '../../data/initialData.js'
 import { IndexConnectEdge } from './EdgeTypes/IndexConnectEdge'
 import EventNode from './NodeTypes/EventNode'
 import '@xyflow/react/dist/style.css'
@@ -20,7 +21,7 @@ import ExceededGuide from '../../utils/ExceededGuide'
 import NodeSearchPanel from '../../utils/NodeSearchPanel'
 import ShowFileListing from '../../utils/ShowFileListing'
 import { antdColors } from '../../utils/colors'
-import { getDagreLayout } from '../../utils/dagreLayout.js'
+import { getDagreLayout } from '../../utils/dagreLayout'
 import DownloadImage from '../../utils/DownloadImage'
 import {
   toggleChildrenVisibility,
@@ -28,8 +29,8 @@ import {
 } from '../../utils/layoutUtils.js'
 
 import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
-import type { StrelkaNodeData } from '../../utils/indexDataUtils.js'
-import type { StrelkaResponse } from '../../services/api.types.js'
+import type { StrelkaNodeData } from '../../utils/indexDataUtils'
+import type { StrelkaResponse } from '../../services/api.types'
 
 const nodeTypes = {
   event: EventNode,
@@ -48,8 +49,8 @@ export interface FileTreeCardProps {
   fileYaraFilter: string
   fileIocFilter: string
   fileNameFilter: string
-  selectedNodeData: StrelkaNodeData
-  setSelectedNodeData: (nodeData: StrelkaNodeData) => void
+  selectedNodeData: StrelkaResponse
+  setSelectedNodeData: (nodeData: StrelkaResponse) => void
 }
 
 const FileTreeCard = (props: FileTreeCardProps) => {
@@ -66,14 +67,13 @@ const FileTreeCard = (props: FileTreeCardProps) => {
   const [searchTerm, setSearchTerm] = useState('')
   const { fitView } = useReactFlow()
 
-  const layoutedElements = useMemo(
-    () => getDagreLayout(initialNodes, initialEdges),
-    [],
-  )
-  const layoutedNodes = layoutedElements.filter(isNode)
-  const layoutedEdges = layoutedElements.filter((el) => !isNode(el))
+  const layoutedElements = useMemo(() => getDagreLayout([], []), [])
+  const layoutedNodes = layoutedElements.filter(
+    isNode,
+  ) as Node<StrelkaNodeData>[]
+  const layoutedEdges = layoutedElements.filter((el) => !isNode(el)) as Edge[]
   const [nodes, setNodes] = useNodesState(layoutedNodes)
-  const [edges, setEdges] = useEdgesState(layoutedEdges)
+  const [edges, setEdges] = useEdgesState<Edge>(layoutedEdges)
   const showClickGuide = !selectedNodeData
   const [showExceededGuide, setShowExceededGuide] = useState(false)
   const ref = useRef(null)
@@ -107,34 +107,28 @@ const FileTreeCard = (props: FileTreeCardProps) => {
   )
 
   const filteredNodes = useMemo(() => {
-    let nodesToFilter = fileTypeFilter
-      ? nodes.filter((node) =>
-          (node.data as unknown as StrelkaNodeData).nodeMain.includes(
-            fileTypeFilter,
-          ),
-        )
-      : nodes
+    let nodesToFilter = nodes
+
+    if (fileTypeFilter) {
+      nodesToFilter = nodesToFilter.filter((node) =>
+        node.data.nodeMain.includes(fileTypeFilter),
+      )
+    }
 
     if (fileNameFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        (node.data as unknown as StrelkaNodeData).nodeRelationshipId?.includes(
-          fileNameFilter,
-        ),
+        node.data.nodeRelationshipId?.includes(fileNameFilter),
       )
     }
     if (fileYaraFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        (node.data as unknown as StrelkaNodeData).nodeYaraList?.includes(
-          fileYaraFilter,
-        ),
+        node.data.nodeYaraList?.includes(fileYaraFilter),
       )
     }
 
     if (fileIocFilter) {
       nodesToFilter = nodesToFilter.filter((node) =>
-        (node.data as unknown as StrelkaNodeData).nodeIocList?.includes(
-          fileIocFilter,
-        ),
+        node.data.nodeIocList?.includes(fileIocFilter),
       )
     }
 
@@ -155,10 +149,9 @@ const FileTreeCard = (props: FileTreeCardProps) => {
     fileNameFilter,
   ])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: TODO: use the correct dependencies
   useEffect(() => {
     fitView({ padding: 0.2 })
-  }, [fileTypeFilter, fileYaraFilter, fileNameFilter, fitView])
+  }, [fitView])
 
   const handleNodeClick = (_event, node) => {
     if (node.type === 'index') {
@@ -255,8 +248,8 @@ const FileTreeCard = (props: FileTreeCardProps) => {
 
     const layoutedData = getDagreLayout(nodesToLayout, edgesToLayout)
 
-    setNodes(layoutedData.filter(isNode))
-    setEdges(layoutedData.filter((el) => !isNode(el)))
+    setNodes(layoutedData.filter(isNode) as Node<StrelkaNodeData>[])
+    setEdges(layoutedData.filter((el) => !isNode(el)) as Edge[])
   }, [data, setEdges, setNodes])
 
   const { isDarkMode } = useDarkModeSetting()

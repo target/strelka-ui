@@ -90,13 +90,13 @@ interface Ioc {
 }
 
 export interface StrelkaResponse {
+  index?: string
   file: FileDetails
   insights: string[]
   request: RequestDetails
   scan: ScanDetails
   enrichment?: Enrichment
   iocs?: Ioc[]
-
   strelka_response?: StrelkaResponse[]
 }
 

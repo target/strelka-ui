@@ -33,6 +33,7 @@ export const antdColors = {
   olive: '#808000',
   darkRed: '#8b0000',
   darkBlue: '#00008b',
+  violet: '#8A2BE2',
 }
 
 export const antdColorNames = PresetColors
