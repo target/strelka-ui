@@ -22,7 +22,6 @@ jobs:
             type=raw,value=latest
             type=raw,value=release
             type=ref,event=branch
-            type=ref,event=release
             type=semver,pattern={{major}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{version}}
