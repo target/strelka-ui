@@ -40,22 +40,22 @@ export const antdColorNames = PresetColors
 
 /**
  * Get an Ant Design color name for a given string in a deterministic way.
- * @param string
+ * @param input
  * @returns string
  * @description This function generates a hash from the input string and maps it to one of the predefined Ant Design color names.
  */
-export const getColorForString = (string: string): string => {
-  // if its not a string or empty, return dark gray
-  if (typeof string !== 'string' || !string) {
-    return antdColors.darkGray
+export const getColorForString = (input: string | string[]): string => {
+  if (Array.isArray(input)) {
+    return getColorForString(input.join(''))
   }
-  if (!string) {
+  if (!input) {
     return antdColors.darkGray
   }
   let hash = 0
-  for (let i = 0; i < string.length; i++) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash)
+  for (let i = 0; i < input.length; i++) {
+    hash = input.charCodeAt(i) + ((hash << 5) - hash)
   }
-  const index = Math.abs(hash) % antdColorNames.length
-  return `${antdColorNames[index]}`
+  const colorKeys = Object.keys(antdColors)
+  const index = Math.abs(hash) % colorKeys.length
+  return antdColors[colorKeys[index]]
 }
