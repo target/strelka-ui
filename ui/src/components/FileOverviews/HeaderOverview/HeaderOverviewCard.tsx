@@ -138,7 +138,7 @@ const HeaderOverviewCard = (props: HeaderOverviewCardProps) => {
   const virustotalData = data.strelka_response[0]?.enrichment?.virustotal
   const vtColor = getVirusTotalTagProps(virustotalData)
   const { isApiKeyAvailable } = useVirusTotalApiKey()
-  const getColorForMimetypes = useCallback((str) => getColorForString(str), [])
+  const getColorForMimetypes = useCallback((str: string | string[]) => getColorForString(str), [])
 
   const mappingEntry = getIconConfig(
     'strelka',
