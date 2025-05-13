@@ -7,7 +7,7 @@ authors = [
 ]
 
 [tool.poetry.dependencies]
-flask = "^3.1.0"
+flask = "^3.1.1"
 flask-Cors = "^4.0.1"
 flask-migrate = "^4.0.7"
 flask-sqlalchemy = "3.0.5"
