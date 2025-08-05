@@ -14,11 +14,23 @@ services:
       - "8080:8080"
     depends_on:
       - postgresdb
+      - minio
     environment:
       DATABASE_HOST: postgresdb
       DATABASE_NAME: strelka_ui
       DATABASE_PASSWORD: postgres
       DATABASE_USERNAME: postgres
+      # MinIO Configuration for local development
+      ENABLE_FILE_RESUBMISSION: "true"
+      S3_BUCKET_NAME: strelka-files
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: strelkaminioadmin
+      S3_SECRET_ACCESS_KEY: strelkaminioadmin
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_FILE_RETENTION_DAYS: 7
+      # Disable AWS checksums for MinIO compatibility
+      AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
     env_file:
       # Add/override environment variables in this file 
       # See ./app/strelka_ui/.env.example for reference
@@ -40,5 +52,29 @@ services:
     volumes:
       - data17:/bitnami/postgresql
 
+  minio:
+    image: minio/minio:latest
+    container_name: strelka-ui-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: strelkaminioadmin
+      MINIO_ROOT_PASSWORD: strelkaminioadmin
+    ports:
+      - "9001:9001"  # MinIO Console
+      - "9000:9000"  # MinIO API
+    volumes:
+      - minio_data:/data
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: strelka-ui-minio-init
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 strelkaminioadmin strelkaminioadmin;
+      mc mb myminio/strelka-files --ignore-existing;
+      exit 0;
+      "
+
 volumes:
   data17:
+  minio_data:

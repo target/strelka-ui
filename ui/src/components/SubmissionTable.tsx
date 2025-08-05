@@ -1,10 +1,12 @@
 import {
   CopyOutlined,
   InfoCircleOutlined,
+  ReloadOutlined,
   SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons'
 import {
+  Button,
   Col,
   Input,
   Row,
@@ -26,6 +28,7 @@ import VirusTotalAugmentDrawer from './VirusTotal/VirusTotalAugmentDrawer'
 import { debounce } from 'lodash'
 import { APP_CONFIG } from '../config'
 import { useSearchScans } from '../hooks/useSearchScans'
+import { resubmitFile } from '../services/api'
 const { Text } = Typography
 /**
  * A table component for displaying submission data.
@@ -44,6 +47,7 @@ const SubmissionTable = () => {
 
   const [vtDrawerVisible, setVtDrawerVisible] = useState(false)
   const [selectedResource, setSelectedResource] = useState(null)
+  const [resubmittingIds, setResubmittingIds] = useState<Set<string>>(new Set())
   const { isApiKeyAvailable } = useVirusTotalApiKey()
   const message = useMessageApi()
 
@@ -55,8 +59,48 @@ const SubmissionTable = () => {
     }
   }
 
+  // Function to handle file resubmission
+  const handleResubmit = async (submissionId: string, fileName: string) => {
+    try {
+      setResubmittingIds((prev) => new Set(prev).add(submissionId))
+
+      const response = await resubmitFile(submissionId)
+
+      message.success(
+        `${fileName} resubmitted successfully! New submission ID: ${response.file_id}`,
+      )
+
+      // Refresh the table data by calling useSearchScans.reload
+      reload()
+    } catch (error) {
+      console.error('Resubmit error:', error)
+      message.error(
+        `Failed to resubmit ${fileName}: ${error.response?.data?.details || error.message}`,
+      )
+    } finally {
+      setResubmittingIds((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(submissionId)
+        return newSet
+      })
+    }
+  }
+
+  // Helper function to check if resubmit button should be shown
+  const canResubmit = (record) => {
+    return (
+      record.s3_key &&
+      record.s3_expires_at &&
+      new Date(record.s3_expires_at) > new Date()
+    )
+  }
+
   // Fetches Data from the Strelka UP API
-  const { data: result, isLoading } = useSearchScans({
+  const {
+    data: result,
+    isLoading,
+    reload,
+  } = useSearchScans({
     searchQuery,
     page: currentPage,
     pageSize: pageSize,
@@ -119,12 +163,15 @@ const SubmissionTable = () => {
       width: 1,
       render: (submitted_type) => {
         const typeToDisplay = submitted_type || 'api'
-        const imageSrc =
-          typeToDisplay === 'api' ? '/strelka.png' : '/virustotal.png'
-        const tooltipText =
-          typeToDisplay === 'api'
-            ? 'Uploaded via File Upload'
-            : 'Uploaded via VirusTotal'
+        let imageSrc = '/strelka.png'
+        let tooltipText = 'Uploaded via File Upload'
+        if (typeToDisplay === 'virustotal') {
+          imageSrc = '/virustotal.png'
+          tooltipText = 'Uploaded via VirusTotal'
+        } else if (typeToDisplay === 'resubmission') {
+          imageSrc = '/strelka-resubmission.png'
+          tooltipText = 'Uploaded via Resubmission'
+        }
 
         return (
           <Tooltip title={tooltipText}>
@@ -433,7 +480,7 @@ const SubmissionTable = () => {
     {
       title: 'Actions',
       align: 'center' as const,
-      key: 'action',
+      key: 'actions',
       width: 1,
       render: (_text, record) => {
         // Find the sha256 hash in the array of hashes
@@ -442,43 +489,60 @@ const SubmissionTable = () => {
         )
         const sha256Value = sha256Array ? sha256Array[1] : 'N/A'
 
+        const isResubmitting = resubmittingIds.has(record.file_id)
+        const showResubmit = canResubmit(record)
+
         return (
-          <div>
-            <Space size="middle">
-              {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
-                <Tooltip title={`Search ${APP_CONFIG.SEARCH_NAME}`}>
-                  <a
-                    target="_blank"
-                    href={`${APP_CONFIG.SEARCH_URL}`.replace(
-                      '<REPLACE>',
-                      record.file_id,
-                    )}
-                    rel="noreferrer"
-                  >
-                    <SearchOutlined style={{ cursor: 'pointer' }} />
-                  </a>
-                </Tooltip>
-              )}
-              <Space size="middle">
-                <Tooltip title="Copy SHA256">
-                  <a
-                    href="/"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (sha256Value !== 'N/A') {
-                        navigator.clipboard.writeText(sha256Value)
-                        message.success('SHA256 copied to clipboard!')
-                      } else {
-                        message.error('SHA256 is undefined!')
-                      }
-                    }}
-                  >
-                    <CopyOutlined style={{ cursor: 'pointer' }} />
-                  </a>
-                </Tooltip>
-              </Space>
-            </Space>
-          </div>
+          <Space size="small">
+            {APP_CONFIG.SEARCH_URL && APP_CONFIG.SEARCH_NAME && (
+              <Tooltip title={`Search ${APP_CONFIG.SEARCH_NAME}`}>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<SearchOutlined />}
+                  onClick={() => {
+                    window.open(
+                      `${APP_CONFIG.SEARCH_URL}`.replace(
+                        '<REPLACE>',
+                        record.file_id,
+                      ),
+                      '_blank',
+                    )
+                  }}
+                />
+              </Tooltip>
+            )}
+
+            <Tooltip title="Copy SHA256">
+              <Button
+                type="link"
+                size="small"
+                icon={<CopyOutlined />}
+                onClick={() => {
+                  if (sha256Value !== 'N/A') {
+                    navigator.clipboard.writeText(sha256Value)
+                    message.success('SHA256 copied to clipboard!')
+                  } else {
+                    message.error('SHA256 is undefined!')
+                  }
+                }}
+              />
+            </Tooltip>
+            {showResubmit && (
+              <Tooltip title="Resubmit file for analysis">
+                <Button
+                  type="link"
+                  size="small"
+                  loading={isResubmitting}
+                  disabled={isResubmitting}
+                  onClick={() =>
+                    handleResubmit(record.file_id, record.file_name)
+                  }
+                  icon={<ReloadOutlined />}
+                />
+              </Tooltip>
+            )}
+          </Space>
         )
       },
     },

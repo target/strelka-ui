@@ -30,6 +30,8 @@ class FileSubmission(db.Model):
         highest_vt_count (int): The highest number of VirusTotal hits for a file.
         highest_vt_sha256 (str): The SHA256 hash of the file with the highest number of VirusTotal hits.
         mime_type (str): The MIME type of the file.
+        s3_key (str): S3 object key for stored file (for resubmission).
+        s3_expires_at (datetime.datetime): When the S3 file expires and gets deleted.
     """
 
     __tablename__ = "file_submission"
@@ -69,6 +71,10 @@ class FileSubmission(db.Model):
     )
     processed_at: datetime.datetime = db.Column(db.DateTime())
 
+    # S3 Storage Metadata (for file resubmission)
+    s3_key: str = db.Column(db.String(), nullable=True)
+    s3_expires_at: datetime.datetime = db.Column(db.DateTime(), nullable=True)
+
     def __init__(
         self,
         file_name: str,
@@ -80,7 +86,8 @@ class FileSubmission(db.Model):
         submitted_by_user_id: int,
         submitted_description: str,
         submitted_at: datetime.datetime,
-
+        s3_key: str = None,
+        s3_expires_at: datetime.datetime = None,
     ):
         self.file_id = get_request_id(strelka_response[0]) # submitted_file
         self.file_name = file_name
@@ -107,6 +114,10 @@ class FileSubmission(db.Model):
         self.hashes = get_hashes(strelka_response[0])
         self.insights = get_all_insights(strelka_response)
         self.iocs = get_all_iocs(strelka_response)
+        
+        # S3 Storage fields
+        self.s3_key = s3_key
+        self.s3_expires_at = s3_expires_at
 
 
     def __repr__(self):

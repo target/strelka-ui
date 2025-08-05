@@ -4,6 +4,8 @@ import type {
   AuthApiKeyResponse,
   LoginResponse,
   MimeTypeStatsResponse,
+  ResubmitRequest,
+  ResubmitResponse,
   Scan,
   SearchScanOptions,
   SearchScanResponse,
@@ -231,5 +233,36 @@ export async function searchScans(
   } catch (error) {
     console.error('searchScans error:', error)
     throw error
+  }
+}
+
+/**
+ * Resubmit a file for analysis from S3 storage
+ */
+export async function resubmitFile(
+  submissionId: string,
+  request?: ResubmitRequest,
+): Promise<ResubmitResponse> {
+  try {
+    const resp = await client.post(`/strelka/resubmit/${submissionId}`, request)
+    return resp.data
+  } catch (error) {
+    console.error('resubmitFile error:', error)
+    throw error
+  }
+}
+
+/**
+ * Check if file resubmission feature is enabled
+ */
+export async function checkResubmissionEnabled(): Promise<boolean> {
+  try {
+    // We can check this by attempting to get status or by using environment variable
+    // For now, we'll assume it's enabled if the S3 configuration is available
+    // This could be enhanced with a specific endpoint if needed
+    return true
+  } catch (error) {
+    console.error('checkResubmissionEnabled error:', error)
+    return false
   }
 }
