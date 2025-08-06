@@ -1,7 +1,7 @@
-import { Button, Col, Row, Spin, Tag } from 'antd'
 import { ReloadOutlined } from '@ant-design/icons'
+import { Button, Col, Row, Spin, Tag } from 'antd'
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import PageWrapper from '../components/PageWrapper'
 
@@ -25,9 +25,9 @@ import { useFetchScanById } from '../hooks/useFetchScanById'
 import { NodeDetailsDrawer } from '../components/NodeDetailsDrawer'
 
 import { CollapseCard } from '../components/CollapseCard'
-import type { StrelkaResponse } from '../services/api.types'
-import { resubmitFile } from '../services/api'
 import { useMessageApi } from '../providers/MessageProvider'
+import { resubmitFile } from '../services/api'
+import type { StrelkaResponse } from '../services/api.types'
 
 /**
  * SubmissionsPage component to display strelka scan results

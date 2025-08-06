@@ -62,19 +62,23 @@ const MimeTypeBarChart = ({ height }: MimeTypeBarChartProps) => {
   const otherKeys = allBarKeys.slice(20)
 
   let otherTotal = 0
-  for (const item of data) {
-    item.other = otherKeys.reduce(
+  const dataWithOther = data.map((item) => {
+    const otherValue = otherKeys.reduce(
       (acc, key) => acc + ((item[key] as number) || 0),
       0,
     )
-    otherTotal += item.other
-  }
+    otherTotal += otherValue
+    return { ...item, other: otherValue }
+  })
 
   const barKeys = topKeys
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <BarChart
+        data={dataWithOther}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="month" tick={{ fontSize: 10 }} />
         <YAxis tick={{ fontSize: 10 }} />

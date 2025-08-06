@@ -7,7 +7,7 @@ import {
 import { Layout, Menu, Switch } from 'antd'
 import { useState } from 'react'
 
-import { lazy, Suspense } from 'react'
+import { Suspense, lazy } from 'react'
 import { Link } from 'react-router'
 import { DatabaseStatus } from '../components/DatabaseStatus'
 import SystemStatus from '../components/SystemStatus'

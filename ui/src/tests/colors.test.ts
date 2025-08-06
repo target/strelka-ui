@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { getColorForString, antdColors } from '../utils/colors'
+import { antdColors, getColorForString } from '../utils/colors'
 
 test('should return a color for a given string', () => {
   const input = 'test'
