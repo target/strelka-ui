@@ -1,6 +1,7 @@
-import { Col, Row, Spin, Tag } from 'antd'
+import { Button, Col, Row, Spin, Tag } from 'antd'
+import { ReloadOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { useParams, useNavigate } from 'react-router'
 
 import PageWrapper from '../components/PageWrapper'
 
@@ -25,6 +26,8 @@ import { NodeDetailsDrawer } from '../components/NodeDetailsDrawer'
 
 import { CollapseCard } from '../components/CollapseCard'
 import type { StrelkaResponse } from '../services/api.types'
+import { resubmitFile } from '../services/api'
+import { useMessageApi } from '../providers/MessageProvider'
 
 /**
  * SubmissionsPage component to display strelka scan results
@@ -33,6 +36,8 @@ import type { StrelkaResponse } from '../services/api.types'
 const SubmissionsPage = () => {
   const { id } = useParams()
   const { data, isLoading } = useFetchScanById(id)
+  const message = useMessageApi()
+  const navigate = useNavigate()
   // TODO: handle 404
 
   const [selectedNodeData, setSelectedNodeData] =
@@ -44,13 +49,50 @@ const SubmissionsPage = () => {
   const [virusTotalDrawerOpen, setVirusTotalDrawerOpen] = useState(false)
   const [selectedResource, setSelectedResource] = useState(null)
   const [drawerVisible, setDrawerVisible] = useState(false)
+  const [isResubmitting, setIsResubmitting] = useState(false)
 
   const [fileFlowExpanded, setFileFlowExpanded] = useState(true)
   const [jsonViewExpanded, setJsonViewExpanded] = useState(false)
+  const [additionalActionsExpanded, setAdditionalActionsExpanded] =
+    useState(true)
 
   const handleVirusTotalClick = (sha256Hash) => {
     setSelectedResource(sha256Hash) // Store the SHA hash for the VirusTotal drawer
     setVirusTotalDrawerOpen(true) // Open the drawer
+  }
+
+  // Function to handle file resubmission
+  const handleResubmit = async () => {
+    if (!data?.file_id) return
+
+    try {
+      setIsResubmitting(true)
+
+      const response = await resubmitFile(data.file_id)
+
+      message.success(
+        `${data.file_name} resubmitted successfully! New submission ID: ${response.file_id}`,
+      )
+
+      // navigate to the new submission view
+      navigate(`/submissions/${response.file_id}`)
+    } catch (error) {
+      console.error('Resubmit error:', error)
+      message.error(
+        `Failed to resubmit ${data.file_name}: ${error.response?.data?.details || error.message}`,
+      )
+    } finally {
+      setIsResubmitting(false)
+    }
+  }
+
+  // Helper function to check if resubmit button should be shown
+  const canResubmit = () => {
+    return (
+      data?.s3_key &&
+      data?.s3_expires_at &&
+      new Date(data.s3_expires_at) > new Date()
+    )
   }
 
   // Callback to set file type filter
@@ -246,6 +288,26 @@ const SubmissionsPage = () => {
             data={data}
             onFileYaraSelect={handleFileYaraSelect}
           />
+          {canResubmit() && (
+            <CollapseCard
+              label="Additional Actions"
+              expanded={additionalActionsExpanded}
+              onExpandChange={(expanded) =>
+                setAdditionalActionsExpanded(expanded)
+              }
+            >
+              {/* Resubmit Button */}
+              <Button
+                type="link"
+                loading={isResubmitting}
+                disabled={isResubmitting}
+                onClick={handleResubmit}
+                icon={<ReloadOutlined />}
+              >
+                Resubmit File
+              </Button>
+            </CollapseCard>
+          )}
         </Col>
 
         {/* ReactFlow / Visual Components */}

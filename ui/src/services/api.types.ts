@@ -64,6 +64,9 @@ export interface Scan {
   submitted_type: string
   user: User
   yara_hits: string[]
+  // S3 fields for file resubmission
+  s3_key?: string
+  s3_expires_at?: string
 }
 
 export interface ScanRequest {
@@ -467,5 +470,21 @@ interface ScanEmail {
   subject: string
   total: {
     attachments: number
+  }
+}
+
+// File resubmission types
+export interface ResubmitRequest {
+  description?: string
+}
+
+export interface ResubmitResponse {
+  file_id: string
+  response: StrelkaResponse[]
+  original_submission_id: string
+  meta: {
+    file_size: number
+    iocs: string[]
+    vt_positives: Array<{ file_sha256: string; positives: number }>
   }
 }

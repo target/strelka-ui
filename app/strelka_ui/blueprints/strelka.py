@@ -11,7 +11,7 @@ from sqlalchemy import or_, desc, asc, func, case, cast, String
 from sqlalchemy.orm import joinedload, defer
 
 from strelka_ui.database import db
-from strelka_ui.models import FileSubmission, User
+from strelka_ui.models import FileSubmission, User, get_request_id
 from strelka_ui.services.auth import auth_required
 from strelka_ui.services.files import (
     decrypt_file,
@@ -19,6 +19,7 @@ from strelka_ui.services.files import (
     convert_bytesio_to_filestorage,
 )
 from strelka_ui.services.strelka import get_db_status, get_frontend_status, submit_data
+from strelka_ui.services.s3 import upload_file, calculate_expires_at, is_s3_enabled, download_file, is_file_expired
 from strelka_ui.services.virustotal import (
     get_virustotal_positives,
     create_vt_zip_and_download,
@@ -339,6 +340,21 @@ def submit_to_strelka(
         # Get Strelka Submission IoCs
         # Store a set of IoCs in IoCs field
 
+        # Handle S3 upload if enabled
+        s3_key = None
+        s3_expires_at = None
+        if is_s3_enabled():
+            try:
+                # Create temporary submission ID for S3 key generation
+                temp_submission_id = get_request_id(response[0])
+                success, s3_key, error_msg = upload_file(file, temp_submission_id)
+                if success:
+                    s3_expires_at = calculate_expires_at()
+                    logging.info(f"Successfully uploaded file to S3: {s3_key}")
+                else:
+                    logging.warning(f"Failed to upload file to S3: {error_msg}")
+            except Exception as e:
+                logging.error(f"Unexpected error during S3 upload: {e}")
 
         # Create a new submission object and add it to the database.
         new_submission = FileSubmission(
@@ -350,7 +366,9 @@ def submit_to_strelka(
             request.headers.get("User-Agent"),
             user.id,
             submitted_description,
-            submitted_at
+            submitted_at,
+            s3_key,
+            s3_expires_at
         )
 
         db.session.add(new_submission)
@@ -707,6 +725,105 @@ def check_vt_api_key():
     api_key_exists = bool(os.environ.get("VIRUSTOTAL_API_KEY"))
     return jsonify({"apiKeyAvailable": api_key_exists}), 200
 
+
+@strelka.route("/resubmit/<submission_id>", methods=["POST"])
+@auth_required
+def resubmit_file(user: User, submission_id: str) -> Tuple[Response, int]:
+    """
+    Resubmit a file from S3 storage for analysis.
+    
+    Args:
+        user: User object representing the authenticated user.
+        submission_id: ID of the original submission to resubmit.
+        
+    Returns:
+        If successful, returns the new submission details and a 200 status code.
+        If unsuccessful, returns an error message and appropriate status code.
+    """
+    if not is_s3_enabled():
+        return jsonify({
+            "error": "File resubmission is not enabled",
+            "details": "S3 storage is not configured or feature is disabled"
+        }), 400
+    
+    try:
+        # Find the original submission
+        original_submission = db.session.query(FileSubmission).filter_by(
+            file_id=submission_id
+        ).first()
+        
+        if not original_submission:
+            return jsonify({
+                "error": "Original submission not found",
+                "details": f"Submission {submission_id} does not exist"
+            }), 404
+        
+        # Check if file has S3 key
+        if not original_submission.s3_key:
+            return jsonify({
+                "error": "File not available for resubmission",
+                "details": "Original file was not stored in S3"
+            }), 400
+        
+        # Check if file has expired
+        if original_submission.s3_expires_at and is_file_expired(original_submission.s3_expires_at):
+            return jsonify({
+                "error": "File has expired",
+                "details": "The original file has been automatically deleted due to retention policy"
+            }), 410
+        
+        # Download file from S3
+        success, file_storage, error_msg = download_file(original_submission.s3_key)
+        if not success:
+            return jsonify({
+                "error": "Failed to retrieve file from storage",
+                "details": error_msg
+            }), 500
+
+        new_description = f"Resubmission of /submissions/{original_submission.file_id}"
+        
+        # Use the existing submit_to_strelka function with resubmission type
+        # We need to temporarily modify the file object to include the new description
+        class ResubmissionFile:
+            def __init__(self, file_storage, description):
+                self.filename = file_storage.filename
+                self.stream = file_storage.stream
+                self.content_type = file_storage.content_type
+                self.description = description
+                
+            def seek(self, *args, **kwargs):
+                return self.stream.seek(*args, **kwargs)
+                
+            def read(self, *args, **kwargs):
+                return self.stream.read(*args, **kwargs)
+        
+        resubmission_file = ResubmissionFile(file_storage, new_description)
+        
+        # Call the existing submit_to_strelka function
+        response = submit_to_strelka(
+            resubmission_file,
+            user,
+            "",  # No submitted_hash for resubmission
+            new_description,
+            "resubmission"  # Mark as resubmission type
+        )
+        
+        # Add original submission ID to the response
+        if isinstance(response, tuple) and len(response) == 2:
+            response_data, status_code = response
+            if status_code == 200 and hasattr(response_data, 'get_json'):
+                json_data = response_data.get_json()
+                json_data["original_submission_id"] = submission_id
+                return jsonify(json_data), status_code
+        
+        return response
+        
+    except Exception as e:
+        logging.error("Error during file resubmission: %s", e)
+        return jsonify({
+            "error": "File resubmission failed",
+            "details": str(e)
+        }), 500
 
 def submissions_to_json(submission: FileSubmission) -> Dict[str, any]:
     """
