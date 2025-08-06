@@ -477,18 +477,19 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flask-cors"
-version = "4.0.2"
-description = "A Flask extension adding a decorator for CORS support"
+version = "6.0.1"
+description = "A Flask extension simplifying CORS support"
 optional = false
-python-versions = "*"
+python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "Flask_Cors-4.0.2-py2.py3-none-any.whl", hash = "sha256:38364faf1a7a5d0a55bd1d2e2f83ee9e359039182f5e6a029557e1f56d92c09a"},
-    {file = "flask_cors-4.0.2.tar.gz", hash = "sha256:493b98e2d1e2f1a4720a7af25693ef2fe32fbafec09a2f72c59f3e475eda61d2"},
+    {file = "flask_cors-6.0.1-py3-none-any.whl", hash = "sha256:c7b2cbfb1a31aa0d2e5341eea03a6805349f7a61647daee1a15c46bbe981494c"},
+    {file = "flask_cors-6.0.1.tar.gz", hash = "sha256:d81bcb31f07b0985be7f48406247e9243aced229b7747219160a0559edd678db"},
 ]
 
 [package.dependencies]
-Flask = ">=0.9"
+flask = ">=0.9"
+Werkzeug = ">=0.7"
 
 [[package]]
 name = "flask-migrate"
@@ -1998,4 +1999,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.10.14"
-content-hash = "1469900848531744580e57ac640958264981490c53aa62e18c783151a824c503"
+content-hash = "d8411052a850223c0abc4797f8e35ab7ec2c3a63c18a2b1821e60bc6bbf2bde4"

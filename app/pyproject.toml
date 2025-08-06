@@ -8,7 +8,7 @@ authors = [
 
 [tool.poetry.dependencies]
 flask = "^3.1.1"
-flask-Cors = "^4.0.1"
+flask-Cors = "^6.0.0"
 flask-migrate = "^4.0.7"
 flask-sqlalchemy = "3.0.5"
 grpcio = "^1.53.2"
@@ -24,7 +24,7 @@ python-dateutil = "^2.9.0-post.0"
 python-dotenv = "^1.0.1" 
 python-magic = "^0.4.27"
 rarfile = "^4.2"
-requests = "^2.32.3"
+requests = "^2.32.4"
 sqlalchemy = "^1.4.54"
 waitress = "^3.0.2"
 jinja2 = "^3.1.6"
