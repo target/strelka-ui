@@ -78,7 +78,7 @@ def get_db_status() -> bool:
 
 
 def submit_data(
-    file: Any, meta: Dict[str, Any], file_hash: str
+    file: Any, meta: Dict[str, Any], file_hash: str, bypass_gatekeeper: bool = False
 ) -> Tuple[bool, str, int]:
     """
     Submit a file to Strelka for analysis and return the result.
@@ -87,6 +87,7 @@ def submit_data(
         file (Any): The file to be submitted.
         meta (dict): A dictionary of metadata to be included with the submission.
         file_hash (str): Used as a filename if uploading via VirusTotal
+        bypass_gatekeeper (bool): If True, bypasses gatekeeper caching for this request.
 
     Returns:
         tuple: A tuple containing a boolean indicating whether the submission was successful,
@@ -114,6 +115,7 @@ def submit_data(
                 sample_data,
                 f"{strelka_host}:{strelka_port}",
                 meta,
+                bypass_gatekeeper=bypass_gatekeeper,
             )
 
             # Return a tuple indicating success, the response from Strelka, and the file size

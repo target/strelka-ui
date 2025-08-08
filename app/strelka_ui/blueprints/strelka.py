@@ -256,7 +256,7 @@ def submit_file(
 
 
 def submit_to_strelka(
-    file, user, submitted_hash, submitted_description, submitted_type
+    file, user, submitted_hash, submitted_description, submitted_type, bypass_gatekeeper=False
 ):
     """
     Submit file to Strelka for analysis and save results to the database.
@@ -266,7 +266,8 @@ def submit_to_strelka(
         user: User object representing the authenticated user.
         submitted_hash: Hash of the submitted file.
         submitted_description: Description of the submitted file.
-        submitted_type: Type of submission (e.g., 'api', 'virustotal').
+        submitted_type: Type of submission (e.g., 'api', 'virustotal', 'resubmission').
+        bypass_gatekeeper: If True, bypasses gatekeeper caching for this request.
 
     Returns:
         Analysis results and a 200 status code if successful.
@@ -286,6 +287,7 @@ def submit_to_strelka(
                 "client_user_name": user.user_cn,
             },
             submitted_hash,
+            bypass_gatekeeper=bypass_gatekeeper,
         )
 
         # If the Strelka submission was not successful, return an error message.
@@ -805,7 +807,8 @@ def resubmit_file(user: User, submission_id: str) -> Tuple[Response, int]:
             user,
             "",  # No submitted_hash for resubmission
             new_description,
-            "resubmission"  # Mark as resubmission type
+            "resubmission",  # Mark as resubmission type
+            bypass_gatekeeper=True  # Bypass gatekeeper for resubmissions
         )
         
         # Add original submission ID to the response
