@@ -167,7 +167,7 @@ def check_suspicious_yara_rules(strelka_data: dict) -> str:
 
 def check_pe_file_signing(strelka_data: dict) -> str:
     """
-    Checks if the PE file is digitally signed.
+    Checks if the PE file is digitally signed by looking for the 'security' field.
 
     Parameters:
         strelka_data (dict): Strelka file response data.
@@ -177,7 +177,7 @@ def check_pe_file_signing(strelka_data: dict) -> str:
     """
     try:
         pe_data = strelka_data["scan"].get("pe", {})
-        if pe_data and "flags" in pe_data and not "signed" in pe_data["flags"]:
+        if pe_data and not pe_data.get("security"):
             return "The PE file is not digitally signed."
     except Exception as e:
         logging.warning(f"Error in PE file signing check: {e}")
