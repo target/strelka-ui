@@ -6,15 +6,14 @@ import {
 } from '@xyflow/react'
 import { theme } from 'antd'
 import styled from 'styled-components'
-import { antdColors } from '../../../utils/colors'
 
 const { useToken } = theme
 
-const EdgeLabel = styled.div<{ $markerColor: string }>`
+const EdgeLabel = styled.div<{ $markerColor: string; $greyLight: string }>`
   position: absolute;
   transform: translate(-50%, -50%);
   font-size: 11px;
-  font-weight: ${(props) => (props.$markerColor !== antdColors.lightGray ? '700' : '500')};
+  font-weight: ${(props) => (props.$markerColor !== props.$greyLight ? '700' : '500')};
   line-height: 12px;
   padding: 2px 4px;
   border-radius: 3px;
@@ -61,7 +60,7 @@ export function IndexConnectEdge({
   const { token } = useToken()
 
   const markerColor = isHighlighted
-    ? antdColors.darkGray
+    ? token.colorTextSecondary
     : (style.stroke as string)
 
   return (
@@ -85,6 +84,7 @@ export function IndexConnectEdge({
           }}
           className="nodrag nopan"
           $markerColor={markerColor}
+          $greyLight={token.colorTextSecondary}
         >
           {label}
         </EdgeLabel>

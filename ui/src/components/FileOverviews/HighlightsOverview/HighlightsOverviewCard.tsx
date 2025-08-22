@@ -4,11 +4,11 @@ import {
   RightOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
-import { Tag, Tooltip, Typography } from 'antd'
+import { Tag, Tooltip, Typography, theme } from 'antd'
 import { useEffect, useState } from 'react'
-import { antdColors } from '../../../utils/colors'
-import { getIconConfig } from '../../../utils/iconMappingTable'
+import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { ScanData } from '../types'
+const { useToken } = theme
 
 const { Text } = Typography
 
@@ -17,6 +17,7 @@ interface HighlightsOverviewCardProps extends ScanData {
 }
 
 const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
+  const { getIconConfig } = useIconConfig()
   const { data, onFileNameSelect } = props
   const [expandedNodes, setExpandedNodes] = useState(new Set())
   const [selectedNodeId, setSelectedNodeId] = useState(null)
@@ -27,6 +28,8 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
   const iocsByNode = {}
   const mimeTypeByNode = {}
   const filenameByNode = {}
+
+  const { token } = useToken()
 
   // Function to load more nodes
   const loadMoreNodes = () => {
@@ -132,8 +135,8 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
     const iocs = iocsByNode[nodeId] || []
     const mimeType = mimeTypeByNode[nodeId]
     const iconConfig = getIconConfig('strelka', mimeType.toLowerCase())
-    const IconComponent = iconConfig?.icon
-    const bgColor = iconConfig?.color || antdColors.darkGray
+    const IconComponent = iconConfig.icon
+    const bgColor = iconConfig.color
 
     const response = data.strelka_response.find(
       (res) => res.file.tree.node === nodeId,
@@ -149,10 +152,12 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
           overflow: 'hidden',
           cursor: 'pointer',
           background:
-            selectedNodeId === nodeId ? `${antdColors.blue}10` : 'none',
+            selectedNodeId === nodeId ? `${token.colorPrimaryBg}` : 'none',
           borderRadius: '5px',
           border:
-            selectedNodeId === nodeId ? `1px solid ${antdColors.blue}` : 'none',
+            selectedNodeId === nodeId
+              ? `1px solid ${token.colorPrimaryBorder}`
+              : 'none',
         }}
       >
         <div
@@ -235,7 +240,8 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
                 style={{
                   fontSize: '12px',
                   display: 'block',
-                  color: antdColors.purple,
+                  padding: '4px',
+                  color: token.colorTextSecondary,
                 }}
               >
                 <div style={{ display: 'flex' }}>
@@ -244,6 +250,7 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
                       alignItems: 'start',
                       paddingTop: 2,
                       marginRight: 5,
+                      color: token.colorWarning,
                     }}
                   />
                   {ioc}
@@ -252,9 +259,7 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
             ))}
             {insights.map((insight) => {
               const isVirusTotal = insight.toLowerCase().includes('virustotal')
-              const textColor = isVirusTotal
-                ? antdColors.red
-                : antdColors.geekblue
+              const textColor = isVirusTotal ? token.volcano : token.geekblue
               return (
                 <Text
                   key={`${nodeId}-insight-${insight}`}
@@ -311,7 +316,11 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
       ) : (
         <Typography.Title
           level={5}
-          style={{ color: antdColors.gray, textAlign: 'left', margin: '0px' }}
+          style={{
+            color: token.colorTextSecondary,
+            textAlign: 'left',
+            margin: '0px',
+          }}
         >
           No Highlights for this Submission
         </Typography.Title>

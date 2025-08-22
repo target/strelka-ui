@@ -6,7 +6,7 @@ import {
   MessageOutlined,
 } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
-import { Card, Col, Input, Row, Statistic, Typography } from 'antd'
+import { Card, Col, Input, Row, Statistic, Typography, theme } from 'antd'
 import Dropzone from '../components/Dropzone'
 import PageWrapper from '../components/PageWrapper'
 import SubmissionTable from '../components/SubmissionTable'
@@ -20,6 +20,7 @@ import { useMessageApi } from '../providers/MessageProvider'
 const { Title, Text } = Typography
 
 const DashboardPage = () => {
+  const { token } = theme.useToken()
   const message = useMessageApi()
 
   const [fileDescription, setFileDescription] = useState(
@@ -76,22 +77,22 @@ const DashboardPage = () => {
     {
       title: 'All Time Submissions',
       value: stats?.all_time,
-      valueStyle: { color: '#3f8600' },
+      valueStyle: { color: token.green7 },
     },
     {
       title: 'Last 30 Days',
       value: stats?.thirty_days,
-      valueStyle: { color: '#cf1322' },
+      valueStyle: { color: token.red7 },
     },
     {
       title: 'Last 7 Days',
       value: stats?.seven_days,
-      valueStyle: { color: '#125ecf' },
+      valueStyle: { color: token.blue7 },
     },
     {
       title: 'Last 24 Hours',
       value: stats?.twentyfour_hours,
-      valueStyle: { color: '#cf8512' },
+      valueStyle: { color: token.gold7 },
     },
   ]
 
@@ -122,7 +123,7 @@ const DashboardPage = () => {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  backgroundColor: `${token.colorBgMask}`,
                   zIndex: 10,
                   display: 'flex',
                   flexDirection: 'column',
@@ -130,7 +131,7 @@ const DashboardPage = () => {
                   justifyContent: 'center',
                   borderRadius: '4px',
                   textAlign: 'center',
-                  color: 'grey',
+                  color: token.colorTextSecondary,
                   fontSize: '18px',
                   padding: '20px',
                 }}

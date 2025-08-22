@@ -1,9 +1,8 @@
-import { Tag, Typography } from 'antd'
-import { antdColors } from '../../../utils/colors'
+import { Tag, Typography, theme } from 'antd'
 import '../../../styles/TlshOverviewCard.css'
 import type { CSSProperties } from 'react'
 import type { OverviewCardProps } from '../types'
-
+const { useToken } = theme
 const { Text } = Typography
 
 interface TlshCustomCss extends CSSProperties {
@@ -16,6 +15,8 @@ const TlshOverviewCard = (props: OverviewCardProps) => {
   const score = match.score
   const family = match.family
   const matchedTlsh = match.tlsh
+
+  const { token } = useToken()
 
   // Define the indexes where we want to show the scores
   const scorePositions = {
@@ -44,7 +45,7 @@ const TlshOverviewCard = (props: OverviewCardProps) => {
       'Quite Different': 'gold',
       'Very Different': 'lime',
     }
-    return colorMapping[description] || antdColors.gray
+    return colorMapping[description] || token.colorTextSecondary
   }
 
   // Construct the sentence with the provided values
@@ -87,12 +88,12 @@ const TlshOverviewCard = (props: OverviewCardProps) => {
 
   // antd color gradient
   const colorGradient = [
-    antdColors.red, // Very Similar
-    antdColors.volcano,
-    antdColors.orange,
-    antdColors.gold,
-    antdColors.lime,
-    antdColors.green, // Very Different
+    token.red7, // Very Similar
+    token.volcano7,
+    token.orange,
+    token.gold,
+    token.lime7,
+    token.green7, // Very Different
   ]
 
   // Assume 300 is the highest score for TLSH comparison (It's not, but let's pretend)
@@ -111,14 +112,14 @@ const TlshOverviewCard = (props: OverviewCardProps) => {
   // Update the color gradient logic to handle scores of 300 or higher
   const getColorForIndex = (index) => {
     if (index === numberOfParts - 1 && score >= maxScore) {
-      return antdColors.green
+      return token.green
     }
 
     return index <= scoreIndex
       ? colorGradient[
           Math.floor((colorGradient.length - 1) * (index / (numberOfParts - 1)))
         ]
-      : antdColors.lightGray
+      : token.colorTextDisabled
   }
 
   return (

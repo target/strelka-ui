@@ -16,7 +16,7 @@ import FileTreeCardWithProvider from '../components/FileFlow/FileTreeCardWithPro
 
 import VirusTotalAugmentDrawer from '../components/VirusTotal/VirusTotalAugmentDrawer'
 
-import { getIconConfig } from '../utils/iconMappingTable'
+import { useIconConfig } from '../utils/iconMappingTable'
 
 import '../styles/IconContainer.css'
 
@@ -38,6 +38,8 @@ const SubmissionsPage = () => {
   const { data, isLoading } = useFetchScanById(id)
   const message = useMessageApi()
   const navigate = useNavigate()
+  const { getIconConfig } = useIconConfig()
+
   // TODO: handle 404
 
   const [selectedNodeData, setSelectedNodeData] =

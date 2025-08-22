@@ -1,6 +1,5 @@
 import type { Edge, Node } from '@xyflow/react'
 import type { StrelkaResponse } from '../services/api.types'
-import { getIconConfig } from './iconMappingTable'
 import {
   type StrelkaNodeData,
   indexDataType,
@@ -76,6 +75,7 @@ export const toggleChildrenVisibility = (
 
 export function transformElasticSearchDataToElements(
   results: StrelkaResponse[],
+  getIconConfig: (type: string, subtype: string) => { color: string },
 ) {
   const nodes: Node<StrelkaNodeData>[] = []
   const edges: Edge[] = []

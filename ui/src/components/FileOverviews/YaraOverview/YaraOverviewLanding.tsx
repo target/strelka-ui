@@ -1,8 +1,10 @@
 import { Collapse, Tag, Typography } from 'antd'
+import { theme } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
 import type { ScanData } from '../types'
 import YaraTypeOverviewCard from './YaraTypeOverviewCard'
+
+const { useToken } = theme
 
 const { Text } = Typography
 
@@ -11,9 +13,9 @@ interface YaraOverviewLandingProps extends ScanData {
 }
 
 const YaraOverviewLanding = (props: YaraOverviewLandingProps) => {
+  const { token } = useToken()
   const { data, onFileYaraSelect } = props
   const [filterApplied, setFilterApplied] = useState(false)
-
   const handleYaraSelect = (selectedYara) => {
     setFilterApplied(!!selectedYara)
     onFileYaraSelect(selectedYara)
@@ -22,7 +24,7 @@ const YaraOverviewLanding = (props: YaraOverviewLandingProps) => {
   const borderStyle = filterApplied
     ? {
         // Styles when the filter is applied
-        border: `2px solid ${antdColors.purple}50`,
+        border: `2px solid ${token.purple5}`,
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         padding: '3px',
@@ -55,7 +57,10 @@ const YaraOverviewLanding = (props: YaraOverviewLandingProps) => {
               <Text>File YARA Matches</Text>
               {filterApplied && (
                 <Tag
-                  style={{ color: `${antdColors.purple}99`, fontWeight: 700 }}
+                  style={{
+                    fontWeight: 700,
+                  }}
+                  color="purple"
                 >
                   Filter Applied
                 </Tag>

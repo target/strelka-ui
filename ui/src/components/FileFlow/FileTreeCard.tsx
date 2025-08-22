@@ -12,6 +12,7 @@ import {
   useNodesState,
   useReactFlow,
 } from '@xyflow/react'
+import { theme } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IndexConnectEdge } from './EdgeTypes/IndexConnectEdge'
 import EventNode from './NodeTypes/EventNode'
@@ -21,7 +22,6 @@ import DownloadImage from '../../utils/DownloadImage'
 import ExceededGuide from '../../utils/ExceededGuide'
 import NodeSearchPanel from '../../utils/NodeSearchPanel'
 import ShowFileListing from '../../utils/ShowFileListing'
-import { antdColors } from '../../utils/colors'
 import { getDagreLayout } from '../../utils/dagreLayout'
 import {
   toggleChildrenVisibility,
@@ -30,7 +30,10 @@ import {
 
 import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
 import type { StrelkaResponse } from '../../services/api.types'
+import { useIconConfig } from '../../utils/iconMappingTable.js'
 import type { StrelkaNodeData } from '../../utils/indexDataUtils'
+
+const { useToken } = theme
 
 const nodeTypes = {
   event: EventNode,
@@ -64,6 +67,7 @@ const FileTreeCard = (props: FileTreeCardProps) => {
     selectedNodeData,
     setSelectedNodeData,
   } = props
+  const { token } = useToken()
   const [searchTerm, setSearchTerm] = useState('')
   const { fitView } = useReactFlow()
 
@@ -80,6 +84,8 @@ const FileTreeCard = (props: FileTreeCardProps) => {
 
   const [highlightedEdge, setHighlightedEdge] = useState(null)
   const [highlightedNode, setHighlightedNode] = useState(null)
+
+  const { getIconConfig } = useIconConfig()
 
   useEffect(() => {
     const vtExceeded = data.some((item) => {
@@ -219,7 +225,9 @@ const FileTreeCard = (props: FileTreeCardProps) => {
       ...edge,
       style: {
         ...edge.style,
-        stroke: isHighlighted ? antdColors.darkGray : antdColors.lightGray,
+        stroke: isHighlighted
+          ? token.colorTextSecondary
+          : token.colorTextTertiary,
         strokeWidth: isHighlighted ? 2 : 2,
       },
       data: { ...edge.data, isHighlighted },
@@ -241,7 +249,7 @@ const FileTreeCard = (props: FileTreeCardProps) => {
 
   useEffect(() => {
     const { nodes: transformedNodes, edges: transformedEdges } =
-      transformElasticSearchDataToElements(data)
+      transformElasticSearchDataToElements(data, getIconConfig)
 
     const nodesToLayout = transformedNodes.filter(isNode)
     const edgesToLayout = transformedEdges.filter((el) => !isNode(el))
@@ -250,7 +258,7 @@ const FileTreeCard = (props: FileTreeCardProps) => {
 
     setNodes(layoutedData.filter(isNode) as Node<StrelkaNodeData>[])
     setEdges(layoutedData.filter((el) => !isNode(el)) as Edge[])
-  }, [data, setEdges, setNodes])
+  }, [data, setEdges, setNodes, getIconConfig])
 
   const { isDarkMode } = useDarkModeSetting()
   const colorMode = isDarkMode ? 'dark' : 'light'

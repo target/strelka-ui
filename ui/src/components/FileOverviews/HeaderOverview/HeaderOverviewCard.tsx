@@ -1,6 +1,6 @@
 import { Button, Card, Row, Tag, Tooltip, Typography } from 'antd'
 import { useCallback } from 'react'
-import { getIconConfig } from '../../../utils/iconMappingTable'
+import { useIconConfig } from '../../../utils/iconMappingTable'
 
 import styled from 'styled-components'
 import { APP_CONFIG } from '../../../config'
@@ -133,6 +133,8 @@ interface HeaderOverviewCardProps extends ScanData {
 }
 
 const HeaderOverviewCard = (props: HeaderOverviewCardProps) => {
+  const { getIconConfig } = useIconConfig()
+
   const { data, onOpenVT } = props
   const sortedScannersRun = [...(data?.scanners_run || [])].sort()
   const virustotalData = data.strelka_response[0]?.enrichment?.virustotal
