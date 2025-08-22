@@ -215,10 +215,7 @@ const HighlightsOverviewCard = (props: HighlightsOverviewCardProps) => {
             )}
             {iocs.length > 0 && (
               <Tooltip title="Potential IOCs">
-                <Tag
-                  color="magenta"
-                  style={{ margin: '1px', fontSize: '10px' }}
-                >
+                <Tag color="purple" style={{ margin: '1px', fontSize: '10px' }}>
                   {iocs.length}
                 </Tag>
               </Tooltip>
