@@ -8,8 +8,7 @@ import { Handle, Position } from '@xyflow/react'
 import { Tag, Tooltip, theme } from 'antd'
 import { memo, useEffect, useState } from 'react'
 import styled, { createGlobalStyle } from 'styled-components'
-import { antdColors } from '../../../utils/colors'
-import { getIconConfig } from '../../../utils/iconMappingTable'
+import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { StrelkaNodeData } from '../../../utils/indexDataUtils'
 
 const { useToken } = theme
@@ -34,15 +33,18 @@ function lightenHexColor(hexColor: string, factor: number): string {
 }
 
 // Styled Components
-const LockIndicatorWrapper = styled.div`
+const LockIndicatorWrapper = styled.div<{
+  $bgColor?: string
+  $borderColor?: string
+}>`
   position: absolute;
   bottom: 10px;
   right: 15px;
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  border: 1px solid ${antdColors.red};
-  background: ${antdColors.lightRed};
+  border: 1px solid ${({ $borderColor }) => $borderColor || 'transparent'};
+  background: ${({ $bgColor }) => $bgColor || 'transparent'};
   box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
     0px 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
@@ -51,15 +53,18 @@ const LockIndicatorWrapper = styled.div`
   cursor: pointer;
 `
 
-const UnlockIndicatorWrapper = styled.div`
+const UnlockIndicatorWrapper = styled.div<{
+  $bgColor?: string
+  $borderColor?: string
+}>`
   position: absolute;
   bottom: 10px;
   right: 15px;
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  border: 1px solid ${antdColors.darkGreen};
-  background: ${antdColors.lightGreen};
+  border: 1px solid ${(props) => props.$borderColor};
+  background: ${(props) => props.$bgColor};
   box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
     0px 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
@@ -68,14 +73,17 @@ const UnlockIndicatorWrapper = styled.div`
   cursor: pointer;
 `
 
-const QrCodePreviewWrapper = styled.div<{ hasImage: boolean }>`
+const QrCodePreviewWrapper = styled.div<{
+  hasImage: boolean
+  $bgColor?: string
+}>`
   position: absolute;
   bottom: 10px;
   right: ${({ hasImage }) => (hasImage ? '40px' : '10px')};
   width: 24px;
   height: 24px;
   border-radius: 20%;
-  background-color: #ff7a45;
+  background-color: ${(props) => props.$bgColor};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -257,6 +265,7 @@ const EventNode = memo(({ data, selected }: EventNodeProps) => {
   const previewStyle = isBlurred ? { filter: 'blur(4px)' } : {}
 
   const { token } = useToken()
+  const { getIconConfig } = useIconConfig()
 
   const mappingEntry = getIconConfig(
     'strelka',
@@ -331,12 +340,12 @@ const EventNode = memo(({ data, selected }: EventNodeProps) => {
       )}
       <LeftWrapper $bgColor={color}>
         {IconComponent ? (
-          <IconComponent style={{ color: '#ffffff', fontSize: '36px' }} />
+          <IconComponent style={{ color: 'white', fontSize: '36px' }} />
         ) : (
           <p>{data.nodeMain[0]}</p>
         )}
       </LeftWrapper>
-      <RightWrapper $acColor={'#999094'}>
+      <RightWrapper $acColor={token.colorTextSecondary}>
         <Tooltip title={data.nodeMain.join(', ')} placement="topLeft">
           <p className="node-header">{data.nodeMain.join(', ')}</p>
         </Tooltip>
@@ -370,11 +379,11 @@ const EventNode = memo(({ data, selected }: EventNodeProps) => {
         type="source"
         position={Position.Right}
         style={{
-          backgroundColor: '#aaa',
+          backgroundColor: token.colorTextTertiary,
           width: 12,
           height: 12,
           borderRadius: '50%',
-          border: '1px solid #bbb',
+          border: `1px solid ${token.colorBorderSecondary}`,
           bottom: '10%',
           transform: 'translate(30%, -50%)',
         }}
@@ -386,23 +395,29 @@ const EventNode = memo(({ data, selected }: EventNodeProps) => {
       </VirustotalWrapper>
       {data.nodeDecryptionSuccess === false && (
         <Tooltip title="Failed to decrypt files. Password not provided or could not be cracked.">
-          <LockIndicatorWrapper>
-            <LockOutlined style={{ color: antdColors.red, fontSize: '16px' }} />
+          <LockIndicatorWrapper
+            $bgColor={token.colorErrorBg}
+            $borderColor={token.colorErrorBorder}
+          >
+            <LockOutlined
+              style={{ color: token.colorError, fontSize: '16px' }}
+            />
           </LockIndicatorWrapper>
         </Tooltip>
       )}
       {data.nodeDecryptionSuccess === true && (
         <Tooltip title="Successfully decrypted files.">
-          <UnlockIndicatorWrapper>
-            <UnlockOutlined
-              style={{ color: antdColors.darkGreen, fontSize: '16px' }}
-            />
+          <UnlockIndicatorWrapper
+            $bgColor={token.green3}
+            $borderColor={token.green7}
+          >
+            <UnlockOutlined style={{ color: token.green7, fontSize: '16px' }} />
           </UnlockIndicatorWrapper>
         </Tooltip>
       )}
       {data.nodeQrData && (
         <Tooltip title="QR Code found">
-          <QrCodePreviewWrapper hasImage={hasImage}>
+          <QrCodePreviewWrapper hasImage={hasImage} $bgColor={token.orange}>
             <QrcodeOutlined style={{ color: 'white' }} />
           </QrCodePreviewWrapper>
         </Tooltip>

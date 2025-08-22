@@ -8,9 +8,11 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
+
+const { useToken } = theme
 
 const { Text } = Typography
 
@@ -23,22 +25,22 @@ const formatBytes = (bytes, decimals = 2) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
 }
-
 // Function to determine extraction color based on extracted and total files
-const getExtractionColor = (extracted, total) => {
-  if (extracted === total && total > 0) {
-    return { color: antdColors.darkGreen }
+const getExtractionColor = (extracted, total, token) => {
+  if (extracted === total) {
+    return { color: token.green7 }
   }
 
   if (extracted > 0 && extracted < total) {
-    return { color: antdColors.deepOrange }
+    return { color: token.volcano }
   }
 
-  return { color: antdColors.red }
+  return { color: token.colorError }
 }
 
 const SevenZipOverviewCard = ({ data }) => {
   const [filter, setFilter] = useState('')
+  const { token } = useToken()
 
   // Check if files exist and filter based on user input
   const files = data.scan.seven_zip.files || []
@@ -85,7 +87,7 @@ const SevenZipOverviewCard = ({ data }) => {
 
   const extracted = data.scan.seven_zip.total.extracted
   const total = data.scan.seven_zip.total.files
-  const extractionColor = getExtractionColor(extracted, total)
+  const extractionColor = getExtractionColor(extracted, total, token)
 
   return (
     <div>

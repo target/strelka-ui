@@ -8,10 +8,11 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
 import type { OverviewCardProps } from '../types'
+const { useToken } = theme
 
 const { Text } = Typography
 
@@ -26,22 +27,22 @@ const formatBytes = (bytes, decimals = 2) => {
 }
 
 // Function to determine extraction color based on extracted and total files
-const getExtractionColor = (extracted, total) => {
-  if (extracted === total && total > 0) {
-    return { color: antdColors.darkGreen }
+const getExtractionColor = (extracted, total, token) => {
+  if (extracted === total) {
+    return { color: token.green7 }
   }
 
   if (extracted > 0 && extracted < total) {
-    return { color: antdColors.deepOrange }
+    return { color: token.volcano }
   }
 
-  return { color: antdColors.red }
+  return { color: token.colorError }
 }
 
 const RarOverviewCard = (props: OverviewCardProps) => {
   const { data } = props
   const [filter, setFilter] = useState('')
-
+  const { token } = useToken()
   // Check if files exist and filter based on user input
   const files = data.scan.rar.files || []
   const filteredFiles = files
@@ -145,7 +146,7 @@ const RarOverviewCard = (props: OverviewCardProps) => {
 
   const extracted = data.scan.rar.total.extracted
   const total = data.scan.rar.total.files
-  const extractionColor = getExtractionColor(extracted, total)
+  const extractionColor = getExtractionColor(extracted, total, token)
 
   return (
     <div>

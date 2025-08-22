@@ -1,7 +1,7 @@
-import { Space, Tag, Tooltip, Typography } from 'antd'
+import { Space, Tag, Tooltip, Typography, theme } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
-import { getIconConfig } from '../../../utils/iconMappingTable'
+const { useToken } = theme
+import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { ScanData } from '../types'
 
 const { Text } = Typography
@@ -18,6 +18,9 @@ interface MimeTypeDetails {
 }
 
 const FileTypeOverviewCard = (props: FileTypeOverviewCardProps) => {
+  const { getIconConfig } = useIconConfig()
+  const { token } = useToken()
+
   const { data, onFileTypeSelect } = props
   const [selectedFileType, setSelectedFileType] = useState(null)
   const [showMoreFileTypes, setShowMoreFileTypes] = useState(false)
@@ -61,7 +64,7 @@ const FileTypeOverviewCard = (props: FileTypeOverviewCardProps) => {
   const renderFileTypeTag = (item) => {
     const iconConfig = getIconConfig('strelka', item.mimeType.toLowerCase())
     const IconComponent = iconConfig?.icon
-    const bgColor = iconConfig?.color || antdColors.darkGray
+    const bgColor = iconConfig?.color
 
     return (
       <Space
@@ -78,13 +81,11 @@ const FileTypeOverviewCard = (props: FileTypeOverviewCardProps) => {
               justifyContent: 'space-between',
               alignItems: 'center',
               background:
-                selectedFileType === item.mimeType
-                  ? `${antdColors.blue}20`
-                  : 'none',
+                selectedFileType === item.mimeType ? `${token.blue}20` : 'none',
               cursor: 'pointer',
               border:
                 selectedFileType === item.mimeType
-                  ? `1px solid ${antdColors.blue}`
+                  ? `1px solid ${token.blue}`
                   : 'none',
             }}
           >
@@ -131,7 +132,7 @@ const FileTypeOverviewCard = (props: FileTypeOverviewCardProps) => {
             style={{
               marginLeft: '30px',
               fontSize: '12px',
-              color: antdColors.blue,
+              color: token.blue,
               cursor: 'pointer',
             }}
           >

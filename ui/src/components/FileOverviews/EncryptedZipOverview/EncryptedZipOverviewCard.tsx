@@ -1,24 +1,30 @@
-import { Card, Col, Descriptions, Row, Tag, Typography } from 'antd'
-import { antdColors } from '../../../utils/colors'
+import { Card, Col, Descriptions, Row, Tag, Typography, theme } from 'antd'
+import { useMemo } from 'react'
 import type { OverviewCardProps } from '../types'
+const { useToken } = theme
 
 const { Text } = Typography
 
 // Function to determine extraction color based on extracted and total files
-const getExtractionColor = (extracted, total) => {
-  let colorObj = { color: antdColors.red }
+const getExtractionColor = (extracted, total, token) => {
+  let colorObj = { color: token.red }
   if (extracted === total && total > 0) {
-    colorObj = { color: antdColors.darkGreen }
+    colorObj = { color: token.green7 }
   } else if (extracted > 0 && extracted < total) {
-    colorObj = { color: antdColors.deepOrange }
+    colorObj = { color: token.orange }
   }
   return colorObj
 }
 
 const EncryptedZipOverviewCard = ({ data }: OverviewCardProps) => {
+  const token = useToken()
+
   const extracted = data.scan.encrypted_zip.total.extracted
   const total = data.scan.encrypted_zip.total.files
-  const extractionColor = getExtractionColor(extracted, total)
+  const extractionColor = useMemo(
+    () => getExtractionColor(extracted, total, token),
+    [extracted, total, token],
+  )
 
   return (
     <div>

@@ -1,8 +1,8 @@
-import { Collapse, Tag, Typography } from 'antd'
+import { Collapse, Tag, Typography, theme } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
 import type { ScanData } from '../types'
 import FileTypeOverviewCard from './FileTypeOverviewCard'
+const { useToken } = theme
 
 const { Text } = Typography
 
@@ -14,6 +14,8 @@ const FileTypeOverviewLanding = (props: FileTypeOverviewLandingProps) => {
   const { data, onFileTypeSelect } = props
   const [filterApplied, setFilterApplied] = useState(false)
 
+  const { token } = useToken()
+
   const handleFileTypeSelect = (selectedFileType) => {
     setFilterApplied(!!selectedFileType)
     onFileTypeSelect(selectedFileType)
@@ -22,7 +24,7 @@ const FileTypeOverviewLanding = (props: FileTypeOverviewLandingProps) => {
   const borderStyle = filterApplied
     ? {
         // Styles when the filter is applied
-        border: `2px solid ${antdColors.blue}50`,
+        border: `2px solid ${token.colorPrimaryBorder}`,
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         padding: '3px',

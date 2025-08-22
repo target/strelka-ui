@@ -1,10 +1,10 @@
 import { BookOutlined, WarningOutlined } from '@ant-design/icons'
-import { Row, Tag, Tooltip, Typography } from 'antd'
+import { Row, Tag, Tooltip, Typography, theme } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
 import type { ScanData } from '../types'
 
 const { Text } = Typography
+const { useToken } = theme
 
 interface YaraTypeOverviewCardProps extends ScanData {
   onFileYaraSelect: (selectedYara: string | null) => void
@@ -15,6 +15,7 @@ interface YaraTypeOverviewCardProps extends ScanData {
  */
 const YaraTypeOverviewCard = (props: YaraTypeOverviewCardProps) => {
   const { data, onFileYaraSelect } = props
+  const { token } = useToken()
   const [selectedYara, setSelectedYara] = useState(null)
   const [showMoreSuspicious, setShowMoreSuspicious] = useState(false)
   const [showMoreClassifiers, setShowMoreClassifiers] = useState(false)
@@ -99,14 +100,16 @@ const YaraTypeOverviewCard = (props: YaraTypeOverviewCardProps) => {
             background:
               selectedYara === item.yara
                 ? isSuspicious
-                  ? `${antdColors.deepOrange}20`
-                  : `${antdColors.blue}20`
+                  ? token.colorErrorBg
+                  : token.colorPrimaryBg
                 : 'none',
             cursor: 'pointer',
+            paddingTop: '3px',
+            paddingBottom: '3px',
             border:
               selectedYara === item.yara
                 ? `1px solid ${
-                    isSuspicious ? antdColors.deepOrange : antdColors.blue
+                    isSuspicious ? token.volcano6 : token.colorPrimaryBorder
                   }`
                 : 'none',
           }}
@@ -116,8 +119,8 @@ const YaraTypeOverviewCard = (props: YaraTypeOverviewCardProps) => {
               className="file-type-box"
               style={{
                 backgroundColor: isSuspicious
-                  ? antdColors.deepOrange
-                  : antdColors.darkGray,
+                  ? token.volcano6
+                  : token.colorTextSecondary,
                 marginRight: '8px',
               }}
             >
@@ -171,7 +174,7 @@ const YaraTypeOverviewCard = (props: YaraTypeOverviewCardProps) => {
               style={{
                 marginLeft: '30px',
                 fontSize: '12px',
-                color: antdColors.blue,
+                color: token.colorPrimary,
                 cursor: 'pointer',
               }}
             >

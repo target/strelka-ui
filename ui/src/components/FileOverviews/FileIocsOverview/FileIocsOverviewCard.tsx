@@ -1,9 +1,9 @@
 import { Space, Tag, Tooltip, Typography } from 'antd'
+import { theme } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
-import { getIconConfig } from '../../../utils/iconMappingTable'
+import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { FileIocsOverviewProps } from '../types'
-
+const { useToken } = theme
 const { Text } = Typography
 
 /**
@@ -11,6 +11,9 @@ const { Text } = Typography
  * @param {{ data: Object, onFileIocSelect: Function }} props
  */
 const FileIocsOverviewCard = (props: FileIocsOverviewProps) => {
+  const { getIconConfig } = useIconConfig()
+  const { token } = useToken()
+
   const { data, onFileIocSelect } = props
   const [selectedIoc, setSelectedIoc] = useState(null)
   const [showMore, setShowMore] = useState(false) // State to control showing more IOCs
@@ -86,7 +89,7 @@ const FileIocsOverviewCard = (props: FileIocsOverviewProps) => {
     // Get the icon configuration for the current IOC type
     const iconConfig = getIconConfig('strelka', iocType)
     const IconComponent = iconConfig?.icon
-    const iconColor = iconConfig?.color || antdColors.darkPurple // Default to darkPurple if no color is provided
+    const iconColor = iconConfig?.color || token.purple7 // Default to darkPurple if no color is provided
 
     return (
       <Tooltip key={value} title={`Files: ${files.join(', ')}`}>
@@ -98,9 +101,12 @@ const FileIocsOverviewCard = (props: FileIocsOverviewProps) => {
             width: '100%',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: selectedIoc === value ? `${antdColors.blue}10` : 'none',
+            background:
+              selectedIoc === value ? `${token.colorPrimaryBg}` : 'none',
             border:
-              selectedIoc === value ? `1px solid ${antdColors.blue}` : 'none',
+              selectedIoc === value
+                ? `1px solid ${token.colorPrimaryBorder}`
+                : 'none',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -161,7 +167,7 @@ const FileIocsOverviewCard = (props: FileIocsOverviewProps) => {
             onClick={() => setShowMore(true)}
             style={{
               cursor: 'pointer',
-              color: '#1890ff',
+              color: token.blue,
               marginLeft: '30px',
               fontSize: '12px',
             }}

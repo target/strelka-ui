@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useMimeTypeStats } from '../../hooks/useMimeTypeStats'
-import { getIconConfig } from '../../utils/iconMappingTable'
+import { useIconConfig } from '../../utils/iconMappingTable'
 
 interface MimeTypeBarChartProps {
   height: number
@@ -22,6 +22,7 @@ interface MimeTypeBarChartProps {
  * @param {number} height - Height of the chart container.
  */
 const MimeTypeBarChart = ({ height }: MimeTypeBarChartProps) => {
+  const { getIconConfig } = useIconConfig()
   const { data, isLoading } = useMimeTypeStats()
 
   if (isLoading) {

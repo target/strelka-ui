@@ -22,7 +22,7 @@ import { Link } from 'react-router'
 
 import { useVirusTotalApiKey } from '../hooks/useVirusTotalApiKey'
 import { useMessageApi } from '../providers/MessageProvider'
-import { getIconConfig } from '../utils/iconMappingTable'
+import { useIconConfig } from '../utils/iconMappingTable'
 import VirusTotalAugmentDrawer from './VirusTotal/VirusTotalAugmentDrawer'
 
 import { debounce } from 'lodash'
@@ -50,6 +50,7 @@ const SubmissionTable = () => {
   const [resubmittingIds, setResubmittingIds] = useState<Set<string>>(new Set())
   const { isApiKeyAvailable } = useVirusTotalApiKey()
   const message = useMessageApi()
+  const { getIconConfig } = useIconConfig()
 
   // Function to handle opening the VT Augment
   const handleVtOpen = (sha256Hash) => {
@@ -409,7 +410,7 @@ const SubmissionTable = () => {
         // }
         // Lookup Icon and Color entry based on mimeType
         const mappingEntry = getIconConfig('strelka', mimeType.toLowerCase())
-        const bgColor = mappingEntry?.color || 'defaultBackgroundColor'
+        const tagColor = mappingEntry?.name || 'default'
 
         const tagStyle = {
           fontSize: '10px',
@@ -434,7 +435,7 @@ const SubmissionTable = () => {
               justifyContent: 'center',
             }}
           >
-            <Tag style={tagStyle} color={bgColor}>
+            <Tag style={tagStyle} color={tagColor}>
               {mimeType}
             </Tag>
           </div>

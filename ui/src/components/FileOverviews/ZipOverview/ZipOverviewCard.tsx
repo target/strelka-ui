@@ -8,12 +8,13 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from 'antd'
 import { useState } from 'react'
-import { antdColors } from '../../../utils/colors'
 import type { OverviewCardProps } from '../types'
 
 const { Text } = Typography
+const { useToken } = theme
 
 // Utility function to format bytes into more readable formats
 const formatBytes = (bytes, decimals = 2) => {
@@ -26,29 +27,30 @@ const formatBytes = (bytes, decimals = 2) => {
 }
 
 // Function to determine style based on compression rate
-const getCompressionRateStyle = (rate) => {
+const getCompressionRateStyle = (rate, token) => {
   if (rate > 90) {
-    return { color: antdColors.red, fontWeight: 'bold' }
+    return { color: token.colorError, fontWeight: 'bold' }
   }
 
-  return { color: antdColors.darkGreen, fontWeight: 'bold' }
+  return { color: token.green7, fontWeight: 'bold' }
 }
 
 // Function to determine extraction color based on extracted and total files
-const getExtractionColor = (extracted, total) => {
+const getExtractionColor = (extracted, total, token) => {
   if (extracted === total) {
-    return { color: antdColors.darkGreen }
+    return { color: token.green7 }
   }
 
   if (extracted > 0 && extracted < total) {
-    return { color: antdColors.deepOrange }
+    return { color: token.volcano }
   }
 
-  return { color: antdColors.red }
+  return { color: token.colorError }
 }
 
 const ZipOverviewCard = (props: OverviewCardProps) => {
   const { data } = props
+  const { token } = useToken()
   const [filter, setFilter] = useState('')
 
   // Filter files based on user input
@@ -101,7 +103,7 @@ const ZipOverviewCard = (props: OverviewCardProps) => {
           style={{
             float: 'right',
             fontSize: '12px',
-            ...getCompressionRateStyle(rate),
+            ...getCompressionRateStyle(rate, token),
           }}
         >
           {rate.toFixed(2)}%
@@ -158,7 +160,7 @@ const ZipOverviewCard = (props: OverviewCardProps) => {
 
   const extracted = data.scan.zip.total.extracted
   const total = data.scan.zip.total.files
-  const extractionColor = getExtractionColor(extracted, total)
+  const extractionColor = getExtractionColor(extracted, total, token)
 
   return (
     <div>
@@ -208,7 +210,10 @@ const ZipOverviewCard = (props: OverviewCardProps) => {
               <Text
                 style={{
                   fontSize: '12px',
-                  ...getCompressionRateStyle(data.scan.zip.compression_rate),
+                  ...getCompressionRateStyle(
+                    data.scan.zip.compression_rate,
+                    token,
+                  ),
                 }}
               >
                 {data.scan.zip.compression_rate}%
