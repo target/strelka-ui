@@ -2,9 +2,8 @@ import { CopyOutlined } from '@ant-design/icons'
 import { Modal, Spin, Tag, Typography } from 'antd'
 import { useApiKey } from '../../hooks/useApiKey'
 import { useMessageApi } from '../../providers/MessageProvider'
-import { examples } from './examples'
 
-const { Paragraph, Text } = Typography
+const { Paragraph } = Typography
 
 interface ApiKeyModalProps {
   open: boolean
@@ -45,10 +44,15 @@ export const ApiKeyModal = ({ open, onCancel }: ApiKeyModalProps) => {
         </Tag>
       </center>
       <br />
-      <Paragraph>
-        Examples of using your API key with Python requests:
+      <Paragraph style={{ textAlign: 'center' }}>
+        <a href="/api/docs" target="_blank" rel="noopener noreferrer">
+          OpenAPI Docs
+        </a>
+        &nbsp;|&nbsp;
+        <a href="/api/swagger.json" target="_blank" rel="noopener noreferrer">
+          Swagger JSON
+        </a>
       </Paragraph>
-      <Text>{examples}</Text>
     </Modal>
   )
 }
