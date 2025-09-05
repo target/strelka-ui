@@ -18,6 +18,7 @@ from strelka_ui.blueprints.auth import auth
 from strelka_ui.blueprints.strelka import strelka
 from strelka_ui.blueprints.ui import ui
 from strelka_ui.models import db
+from strelka_ui.api import api_blueprint
 
 
 def create_app() -> Flask:
@@ -54,6 +55,9 @@ def create_app() -> Flask:
     app.register_blueprint(ui)
     app.register_blueprint(auth, url_prefix="/api/auth")
     app.register_blueprint(strelka, url_prefix="/api/strelka")
+
+    # This provides Swagger UI at /api/docs
+    app.register_blueprint(api_blueprint)
 
     return app
 
