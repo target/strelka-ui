@@ -561,6 +561,7 @@ def view(user: User) -> Tuple[Dict[str, any], int]:
             FileSubmission.submitted_description.ilike(f"%{search_query}%"),
             cast(FileSubmission.yara_hits, String).ilike(f"%{search_query}%"),
             User.user_cn.ilike(f"%{search_query}%"),
+            cast(FileSubmission.hashes, String).ilike(f"%{search_query}%"),
         )
         base_query = base_query.filter(search_filter)
 
