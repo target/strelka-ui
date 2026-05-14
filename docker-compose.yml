@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - cacert
     develop:
       watch:
         - action: rebuild
@@ -41,16 +43,16 @@ services:
       - ./certs:/certs
 
   postgresdb:
-    image: hub.docker.target.com/bitnami/postgresql:17
+    image: postgres:17
     container_name: strelka-ui-postgresdb
     environment:
-      POSTGRESQL_DATABASE: strelka_ui
-      POSTGRESQL_PASSWORD: postgres
-      POSTGRESQL_USERNAME: postgres
+      POSTGRES_DB: strelka_ui
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     ports:
       - "5432:5432"
     volumes:
-      - data17:/bitnami/postgresql
+      - data17:/var/lib/postgresql/data
 
   minio:
     image: minio/minio:latest
@@ -78,3 +80,11 @@ services:
 volumes:
   data17:
   minio_data:
+
+# Pass CUSTOM_CA_CERT=/path/to/corp-ca.crt before building if your network
+# intercepts TLS (e.g. a corporate proxy). The cert is never baked into the
+# image; it is mounted ephemerally via BuildKit secrets only during build steps
+# that need network access. Leave CUSTOM_CA_CERT unset on open networks.
+secrets:
+  cacert:
+    file: ${CUSTOM_CA_CERT:-/dev/null}
