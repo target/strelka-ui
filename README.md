@@ -116,9 +116,30 @@ Supported modification fields in `./ui/src/config.js`:
 | DEFAULT_EXCLUDED_SUBMITTERS | Default users to be exluded from Submission table view. Useful for hiding automations by default. | Ex: SearchBot |
 
 #### Providing CA certificates
-If you need to provide a custom CA bundle due to your network environment, you can do so by setting the `REQUESTS_CA_BUNDLE` environment variable.
 
-When running via docker compose, the `certs` directory at the root of the project will be mounted to `/certs` in the container. Place your CA bundle in that directory and set the `REQUESTS_CA_BUNDLE` environment variable to point to it.
+If your network environment requires a custom CA bundle (e.g., a corporate TLS inspection proxy), you can supply it at both build time and runtime without committing any certificate files to the repository.
+
+**Build time** — pass the path to your CA bundle via `CUSTOM_CA_CERT` before running `docker compose build`. The certificate is mounted ephemerally using a BuildKit secret and is never written to any image layer:
+
+```bash
+CUSTOM_CA_CERT=/path/to/your/ca-bundle.crt docker compose build
+# or, combined with up:
+CUSTOM_CA_CERT=/path/to/your/ca-bundle.crt docker compose up --build
+```
+
+On open networks where no custom CA is needed, omit the variable entirely — the build degrades gracefully:
+
+```bash
+docker compose up --build
+```
+
+**Runtime** — the `certs` directory at the root of the project is mounted to `/certs` inside the running container. Place your CA bundle there and set `REQUESTS_CA_BUNDLE` (and optionally `SSL_CERT_FILE`) in `./app/strelka_ui/.env` or as a Docker environment variable:
+
+```bash
+# ./app/strelka_ui/.env
+REQUESTS_CA_BUNDLE=/certs/ca-bundle.crt
+SSL_CERT_FILE=/certs/ca-bundle.crt
+```
 
 ## API
 

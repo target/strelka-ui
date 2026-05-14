@@ -17,7 +17,12 @@ ENV REACT_APP_SEARCH_URL=$REACT_APP_SEARCH_URL
 WORKDIR /usr/src/app
 COPY ./ui/package.json ./ui/yarn.lock ./
 
-RUN yarn install
+RUN --mount=type=secret,id=cacert \
+    if [ -s /run/secrets/cacert ]; then \
+        NODE_EXTRA_CA_CERTS=/run/secrets/cacert yarn install; \
+    else \
+        yarn install; \
+    fi
 
 # Copy over the rest of the dependencies, source files, etc
 COPY ./ui .
@@ -39,8 +44,16 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=1
 ENV POETRY_VIRTUALENVS_CREATE=1
 
 # Install Poetry globally and copy project files
-RUN python3 -m pip install -U pip setuptools && \
-    python3 -m pip install poetry && \
+RUN --mount=type=secret,id=cacert \
+    if [ -s /run/secrets/cacert ]; then \
+        REQUESTS_CA_BUNDLE=/run/secrets/cacert SSL_CERT_FILE=/run/secrets/cacert \
+            python3 -m pip install -U pip setuptools && \
+        REQUESTS_CA_BUNDLE=/run/secrets/cacert SSL_CERT_FILE=/run/secrets/cacert \
+            python3 -m pip install poetry; \
+    else \
+        python3 -m pip install -U pip setuptools && \
+        python3 -m pip install poetry; \
+    fi && \
     rm -rf /root/.cache/pip
 
 # Set the working directory and copy the project files
@@ -49,7 +62,13 @@ WORKDIR /app
 # Copy only the pyproject.toml and poetry.lock files
 COPY ./app/pyproject.toml ./app/poetry.lock ./
 
-RUN poetry install --no-root
+RUN --mount=type=secret,id=cacert \
+    if [ -s /run/secrets/cacert ]; then \
+        REQUESTS_CA_BUNDLE=/run/secrets/cacert SSL_CERT_FILE=/run/secrets/cacert \
+            poetry install --no-root; \
+    else \
+        poetry install --no-root; \
+    fi
 
 COPY ./app/strelka_ui/ ./strelka_ui/
 
