@@ -1,4 +1,4 @@
-FROM node:22-slim AS ui-builder
+FROM node:26-slim AS ui-builder
 # We are using a multi-stage build as we require node for 
 # building react. 
 
