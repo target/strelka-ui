@@ -1,4 +1,4 @@
-FROM node:22-slim AS ui-builder
+FROM node:26-slim AS ui-builder
 # We are using a multi-stage build as we require node for 
 # building react. 
 
@@ -16,6 +16,8 @@ ENV REACT_APP_SEARCH_URL=$REACT_APP_SEARCH_URL
 
 WORKDIR /usr/src/app
 COPY ./ui/package.json ./ui/yarn.lock ./
+
+RUN npm install -g yarn@1.22.22
 
 RUN --mount=type=secret,id=cacert \
     if [ -s /run/secrets/cacert ]; then \
