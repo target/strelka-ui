@@ -17,6 +17,8 @@ ENV REACT_APP_SEARCH_URL=$REACT_APP_SEARCH_URL
 WORKDIR /usr/src/app
 COPY ./ui/package.json ./ui/yarn.lock ./
 
+RUN npm install -g yarn@1.22.22
+
 RUN --mount=type=secret,id=cacert \
     if [ -s /run/secrets/cacert ]; then \
         NODE_EXTRA_CA_CERTS=/run/secrets/cacert yarn install; \
