@@ -33,7 +33,7 @@
     "@biomejs/biome": "1.9.4",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^7.0.6",
-    "vitest": "^3.1.2"
+    "vitest": "^3.2.6"
   },
   "scripts": {
     "start": "vite",
