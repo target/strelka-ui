@@ -18,6 +18,7 @@
     "chroma-js": "^3.2.0",
     "dagre": "^0.8.5",
     "html-to-image": "^1.11.13",
+    "lodash": "^4.18.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^8.3.0",
@@ -43,8 +44,7 @@
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "resolutions": {
-    "lodash": "^4.17.23",
-    "lodash-es": "^4.17.23",
+    "lodash-es": "^4.18.1",
     "react-is": "^19.2.8"
   }
 }
