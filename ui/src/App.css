@@ -49,8 +49,18 @@ body {
 }
 
 /* Tag Styles */
+/* antd 6 removed the default Tag margin. Restore it so bare adjacent tags
+   don't collide. */
 .ant-tag {
   margin-inline-end: 8px;
+}
+
+/* ...but not when the parent already controls spacing via gap. Doubling up
+   there mis-spaces tag groups, and pushes full-width tags (e.g. the IOC and
+   file-type overview lists) 8px past their container. */
+.ant-space-item > .ant-tag,
+.ant-flex > .ant-tag {
+  margin-inline-end: 0;
 }
 
 @keyframes glowPurple {
