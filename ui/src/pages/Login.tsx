@@ -47,7 +47,6 @@ export const LoginPage = () => {
               onFinish={async (values: LoginFields) => {
                 await login(values.username, values.password)
               }}
-              autoComplete="off"
             >
               <Form.Item<LoginFields>
                 name="username"
@@ -58,6 +57,7 @@ export const LoginPage = () => {
                 <Input
                   prefix={<UserOutlined />}
                   placeholder="Username"
+                  autoComplete="username"
                   style={{ fontSize: '16px' }}
                 />
               </Form.Item>
@@ -70,6 +70,7 @@ export const LoginPage = () => {
                 <Input.Password
                   prefix={<KeyOutlined />}
                   placeholder="Password"
+                  autoComplete="current-password"
                   style={{ fontSize: '16px' }}
                 />
               </Form.Item>
