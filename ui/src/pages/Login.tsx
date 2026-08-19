@@ -43,7 +43,6 @@ export const LoginPage = () => {
             </div>
             <h1> Strelka Fileshot UI</h1>
             <Form
-              initialValues={{ username: '', password: '' }}
               onFinish={async (values: LoginFields) => {
                 await login(values.username, values.password)
               }}
