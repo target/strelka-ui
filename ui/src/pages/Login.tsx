@@ -1,5 +1,6 @@
 import { KeyOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Card, Form, Input, theme } from 'antd'
+import { useState } from 'react'
 import { Navigate } from 'react-router'
 import GenericLogo from '../components/GenericLogo'
 import { useAuthServices } from '../hooks/useAuthServices'
@@ -13,6 +14,7 @@ type LoginFields = {
 
 export const LoginPage = () => {
   const { isAuthenticated, login } = useAuthServices()
+  const [submitting, setSubmitting] = useState(false)
 
   const tokenData = useToken()
   const BACKGROUND = tokenData.token.geekblue1
@@ -44,7 +46,12 @@ export const LoginPage = () => {
             <h1> Strelka Fileshot UI</h1>
             <Form
               onFinish={async (values: LoginFields) => {
-                await login(values.username, values.password)
+                setSubmitting(true)
+                try {
+                  await login(values.username, values.password)
+                } finally {
+                  setSubmitting(false)
+                }
               }}
             >
               <Form.Item<LoginFields>
@@ -78,6 +85,7 @@ export const LoginPage = () => {
                   type="primary"
                   htmlType="submit"
                   size="large"
+                  loading={submitting}
                   style={{ width: '100%' }}
                 >
                   Login
