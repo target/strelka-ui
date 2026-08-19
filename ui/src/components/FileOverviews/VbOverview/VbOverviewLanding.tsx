@@ -5,11 +5,7 @@ import VbOverviewCard from './VbOverviewCard'
 const VbOverviewLanding = (props: OverviewLandingProps) => {
   const { selectedNodeData, expanded, onExpandChange } = props
 
-  if (
-    !selectedNodeData ||
-    !selectedNodeData.scan ||
-    !selectedNodeData.scan.vb
-  ) {
+  if (!selectedNodeData?.scan?.vb) {
     return null
   }
 

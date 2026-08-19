@@ -34,7 +34,7 @@ const JavascriptOverviewCard = (props: OverviewCardProps) => {
   }
 
   const renderJavascriptSection = (title: string, key: string) => {
-    if (!data.scan.javascript || !data.scan.javascript[key]) {
+    if (!data.scan.javascript?.[key]) {
       return null // Return null or handle the case where key doesn't exist
     }
 

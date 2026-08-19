@@ -1,5 +1,4 @@
-import { Collapse, Tag, Typography } from 'antd'
-import { theme } from 'antd'
+import { Collapse, Tag, Typography, theme } from 'antd'
 import { useState } from 'react'
 import type { ScanData } from '../types'
 import YaraTypeOverviewCard from './YaraTypeOverviewCard'

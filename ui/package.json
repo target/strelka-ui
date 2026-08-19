@@ -5,35 +5,32 @@
   "type": "module",
   "homepage": "/",
   "dependencies": {
-    "@ant-design/icons": "^6.0.0",
-    "@ant-design/pro-form": "^2.25.1",
-    "@ant-design/pro-layout": "^7.19.0",
-    "@ant-design/v5-patch-for-react-19": "^1.0.3",
-    "@microlink/react-json-view": "^1.24.0",
-    "@tanstack/react-query": "^5.64.1",
-    "@tanstack/react-query-devtools": "^5.64.1",
-    "@types/chroma-js": "^3.1.1",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "@xyflow/react": "^12.4.0",
-    "antd": "^5.22.5",
-    "axios": "^1.12.0",
-    "chroma-js": "^3.1.2",
+    "@ant-design/icons": "^6.3.2",
+    "@microlink/react-json-view": "^1.31.28",
+    "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-query-devtools": "^5.101.4",
+    "@types/chroma-js": "^3.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@xyflow/react": "^12.11.3",
+    "antd": "^6.6.0",
+    "axios": "^1.19.0",
+    "chroma-js": "^3.2.0",
     "dagre": "^0.8.5",
-    "html-to-image": "^1.11.11",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-router": "^7.5.2",
-    "recharts": "^3.1.2",
-    "styled-components": "^6.1.1",
-    "typescript": "^5.7.2",
-    "vite-plugin-checker": "^0.10.2"
+    "html-to-image": "^1.11.13",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router": "^8.3.0",
+    "recharts": "^3.10.1",
+    "styled-components": "^6.5.3",
+    "typescript": "^5.9.3",
+    "vite-plugin-checker": "^0.14.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^7.0.6",
-    "vitest": "^3.2.6"
+    "@biomejs/biome": "2.5.8",
+    "@vitejs/plugin-react": "^6.0.5",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.11"
   },
   "scripts": {
     "start": "vite",
@@ -42,15 +39,12 @@
     "serve": "vite preview",
     "test": "vitest && yarn lint --fix",
     "lint": "biome check ./src",
-    "format": "biome check --organize-imports-enabled=true --write"
+    "format": "biome check --write"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "resolutions": {
     "lodash": "^4.17.23",
     "lodash-es": "^4.17.23",
-    "rollup": "^4.59.0",
-    "picomatch": "^4.0.4",
-    "path-to-regexp": "^8.4.0",
-    "postcss": "^8.5.10"
+    "react-is": "^19.2.8"
   }
 }
