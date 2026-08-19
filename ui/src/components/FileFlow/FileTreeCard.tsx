@@ -1,13 +1,13 @@
 import {
+  applyEdgeChanges,
+  applyNodeChanges,
   Background,
   Controls,
   type Edge,
+  isNode,
   MiniMap,
   type Node,
   ReactFlow,
-  applyEdgeChanges,
-  applyNodeChanges,
-  isNode,
   useEdgesState,
   useNodesState,
   useReactFlow,
@@ -17,21 +17,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IndexConnectEdge } from './EdgeTypes/IndexConnectEdge'
 import EventNode from './NodeTypes/EventNode'
 import '@xyflow/react/dist/style.css'
+
+import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
+import type { StrelkaResponse } from '../../services/api.types'
 import ClickGuide from '../../utils/ClickGuide'
 import DownloadImage from '../../utils/DownloadImage'
-import ExceededGuide from '../../utils/ExceededGuide'
-import NodeSearchPanel from '../../utils/NodeSearchPanel'
-import ShowFileListing from '../../utils/ShowFileListing'
 import { getDagreLayout } from '../../utils/dagreLayout'
+import ExceededGuide from '../../utils/ExceededGuide'
+import { useIconConfig } from '../../utils/iconMappingTable.js'
+import type { StrelkaNodeData } from '../../utils/indexDataUtils'
 import {
   toggleChildrenVisibility,
   transformElasticSearchDataToElements,
 } from '../../utils/layoutUtils.js'
-
-import { useDarkModeSetting } from '../../hooks/useDarkModeSetting'
-import type { StrelkaResponse } from '../../services/api.types'
-import { useIconConfig } from '../../utils/iconMappingTable.js'
-import type { StrelkaNodeData } from '../../utils/indexDataUtils'
+import NodeSearchPanel from '../../utils/NodeSearchPanel'
+import ShowFileListing from '../../utils/ShowFileListing'
 
 const { useToken } = theme
 

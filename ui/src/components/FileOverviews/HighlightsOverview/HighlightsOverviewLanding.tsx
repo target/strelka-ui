@@ -2,6 +2,7 @@ import { Collapse, Tag, Typography, theme } from 'antd'
 import { useState } from 'react'
 import type { ScanData } from '../types'
 import HighlightsOverviewCard from './HighlightsOverviewCard.tsx'
+
 const { Text } = Typography
 
 interface HighlightsOverviewLandingProps extends ScanData {

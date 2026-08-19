@@ -1,8 +1,8 @@
-import { Space, Tag, Tooltip, Typography } from 'antd'
-import { theme } from 'antd'
+import { Space, Tag, Tooltip, Typography, theme } from 'antd'
 import { useState } from 'react'
 import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { FileIocsOverviewProps } from '../types'
+
 const { useToken } = theme
 const { Text } = Typography
 
@@ -193,16 +193,14 @@ const FileIocsOverviewCard = (props: FileIocsOverviewProps) => {
           </p>
         </div>
       ) : (
-        <>
-          {Object.entries(iocTypeLabels)
-            .filter(([iocType]) => iocData.some((ioc) => ioc.type === iocType)) // Filter out the IOC types that have no data
-            .map(([iocType, _label]) => {
-              const iocsForType = iocData.filter(
-                (iocData) => iocData.type === iocType,
-              )
-              return renderSection(iocType, iocsForType)
-            })}
-        </>
+        Object.entries(iocTypeLabels)
+          .filter(([iocType]) => iocData.some((ioc) => ioc.type === iocType)) // Filter out the IOC types that have no data
+          .map(([iocType, _label]) => {
+            const iocsForType = iocData.filter(
+              (iocData) => iocData.type === iocType,
+            )
+            return renderSection(iocType, iocsForType)
+          })
       )}
     </div>
   )

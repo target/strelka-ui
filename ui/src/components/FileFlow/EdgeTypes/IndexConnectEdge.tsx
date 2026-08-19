@@ -1,8 +1,8 @@
 import {
   BaseEdge,
   EdgeLabelRenderer,
-  type Position,
   getBezierPath,
+  type Position,
 } from '@xyflow/react'
 import { theme } from 'antd'
 import styled from 'styled-components'

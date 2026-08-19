@@ -17,18 +17,17 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
+import { debounce } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router'
-
+import { APP_CONFIG } from '../config'
+import { useSearchScans } from '../hooks/useSearchScans'
 import { useVirusTotalApiKey } from '../hooks/useVirusTotalApiKey'
 import { useMessageApi } from '../providers/MessageProvider'
+import { resubmitFile } from '../services/api'
 import { useIconConfig } from '../utils/iconMappingTable'
 import VirusTotalAugmentDrawer from './VirusTotal/VirusTotalAugmentDrawer'
 
-import { debounce } from 'lodash'
-import { APP_CONFIG } from '../config'
-import { useSearchScans } from '../hooks/useSearchScans'
-import { resubmitFile } from '../services/api'
 const { Text } = Typography
 /**
  * A table component for displaying submission data.

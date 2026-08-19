@@ -1,4 +1,5 @@
 import { Card, Typography, theme } from 'antd'
+
 const { Text, Paragraph } = Typography
 
 const ClickGuide = () => {

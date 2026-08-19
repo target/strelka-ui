@@ -66,10 +66,11 @@ const SevenZipOverviewCard = ({ data }) => {
       key: 'size',
       render: (size) => (
         <Text style={{ float: 'right', fontSize: '12px' }}>
-          {formatBytes(Number.parseInt(size))}
+          {formatBytes(Number.parseInt(size, 10))}
         </Text>
       ),
-      sorter: (a, b) => Number.parseInt(a.size) - Number.parseInt(b.size),
+      sorter: (a, b) =>
+        Number.parseInt(a.size, 10) - Number.parseInt(b.size, 10),
       width: 100,
     },
     {

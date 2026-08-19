@@ -1,3 +1,4 @@
+import * as colors from '@ant-design/colors'
 import {
   CalculatorOutlined,
   CodeOutlined,
@@ -24,11 +25,9 @@ import {
   SafetyCertificateOutlined,
   TableOutlined,
 } from '@ant-design/icons'
-
-import * as colors from '@ant-design/colors'
+import { theme } from 'antd'
 import { useCallback, useMemo } from 'react'
 
-import { theme } from 'antd'
 const { useToken } = theme
 
 //import { antdColors } from './colors'

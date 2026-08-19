@@ -1,9 +1,9 @@
 import type { Edge, Node } from '@xyflow/react'
 import type { StrelkaResponse } from '../services/api.types'
 import {
-  type StrelkaNodeData,
   indexDataType,
   indexNodeType,
+  type StrelkaNodeData,
 } from './indexDataUtils'
 
 // Recursive function to count all descendants of a node under the same INDEX
