@@ -30,7 +30,7 @@ jinja2 = "^3.1.6"
 boto3 = "^1.40.2"
 brotli = "^1.2.0"
 mako = "^1.3.12"
-pyasn1 = "^0.6.2"
+pyasn1 = "^0.6.4"
 urllib3 = "^2.6.3"
 werkzeug = "^3.1.5"
 
