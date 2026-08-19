@@ -1,6 +1,8 @@
 import { Space, Tag, Tooltip, Typography, theme } from 'antd'
 import { useState } from 'react'
+
 const { useToken } = theme
+
 import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { ScanData } from '../types'
 

@@ -103,7 +103,7 @@ const VirusTotalUploader = (props: VirusTotalUploaderProps) => {
           style={{ fontSize: '12px' }}
         />
       </Form.Item>
-      <Form.Item style={{ float: 'right', marginBottom: '0px' }}>
+      <Form.Item style={{ textAlign: 'right', marginBottom: '0px' }}>
         <Button type="primary" onClick={handleSubmitVtHash} loading={loading}>
           Submit Hash
         </Button>

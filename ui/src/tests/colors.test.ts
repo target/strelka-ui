@@ -1,6 +1,6 @@
+import { PresetColors } from 'antd/lib/theme/interface/presetColors'
 import { expect, test } from 'vitest'
 import { getColorForString } from '../utils/colors'
-import { PresetColors } from 'antd/lib/theme/interface/presetColors'
 
 test('should return a color for a given string', () => {
   const input = 'test'

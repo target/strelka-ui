@@ -4,10 +4,10 @@ body {
   padding: 0;
 }
 
-html,
-body {
-  overflow-y: auto !important;
-  width: 100% !important;
+:root,
+:root body {
+  overflow-y: auto;
+  width: 100%;
 }
 
 /* Layout Styles */
@@ -43,8 +43,19 @@ body {
 .ant-card,
 .submission-card-height,
 .ant-collapse-item {
-  box-shadow: -1px 4px 6px -1px rgba(0, 0, 0, 0.1), -1px -2px 4px -1px
-    rgba(0, 0, 0, 0.06);
+  box-shadow:
+    -1px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    -1px -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Tag Styles */
+.ant-tag {
+  margin-inline-end: 8px;
+}
+
+.ant-space-item > .ant-tag,
+.ant-flex > .ant-tag {
+  margin-inline-end: 0;
 }
 
 @keyframes glowPurple {

@@ -1,7 +1,6 @@
 import { Layout, Typography } from 'antd'
-import styled from 'styled-components'
-
 import type { ReactNode } from 'react'
+import styled from 'styled-components'
 
 const { Title, Text } = Typography
 const { Content } = Layout

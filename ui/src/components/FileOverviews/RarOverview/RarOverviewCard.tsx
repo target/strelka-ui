@@ -12,6 +12,7 @@ import {
 } from 'antd'
 import { useState } from 'react'
 import type { OverviewCardProps } from '../types'
+
 const { useToken } = theme
 
 const { Text } = Typography
@@ -68,11 +69,11 @@ const RarOverviewCard = (props: OverviewCardProps) => {
       key: 'file_size',
       render: (size) => (
         <Text style={{ float: 'right', fontSize: '12px' }}>
-          {formatBytes(Number.parseInt(size))}
+          {formatBytes(Number.parseInt(size, 10))}
         </Text>
       ),
       sorter: (a, b) =>
-        Number.parseInt(a.file_size) - Number.parseInt(b.file_size),
+        Number.parseInt(a.file_size, 10) - Number.parseInt(b.file_size, 10),
       width: 100,
     },
     {

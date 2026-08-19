@@ -8,6 +8,7 @@ import { Tag, Tooltip, Typography, theme } from 'antd'
 import { useEffect, useState } from 'react'
 import { useIconConfig } from '../../../utils/iconMappingTable'
 import type { ScanData } from '../types'
+
 const { useToken } = theme
 
 const { Text } = Typography

@@ -17,11 +17,6 @@
   padding: 4px 0;
 }
 
-/* Label for Exif data entry */
-.exif-data-entry Text {
-  margin-right: 4px;
-}
-
 /* Line number for Exif data entry */
 .line-number {
   text-align: right;

@@ -19,6 +19,7 @@ const App = () => {
   return (
     <div className="App">
       <ConfigProvider
+        tag={{ variant: 'outlined' }}
         theme={{
           ...themeConfig,
           algorithm:

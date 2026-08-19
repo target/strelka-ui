@@ -17,11 +17,6 @@
   padding: 4px 0;
 }
 
-/* Label for IOC data entry */
-.ioc-data-entry Text {
-  margin-right: 4px;
-}
-
 /* Line number for IOC data entry */
 .line-number {
   text-align: right;
