@@ -1,14 +1,20 @@
 import { KeyOutlined, UserOutlined } from '@ant-design/icons'
-import ProForm, { ProFormText } from '@ant-design/pro-form'
-import { Card, theme } from 'antd'
+import { Button, Card, Form, Input, theme } from 'antd'
+import { useState } from 'react'
 import { Navigate } from 'react-router'
 import GenericLogo from '../components/GenericLogo'
 import { useAuthServices } from '../hooks/useAuthServices'
 
 const { useToken } = theme
 
+type LoginFields = {
+  username: string
+  password: string
+}
+
 export const LoginPage = () => {
   const { isAuthenticated, login } = useAuthServices()
+  const [submitting, setSubmitting] = useState(false)
 
   const tokenData = useToken()
   const BACKGROUND = tokenData.token.geekblue1
@@ -38,57 +44,54 @@ export const LoginPage = () => {
               <GenericLogo />
             </div>
             <h1> Strelka Fileshot UI</h1>
-            <ProForm
-              onFinish={async (values) => {
-                await login(values.username, values.password)
+            <Form
+              onFinish={async (values: LoginFields) => {
+                setSubmitting(true)
+                try {
+                  await login(values.username, values.password)
+                } finally {
+                  setSubmitting(false)
+                }
               }}
-              submitter={{
-                searchConfig: {
-                  submitText: 'Login',
-                },
-                render: (_, dom) => dom.pop(),
-                submitButtonProps: {
-                  type: 'primary',
-                  size: 'large',
-                  style: {
-                    width: '100%',
-                  },
-                },
-              }}
-              isKeyPressSubmit={true}
             >
-              <ProFormText
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined />,
-                  autoComplete: 'username',
-                }}
+              <Form.Item<LoginFields>
                 name="username"
-                placeholder="Username"
                 rules={[
-                  {
-                    required: true,
-                    message: 'Please enter your username',
-                  },
+                  { required: true, message: 'Please enter your username' },
                 ]}
-              />
-
-              <ProFormText.Password
-                fieldProps={{
-                  size: 'large',
-                  prefix: <KeyOutlined />,
-                  autoComplete: 'current-password',
-                }}
+              >
+                <Input
+                  prefix={<UserOutlined />}
+                  placeholder="Username"
+                  autoComplete="username"
+                  style={{ fontSize: '16px' }}
+                />
+              </Form.Item>
+              <Form.Item<LoginFields>
                 name="password"
-                placeholder="Password"
                 rules={[
-                  {
-                    required: true,
-                    message: 'Please enter your password',
-                  },
+                  { required: true, message: 'Please enter your password' },
                 ]}
-              />
-            </ProForm>
+              >
+                <Input.Password
+                  prefix={<KeyOutlined />}
+                  placeholder="Password"
+                  autoComplete="current-password"
+                  style={{ fontSize: '16px' }}
+                />
+              </Form.Item>
+              <Form.Item label={null} style={{ marginBottom: 0 }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={submitting}
+                  style={{ width: '100%' }}
+                >
+                  Login
+                </Button>
+              </Form.Item>
+            </Form>
           </Card>
         </div>
       )}

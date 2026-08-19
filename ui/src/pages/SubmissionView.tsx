@@ -2,8 +2,7 @@ import { ReloadOutlined } from '@ant-design/icons'
 import { Button, Col, Row, Spin, Tag } from 'antd'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-
-import PageWrapper from '../components/PageWrapper'
+import FileTreeCardWithProvider from '../components/FileFlow/FileTreeCardWithProvider'
 
 import FileIocsOverviewLanding from '../components/FileOverviews/FileIocsOverview/FileIocsOverviewLanding'
 import FileTypeOverviewLanding from '../components/FileOverviews/FileTypeOverview/FileTypeOverviewLanding'
@@ -11,8 +10,7 @@ import HeaderLanding from '../components/FileOverviews/HeaderOverview/HeaderLand
 import HighlightsOverviewLanding from '../components/FileOverviews/HighlightsOverview/HighlightsOverviewLanding'
 import JsonViewLanding from '../components/FileOverviews/JsonView/JsonViewLanding'
 import YaraOverviewLanding from '../components/FileOverviews/YaraOverview/YaraOverviewLanding'
-
-import FileTreeCardWithProvider from '../components/FileFlow/FileTreeCardWithProvider'
+import PageWrapper from '../components/PageWrapper'
 
 import VirusTotalAugmentDrawer from '../components/VirusTotal/VirusTotalAugmentDrawer'
 
@@ -20,11 +18,10 @@ import { useIconConfig } from '../utils/iconMappingTable'
 
 import '../styles/IconContainer.css'
 
-import { useFetchScanById } from '../hooks/useFetchScanById'
+import { CollapseCard } from '../components/CollapseCard'
 
 import { NodeDetailsDrawer } from '../components/NodeDetailsDrawer'
-
-import { CollapseCard } from '../components/CollapseCard'
+import { useFetchScanById } from '../hooks/useFetchScanById'
 import { useMessageApi } from '../providers/MessageProvider'
 import { resubmitFile } from '../services/api'
 import type { StrelkaResponse } from '../services/api.types'

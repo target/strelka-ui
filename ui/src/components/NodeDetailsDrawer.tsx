@@ -1,3 +1,5 @@
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Col, Drawer, Flex, Typography } from 'antd'
 import { useState } from 'react'
 import EmailOverviewLanding from './FileOverviews/EmailOverview/EmailOverviewLanding'
 import EncryptedZipOverviewLanding from './FileOverviews/EncryptedZipOverview/EncryptedZipOverviewLanding'
@@ -17,10 +19,8 @@ import SubmissionIocsLanding from './FileOverviews/SubmissionIocs/SubmissionIocs
 import FileTlshLanding from './FileOverviews/TlshOverview/TlshLanding'
 import VbOverviewLanding from './FileOverviews/VbOverview/VbOverviewLanding'
 import XmlOverviewLanding from './FileOverviews/XmlOverview/XmlOverviewLanding'
-
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Drawer, Flex, Typography } from 'antd'
 import ZipOverviewLanding from './FileOverviews/ZipOverview/ZipOverviewLanding'
+
 const { Text } = Typography
 
 export const NodeDetailsDrawer = ({

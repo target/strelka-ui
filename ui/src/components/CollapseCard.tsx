@@ -1,5 +1,6 @@
 import { Collapse, Flex, Tag, Typography } from 'antd'
 import type { ReactNode } from 'react'
+
 const { Text } = Typography
 
 interface TagData {

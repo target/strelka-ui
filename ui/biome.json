@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -7,14 +7,16 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["build/**/*", ".vscode/**/*"],
-    "include": [
-      "src/**/*",
-      "public/**/*",
-      "vite.config.ts",
-      "tsconfig.json",
-      "biome.json",
-      "package.json"
+    "includes": [
+      "**/src/**/*",
+      "**/public/**/*",
+      "**/vite.config.ts",
+      "**/tsconfig.json",
+      "**/biome.json",
+      "**/package.json",
+      "!**/*.svg",
+      "!**/build/**/*",
+      "!**/.vscode/**/*"
     ]
   },
   "formatter": {
@@ -22,16 +24,15 @@
     "indentStyle": "space",
     "indentWidth": 2
   },
-  "organizeImports": {
-    "enabled": false
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "a11y": {
         "useKeyWithClickEvents": "off",
-        "noSvgWithoutTitle": "off"
+        "noSvgWithoutTitle": "off",
+        "noStaticElementInteractions": "off"
       }
     }
   },

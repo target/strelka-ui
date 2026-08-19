@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { APP_CONFIG } from '../config'
 import type {
   ApiKeyCheckResponse,
   AuthApiKeyResponse,
@@ -11,8 +12,6 @@ import type {
   SearchScanResponse,
   StatusResponse,
 } from './api.types'
-
-import { APP_CONFIG } from '../config'
 
 /**
  * The Axios client instance.

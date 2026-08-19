@@ -1,13 +1,12 @@
 import ReactJson from '@microlink/react-json-view'
+import { useQuery } from '@tanstack/react-query'
 import { Flex, Input } from 'antd'
 import { useState } from 'react'
 import { useDarkModeSetting } from '../../../hooks/useDarkModeSetting'
 import { useLocalStorage } from '../../../hooks/useLocalStorage'
-import JsonThemeSelect from './JsonThemeSelect'
 
 import type { OverviewCardProps } from '../types'
-
-import { useQuery } from '@tanstack/react-query'
+import JsonThemeSelect from './JsonThemeSelect'
 
 const JsonViewCard = (props: OverviewCardProps) => {
   const { data: json } = props
