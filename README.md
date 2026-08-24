@@ -31,7 +31,7 @@ The file submission UI provides the following features:
 - Accessible Strelka instance (See: [Strelka Quickstart](https://github.com/target/strelka#quickstart))
 - Docker
 - Docker-compose
-- Python 3.9+
+- Python 3.10+
 
 ## Quick Start
 
@@ -80,7 +80,7 @@ Please reference `./app/example.env` for environment variable setup.
 The following detail the configuration items in `./app/config/config.py`.
 
 | Field Name                              | Value                                                                   | Required |
-|-----------------------------------------|-------------------------------------------------------------------------| -------- |
+| --------------------------------------- | ----------------------------------------------------------------------- | -------- |
 | STRELKA_HOST                            | Strelka hostname (e.g., `0.0.0.0`)                                      | Yes      |
 | STRELKA_PORT                            | Strelka port number (e.g., `57314`)                                     | Yes      |
 | STRELKA_CERT                            | Path to certificate for Strelka, if needed (e.g., `/path/to/cert.pem`)  | No       |
