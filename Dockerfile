@@ -34,7 +34,7 @@ RUN yarn run build
 
 # Since we are serving it all from python, switch over to 
 # a more appropriate base image.
-FROM python:3.10-slim as strelka-oss-runner
+FROM python:3.14-slim as strelka-oss-runner
 
 RUN apt-get -y update
 RUN apt-get install -y build-essential libpq-dev libmagic1
