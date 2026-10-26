@@ -15,7 +15,7 @@
     "@types/react-dom": "^19.2.4",
     "@xyflow/react": "^12.11.3",
     "antd": "^6.6.0",
-    "axios": "^1.19.0",
+    "axios": "^1.20.0",
     "chroma-js": "^3.2.0",
     "dagre": "^0.8.5",
     "html-to-image": "^1.11.13",
