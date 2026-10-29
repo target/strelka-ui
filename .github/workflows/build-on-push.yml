@@ -9,3 +9,5 @@ jobs:
       - uses: actions/checkout@master
       - name: Builds Strelka
         run: docker compose build
+        env:
+          COMPOSE_BAKE: "false"
