@@ -11,3 +11,4 @@ jobs:
         run: docker compose build
         env:
           COMPOSE_BAKE: "false"
+          BUILDX_BAKE_ENTITLEMENTS_FS: "0"
